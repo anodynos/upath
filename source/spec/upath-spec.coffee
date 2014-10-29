@@ -40,13 +40,13 @@ describe "\n# upath v#{VERSION}", ->
   ## Added methods
   """, ->
     describe """\n
-      ### `upath.normalizeSafe(path)`
+      #### `upath.normalizeSafe(path)`
 
-      Exactly like `path.normalize(path)`, but it keeps the first meaningful `'./'`.
+      Exactly like `path.normalize(path)`, but it keeps the first meaningful `./`.
 
-      Note that the unix `'/'` is returned everywhere, so windows '\\' is always converted to unix '/'.
+      Note that the unix `/` is returned everywhere, so windows `\\` is always converted to unix `/`.
 
-      #### Examples / specs & how it differs from vanilla `path`
+      ##### Examples / specs & how it differs from vanilla `path`
 
           `upath.normalizeSafe(path)`        --returns-->\n
       """, ->
@@ -86,17 +86,17 @@ describe "\n# upath v#{VERSION}", ->
 
     **Happy notes:**
 
-      * All methods support '.ext' & 'ext' - the dot '.' on the extension is always adjusted correctly.
+      * All methods support `.ext` & `ext` - the dot `.` on the extension is always adjusted correctly.
 
-      * You can omit the `'ext'` param in all methods (or pass null/undefined) and the common sense thing will happen.
+      * You can omit the `ext` param in all methods (or pass null/undefined) and the common sense thing will happen.
     """, ->
 
     describe """ \n
-    ### `upath.addExt(filename, [ext])`
+    #### `upath.addExt(filename, [ext])`
 
     Adds `.ext` to `filename`, but only if it doesn't already have the exact extension.
 
-    #### Examples / specs
+    ##### Examples / specs
 
         `upath.addExt(filename, 'js')`     --returns-->\n
     """, ->
@@ -128,11 +128,11 @@ describe "\n# upath v#{VERSION}", ->
               equal upath.addExt(input), input
 
     describe """\n
-    ### `upath.trimExt(filename)`
+    #### `upath.trimExt(filename)`
 
     Trims a filename's extension.
 
-    #### Examples / specs
+    ##### Examples / specs
 
         `upath.trimExt(filename)`          --returns-->\n
     """, ->
@@ -148,11 +148,11 @@ describe "\n# upath v#{VERSION}", ->
               equal upath.trimExt(input), expected
 
     describe """\n
-    ### `upath.changeExt(filename, [ext])`
+    #### `upath.changeExt(filename, [ext])`
 
     Changes a filename's extension to `ext`. If it has no extension, it adds it.
 
-    #### Examples / specs
+    ##### Examples / specs
 
         `upath.changeExt(filename, 'js')`  --returns-->\n
     """, ->
@@ -170,7 +170,7 @@ describe "\n# upath v#{VERSION}", ->
 
 
       describe """\n
-      If no `ext` param is is given, it trims the current extension (if any).
+      If no `ext` param is given, it trims the current extension (if any).
 
           `upath.changeExt(filename)`        --returns-->\n
       """, ->
@@ -180,15 +180,15 @@ describe "\n# upath v#{VERSION}", ->
               equal upath.changeExt(input), upath.trimExt expected
 
     describe """\n
-    ### `upath.defaultExt(file, [ext], [ignoreExts], [maxSize=6])`
+    #### `upath.defaultExt(filename, [ext], [ignoreExts], [maxSize=6])`
 
-    Adds `.ext` to a filename, only if it doesn't already have _any_ old extension.
+    Adds `.ext` to `filename`, only if it doesn't already have _any_ *old* extension.
 
-      * Old extensions can be an `Array` of `ignoreExts` (eg [`.min`]), adding the default `.ext` even if one of these is present.
+      * (Old) extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 6).
 
-      * Old extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 6).
+      * An `Array` of `ignoreExts` (eg [`.min`]) will force adding default `.ext` even if one of these is present.
 
-    #### Examples / specs
+    ##### Examples / specs
 
         `upath.defaultExt(filename, 'js')`   --returns-->\n
     """, ->
@@ -216,7 +216,7 @@ describe "\n# upath v#{VERSION}", ->
               equal upath.defaultExt(input), input
 
       describe """\n
-      It is ignoring '.min' & '.dev' as extensions, and considers exts with up to 8 chars (incl dot) as extensions.
+      It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars (incl dot) as extensions.
 
           `upath.defaultExt(filename, 'js', ['min', 'dev'], 8)` --returns-->\n
       """, ->
