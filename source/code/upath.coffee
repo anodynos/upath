@@ -4,28 +4,31 @@ path = require 'path'
 
 upath = exports
 
-upath.VERSION = VERSION
+upath.VERSION = VERSION # inject by grunt-concat
 
 for fName, fn of path when _.isFunction fn
   upath[fName] = do (fName)->
-    (p...)->
-      res = path[fName] p...
-      if _.isString res
-        res.replace /\\/g, '/'
-      else
-        res
+    (args...)->
+      args = _.map args, (p)-> if !_.isString(p) then p else p.replace /\\/g, '/'
+      path[fName] args...
 
 extraFunctions =
 
-  normalizeSafe: (path)->
-    path = path.replace /\\/g, '/'
-    if _.startsWith path, './'
-      if _.startsWith(path, './..') or (path is './')
-        upath.normalize(path)
+  normalizeSafe: (p)->
+    if _.startsWith p, './'
+      if _.startsWith(p, './..') or (p is './')
+        upath.normalize(p)
       else
-        './' + upath.normalize(path)
+        './' + upath.normalize(p)
     else
-      upath.normalize(path)
+      upath.normalize(p)
+
+  normalizeTrim: (p)->
+    p = upath.normalizeSafe p
+    if _.endsWith(p, '/')
+      p[0..p.length-2]
+    else
+      p
 
   addExt: (file, ext)->
     if not ext
