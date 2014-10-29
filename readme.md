@@ -140,7 +140,7 @@ Trims a filename's extension.
 
   * Extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
 
-  * An `Array` of `ignoreExts` (eg [`.min`]) prevents these from being considered as extension, thus are not trimmed.
+  * An `Array` of `ignoreExts` (eg `['.min']`) prevents these from being considered as extension, thus are not trimmed.
 
 ##### Examples / specs
 
@@ -170,7 +170,7 @@ Changes a filename's extension to `ext`. If it has no (valid) extension, it adds
 
   * Valid extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
 
-  * An `Array` of `ignoreExts` (eg [`.min`]) prevents these from being considered as extension, thus are not changed - the new extension is added instead.
+  * An `Array` of `ignoreExts` (eg `['.min']`) prevents these from being considered as extension, thus are not changed - the new extension is added instead.
 
 ##### Examples / specs
 
@@ -211,7 +211,7 @@ Adds `.ext` to `filename`, only if it doesn't already have _any_ *old* extension
 
   * (Old) extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
 
-  * An `Array` of `ignoreExts` (eg [`.min`]) will force adding default `.ext` even if one of these is present.
+  * An `Array` of `ignoreExts` (eg `['.min']`) will force adding default `.ext` even if one of these is present.
 
 ##### Examples / specs
 

@@ -251,7 +251,7 @@ describe "\n# upath v#{VERSION}", ->
 
       * Extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
 
-      * An `Array` of `ignoreExts` (eg [`.min`]) prevents these from being considered as extension, thus are not trimmed.
+      * An `Array` of `ignoreExts` (eg `['.min']`) prevents these from being considered as extension, thus are not trimmed.
 
     ##### Examples / specs
 
@@ -289,7 +289,7 @@ describe "\n# upath v#{VERSION}", ->
 
       * Valid extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
 
-      * An `Array` of `ignoreExts` (eg [`.min`]) prevents these from being considered as extension, thus are not changed - the new extension is added instead.
+      * An `Array` of `ignoreExts` (eg `['.min']`) prevents these from being considered as extension, thus are not changed - the new extension is added instead.
 
     ##### Examples / specs
 
@@ -342,7 +342,7 @@ describe "\n# upath v#{VERSION}", ->
 
       * (Old) extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
 
-      * An `Array` of `ignoreExts` (eg [`.min`]) will force adding default `.ext` even if one of these is present.
+      * An `Array` of `ignoreExts` (eg `['.min']`) will force adding default `.ext` even if one of these is present.
 
     ##### Examples / specs
 
