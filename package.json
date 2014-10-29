@@ -1,0 +1,64 @@
+{
+  "name": "upath",
+  "description": "A proxy to `path`, replacing `\\` with `/` for all results & methods to add, change, default, trim file extensions.",
+  "version": "0.1.0",
+  "homepage": "http://github.com/anodynos/upath/",
+  "author": {
+    "name": "Agelos Pikoulas",
+    "email": "agelos.pikoulas@gmail.com"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ],
+  "keywords": [
+    "path",
+    "unix",
+    "windows",
+    "extension",
+    "file extension",
+    "replace extension",
+    "change extension",
+    "trim extension",
+    "add extension",
+    "default extension"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/anodynos/upath"
+  },
+  "bugs": {
+    "url": "http://github.com/anodynos/upath/issues",
+    "email": "agelos.pikoulas@gmail.com"
+  },
+  "main": "./build/code/upath.js",
+  "preferGlobal": false,
+  "scripts": {
+    "test": "grunt"
+  },
+  "directories": {
+    "doc": "./doc",
+    "dist": "./build"
+  },
+  "engines": {
+    "node": "0.8.x",
+    "node": "0.10.x"
+  },
+  "dependencies": {
+    "lodash": "*",
+    "underscore.string": "^2.3.0"
+  },
+  "devDependencies": {
+    "chai": "^1.9.0",
+    "coffee-script": "^1.8.0",
+    "mocha": "^2.0.0",
+    "grunt": "0.4.x",
+    "grunt-contrib-clean": "0.4.x",
+    "grunt-contrib-concat": "0.1.x",
+    "grunt-shell": "~0.3.x",
+    "grunt-contrib-watch": "~0.5.x",
+    "uberscore": "0.0.16"
+  }
+}
