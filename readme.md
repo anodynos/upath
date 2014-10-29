@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/anodynos/upath.svg?branch=master)](https://travis-ci.org/anodynos/upath)
 [![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath.png)
 
-A proxy to nodejs's `path` that:
+A drop-in replacement / proxy to nodejs's `path` that:
 
   * Replaces the windows `\` with the unix `/` in all string results.
 
