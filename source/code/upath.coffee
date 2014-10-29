@@ -37,20 +37,35 @@ extraFunctions =
       ext = '.' + ext if ext[0] isnt '.'
       file + if _.endsWith(file, ext) then '' else ext
 
-  trimExt: (file)->
-    file[0..(file.length - upath.extname(file).length)-1]
-
-  changeExt: (file, ext)->
-    upath.trimExt(file) + if not ext then '' else if ext[0] is '.' then ext else '.' + ext
-
-
-  defaultExt: (file, ext, ignoreExts, maxSize=6)->
-    oldExt = upath.extname file
-    if ((oldExt) and (oldExt.length <= maxSize)) and
-        (oldExt not in _.map(ignoreExts, (e)-> (if e and (e[0] isnt '.') then '.' else '') + e))
-      file
+  trimExt: (filename, ignoreExts, maxSize=7)->
+    oldExt = upath.extname filename
+    if isValidExt oldExt, ignoreExts, maxSize
+      filename[0..(filename.length - oldExt.length)-1]
     else
-      upath.addExt file, ext
+      filename
+
+  changeExt: (filename, ext, ignoreExts, maxSize=7)->
+    upath.trimExt(filename, ignoreExts, maxSize) +
+      if not ext
+        ''
+      else
+        if ext[0] is '.'
+          ext
+        else
+          '.' + ext
+
+  defaultExt: (filename, ext, ignoreExts, maxSize=7)->
+    oldExt = upath.extname filename
+    if isValidExt(oldExt, ignoreExts, maxSize)
+      filename
+    else
+      upath.addExt filename, ext
+
+isValidExt = (ext, ignoreExts, maxSize)->
+  ((ext) and (ext.length <= maxSize)) and
+  (ext not in _.map(ignoreExts, (e)->
+    (if e and (e[0] isnt '.') then '.' else '') + e)
+  )
 
 for name, extraFn of extraFunctions
   if not _.isUndefined upath[name]

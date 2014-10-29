@@ -1,4 +1,4 @@
-# upath v0.1.2
+# upath v0.1.3
 
 [![Build Status](https://travis-ci.org/anodynos/upath.svg?branch=master)](https://travis-ci.org/anodynos/upath)
 [![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath.png)
@@ -7,12 +7,11 @@ A drop-in replacement / proxy to nodejs's `path` that:
 
   * Replaces the windows `\` with the unix `/` in all string params & results. This has significant positives - see below.
 
-  * Adds methods to add, trim, change, and default filename extensions.
+  * Adds **filename extensions** functions `addExt`, `trimExt`, `changeExt`, and `defaultExt`.
 
-  * Add a `normalizeSafe` method to preserve any meaningful leading `./` & a `normalizeTrim` which additionally trims any useless ending `/`.
+  * Add a `normalizeSafe` function to preserve any meaningful leading `./` & a `normalizeTrim` which additionally trims any useless ending `/`.
 
 **Useful note: these docs are actually auto generated from [specs](https://github.com/anodynos/upath/blob/master/source/spec/upath-spec.coffee), running on Linux.**
-
 
 ## Why ?
 
@@ -49,7 +48,7 @@ Joining paths can also be a problem:
           ✓ `'some\\windows\\only', '..\\path'`  --->     `'some/windows/path`'  // `path.join()` gives `'some\windows\only/..\path'`
 
 
-## Added methods
+## Added functions
 
 
 #### `upath.normalizeSafe(path)`
@@ -97,13 +96,18 @@ Exactly like `path.normalizeSafe(path)`, but it trims any useless ending `/`.
         ✓ `'.//windows\\unix/mixed/'`    --->     `'./windows/unix/mixed`'  // `upath.normalizeSafe()` gives `'./windows/unix/mixed/'`
 
 
-## Added methods for *filename extension* manipulation.
+## Added functions for *filename extension* manipulation.
 
 **Happy notes:**
 
-  * All methods support `.ext` & `ext` - the dot `.` on the extension is always adjusted correctly.
+  In all functions you can:
 
-  * You can omit the `ext` param in all methods (or pass null/undefined) and the common sense thing will happen.
+  * use both `.ext` & `ext` - the dot `.` on the extension is always adjusted correctly.
+
+  * omit the `ext` param (pass null/undefined/empty string) and the common sense thing will happen.
+
+  * ignore specific extensions from being considered as valid ones (eg `.min`, `.dev` `.aLongExtIsNotAnExt` etc), hence no trimming or replacement takes place on them.
+
 
 
 #### `upath.addExt(filename, [ext])`
@@ -130,47 +134,82 @@ It adds nothing if no `ext` param is passed.
           ✓ `'myfile/addExt.min.'`     --->        `'myfile/addExt.min.`'
 
 
-#### `upath.trimExt(filename)`
+#### `upath.trimExt(filename, [ignoreExts], [maxSize=7])`
 
 Trims a filename's extension.
+
+  * Extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
+
+  * An `Array` of `ignoreExts` (eg [`.min`]) prevents these from being considered as extension, thus are not trimmed.
 
 ##### Examples / specs
 
     `upath.trimExt(filename)`          --returns-->
 
-        ✓ `'my/trimedExt.txt'`            --->         `'my/trimedExt`'
-        ✓ `'my/trimedExt'`                --->         `'my/trimedExt`'
-        ✓ `'my/trimedExt.min.js'`         --->     `'my/trimedExt.min`'
-        ✓ `'../my/trimedExt.longExt'`     --->      `'../my/trimedExt`'
+        ✓ `'my/trimedExt.txt'`            --->                `'my/trimedExt`'
+        ✓ `'my/trimedExt'`                --->                `'my/trimedExt`'
+        ✓ `'my/trimedExt.min'`            --->                `'my/trimedExt`'
+        ✓ `'my/trimedExt.min.js'`         --->            `'my/trimedExt.min`'
+        ✓ `'../my/trimedExt.longExt'`     --->     `'../my/trimedExt.longExt`'
 
 
-#### `upath.changeExt(filename, [ext])`
+It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
-Changes a filename's extension to `ext`. If it has no extension, it adds it.
+    `upath.trimExt(filename, ['min', '.dev'], 8)`          --returns-->
+
+          ✓ `'my/trimedExt.txt'`             --->                 `'my/trimedExt`'
+          ✓ `'my/trimedExt.min'`             --->             `'my/trimedExt.min`'
+          ✓ `'my/trimedExt.dev'`             --->             `'my/trimedExt.dev`'
+          ✓ `'../my/trimedExt.longExt'`      --->              `'../my/trimedExt`'
+          ✓ `'../my/trimedExt.longRExt'`     --->     `'../my/trimedExt.longRExt`'
+
+
+#### `upath.changeExt(filename, [ext], [ignoreExts], [maxSize=7])`
+
+Changes a filename's extension to `ext`. If it has no (valid) extension, it adds it.
+
+  * Valid extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
+
+  * An `Array` of `ignoreExts` (eg [`.min`]) prevents these from being considered as extension, thus are not changed - the new extension is added instead.
 
 ##### Examples / specs
 
-    `upath.changeExt(filename, 'js')`  --returns-->
+    `upath.changeExt(filename, '.js')`  --returns-->
 
-        ✓ `'my/module.coffee'`     --->        `'my/module.js`'
-        ✓ `'my/module'`            --->        `'my/module.js`'
-        ✓ `'file/withDot.'`        --->     `'file/withDot.js`'
+        ✓ `'my/module.min'`           --->               `'my/module.js`'
+        ✓ `'my/module.coffee'`        --->               `'my/module.js`'
+        ✓ `'my/module'`               --->               `'my/module.js`'
+        ✓ `'file/withDot.'`           --->            `'file/withDot.js`'
+        ✓ `'file/change.longExt'`     --->     `'file/change.longExt.js`'
 
 
 If no `ext` param is given, it trims the current extension (if any).
 
     `upath.changeExt(filename)`        --returns-->
 
-          ✓ `'my/module.coffee'`     --->           `'my/module`'
-          ✓ `'my/module'`            --->           `'my/module`'
-          ✓ `'file/withDot.'`        --->        `'file/withDot`'
+          ✓ `'my/module.min'`           --->                  `'my/module`'
+          ✓ `'my/module.coffee'`        --->                  `'my/module`'
+          ✓ `'my/module'`               --->                  `'my/module`'
+          ✓ `'file/withDot.'`           --->               `'file/withDot`'
+          ✓ `'file/change.longExt'`     --->        `'file/change.longExt`'
 
 
-#### `upath.defaultExt(filename, [ext], [ignoreExts], [maxSize=6])`
+It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
+
+    `upath.changeExt(filename, 'js', ['min', '.dev'], 8)`        --returns-->
+
+          ✓ `'my/module.coffee'`         --->                `'my/module.js`'
+          ✓ `'file/notValidExt.min'`     --->     `'file/notValidExt.min.js`'
+          ✓ `'file/notValidExt.dev'`     --->     `'file/notValidExt.dev.js`'
+          ✓ `'file/change.longExt'`      --->              `'file/change.js`'
+          ✓ `'file/change.longRExt'`     --->     `'file/change.longRExt.js`'
+
+
+#### `upath.defaultExt(filename, [ext], [ignoreExts], [maxSize=7])`
 
 Adds `.ext` to `filename`, only if it doesn't already have _any_ *old* extension.
 
-  * (Old) extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 6).
+  * (Old) extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
 
   * An `Array` of `ignoreExts` (eg [`.min`]) will force adding default `.ext` even if one of these is present.
 
@@ -194,9 +233,9 @@ If no `ext` param is passed, it leaves filename intact.
           ✓ `'fileWith/defaultExt.longExt'`     --->        `'fileWith/defaultExt.longExt`'
 
 
-It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars (incl dot) as extensions.
+It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
-    `upath.defaultExt(filename, 'js', ['min', 'dev'], 8)` --returns-->
+    `upath.defaultExt(filename, 'js', ['min', '.dev'], 8)` --returns-->
 
           ✓ `'fileWith/defaultExt'`              --->              `'fileWith/defaultExt.js`'
           ✓ `'fileWith/defaultExt.min'`          --->          `'fileWith/defaultExt.min.js`'
@@ -205,7 +244,7 @@ It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 ch
           ✓ `'fileWith/defaultExt.longRext'`     --->     `'fileWith/defaultExt.longRext.js`'
 
 
-  65 passing (24ms)
+  80 passing (31ms)
 
 # License
 
