@@ -1,7 +1,5 @@
-node_modules
-dist
-build
 .idea
+node_modules
+build
 DRAFT
-*.tsbuildinfo
-coverage
+temp
