@@ -18,7 +18,6 @@ getDefaultLine = (input, expected, maxLengths)->
   epad = _.pad '', (maxLengths[1] - expected.length) + 5 , ' '
   "`'#{input}'`#{ipad}--->#{epad}`'#{expected}`'"
 
-
 runSpec = (inputToExpected, getLine, itTest)->
   if not itTest     # can also be called as runSpec(inputToExpected, itTest) for getdefaultLine
     itTest = getLine
@@ -47,9 +46,9 @@ describe "\n# upath v#{VERSION}", ->
 
     * Replaces the windows `\\` with the unix `/` in all string params & results. This has significant positives - see below.
 
-    * Adds methods to add, trim, change, and default filename extensions.
+    * Adds **filename extensions** functions `addExt`, `trimExt`, `changeExt`, and `defaultExt`.
 
-    * Add a `normalizeSafe` method to preserve any meaningful leading `./` & a `normalizeTrim` which additionally trims any useless ending `/`.
+    * Add a `normalizeSafe` function to preserve any meaningful leading `./` & a `normalizeTrim` which additionally trims any useless ending `/`.
 
   **Useful note: these docs are actually auto generated from [specs](https://github.com/anodynos/upath/blob/master/source/spec/upath-spec.coffee), running on Linux.**
   """, ->
@@ -86,7 +85,9 @@ describe "\n# upath v#{VERSION}", ->
           '//windows\\..\\unix\/mixed/':    '/unix/mixed/'
 
         runSpec inputToExpected,
-          (input, expected)-> [ input.replace(/\\/g, '\\\\'), expected,
+          (input, expected)-> [ # alt line output
+              input.replace(/\\/g, '\\\\')
+              expected
               if (pathResult = path.normalize input) isnt expected
                 "  // `path.normalize()` gives `'#{pathResult}'`"
               else
@@ -101,9 +102,7 @@ describe "\n# upath v#{VERSION}", ->
 
           `upath.join(paths...)`        --returns-->\n
       """, ->
-
-        splitPaths = (pathsStr)->
-          pathsStr.split(',').map (p)-> _.trim(p)
+        splitPaths = (pathsStr)-> pathsStr.split(',').map (p)-> _.trim(p)
 
         inputToExpected =
           'some/nodejs/deep, ../path' :        'some/nodejs/path'
@@ -111,7 +110,7 @@ describe "\n# upath v#{VERSION}", ->
           'some\\windows\\only, ..\\path' :    'some/windows/path'
 
         runSpec inputToExpected,
-          (input, expected)-> [
+          (input, expected)-> [ # alt line output
               splitPaths(input.replace /\\/g, '\\\\').join("', '")
               expected
               if (pathResult = path.join.apply null, splitPaths input) isnt expected
@@ -123,7 +122,7 @@ describe "\n# upath v#{VERSION}", ->
             equal upath.join.apply(null, splitPaths input), expected
 
   describe """\n
-  ## Added methods
+  ## Added functions
   """, ->
     describe """\n
       #### `upath.normalizeSafe(path)`
@@ -159,7 +158,9 @@ describe "\n# upath v#{VERSION}", ->
           '..//windows\\..\\unix\/mixed': '../unix/mixed'
 
         runSpec inputToExpected,
-          (input, expected)-> [input.replace(/\\/g, '\\\\'), expected,
+          (input, expected)-> [ # alt line output
+              input.replace(/\\/g, '\\\\')
+              expected
               if (pathResult = path.normalize input) isnt expected
                 "  // `path.normalize()` gives `'#{pathResult}'`"
               else
@@ -185,7 +186,9 @@ describe "\n# upath v#{VERSION}", ->
           './/windows\\unix\/mixed/': './windows/unix/mixed'
 
         runSpec inputToExpected,
-          (input, expected)-> [input.replace('\\', '\\\\'), expected,
+          (input, expected)-> [ # alt line output
+            input.replace(/\\/g, '\\\\')
+            expected
             if (pathResult = upath.normalizeSafe input) isnt expected
               "  // `upath.normalizeSafe()` gives `'#{pathResult}'`"
             else
@@ -195,13 +198,18 @@ describe "\n# upath v#{VERSION}", ->
             equal upath.normalizeTrim(input), expected
 
   describe """\n
-    ## Added methods for *filename extension* manipulation.
+    ## Added functions for *filename extension* manipulation.
 
     **Happy notes:**
 
-      * All methods support `.ext` & `ext` - the dot `.` on the extension is always adjusted correctly.
+      In all functions you can:
 
-      * You can omit the `ext` param in all methods (or pass null/undefined) and the common sense thing will happen.
+      * use both `.ext` & `ext` - the dot `.` on the extension is always adjusted correctly.
+
+      * omit the `ext` param (pass null/undefined/empty string) and the common sense thing will happen.
+
+      * ignore specific extensions from being considered as valid ones (eg `.min`, `.dev` `.aLongExtIsNotAnExt` etc), hence no trimming or replacement takes place on them.
+
     """, ->
 
     ######
@@ -237,42 +245,67 @@ describe "\n# upath v#{VERSION}", ->
             equal upath.addExt(input, ''), input
 
     describe """\n
-    #### `upath.trimExt(filename)`
+    #### `upath.trimExt(filename, [ignoreExts], [maxSize=7])`
 
     Trims a filename's extension.
+
+      * Extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
+
+      * An `Array` of `ignoreExts` (eg [`.min`]) prevents these from being considered as extension, thus are not trimmed.
 
     ##### Examples / specs
 
         `upath.trimExt(filename)`          --returns-->\n
     """, ->
+      inputToExpected =
+        'my/trimedExt.txt': 'my/trimedExt'
+        'my/trimedExt': 'my/trimedExt'
+        'my/trimedExt.min': 'my/trimedExt'
+        'my/trimedExt.min.js': 'my/trimedExt.min'
+        '../my/trimedExt.longExt': '../my/trimedExt.longExt'
+
+      runSpec inputToExpected, (input, expected)-> ->
+        equal upath.trimExt(input), expected
+
+      describe """\n
+      It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
+
+          `upath.trimExt(filename, ['min', '.dev'], 8)`          --returns-->\n
+      """, ->
         inputToExpected =
           'my/trimedExt.txt': 'my/trimedExt'
-          'my/trimedExt': 'my/trimedExt'
-          'my/trimedExt.min.js': 'my/trimedExt.min'
+          'my/trimedExt.min': 'my/trimedExt.min'
+          'my/trimedExt.dev': 'my/trimedExt.dev'
           '../my/trimedExt.longExt': '../my/trimedExt'
+          '../my/trimedExt.longRExt': '../my/trimedExt.longRExt'
 
         runSpec inputToExpected, (input, expected)-> ->
-          equal upath.trimExt(input), expected
+          equal upath.trimExt(input, ['min', '.dev'], 8), expected
 
     describe """\n
-    #### `upath.changeExt(filename, [ext])`
+    #### `upath.changeExt(filename, [ext], [ignoreExts], [maxSize=7])`
 
-    Changes a filename's extension to `ext`. If it has no extension, it adds it.
+    Changes a filename's extension to `ext`. If it has no (valid) extension, it adds it.
+
+      * Valid extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
+
+      * An `Array` of `ignoreExts` (eg [`.min`]) prevents these from being considered as extension, thus are not changed - the new extension is added instead.
 
     ##### Examples / specs
 
-        `upath.changeExt(filename, 'js')`  --returns-->\n
+        `upath.changeExt(filename, '.js')`  --returns-->\n
     """, ->
 
       inputToExpected =
+        'my/module.min': 'my/module.js'
         'my/module.coffee': 'my/module.js'
         'my/module': 'my/module.js'
         'file/withDot.': 'file/withDot.js'
+        'file/change.longExt': 'file/change.longExt.js'
 
-      runSpec inputToExpected,
-        (input, expected)-> ->
-          equal upath.changeExt(input, 'js'), expected
-          equal upath.changeExt(input, '.js'), expected
+      runSpec inputToExpected, (input, expected)-> ->
+        equal upath.changeExt(input, 'js'), expected
+        equal upath.changeExt(input, '.js'), expected
 
       describe """\n
       If no `ext` param is given, it trims the current extension (if any).
@@ -285,12 +318,29 @@ describe "\n# upath v#{VERSION}", ->
             equal upath.changeExt(input), upath.trimExt expected
             equal upath.changeExt(input, ''), upath.trimExt expected
 
+      describe """\n
+      It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
+
+          `upath.changeExt(filename, 'js', ['min', '.dev'], 8)`        --returns-->\n
+      """, ->
+        inputToExpected =
+          'my/module.coffee':     'my/module.js'
+          'file/notValidExt.min': 'file/notValidExt.min.js'
+          'file/notValidExt.dev': 'file/notValidExt.dev.js'
+          'file/change.longExt':  'file/change.js'
+          'file/change.longRExt': 'file/change.longRExt.js'
+
+        runSpec inputToExpected,
+          (input, expected)-> ->
+            equal upath.changeExt(input, 'js', ['min', 'dev'], 8), expected
+            equal upath.changeExt(input, '.js', ['.min', '.dev'], 8), expected
+
     describe """\n
-    #### `upath.defaultExt(filename, [ext], [ignoreExts], [maxSize=6])`
+    #### `upath.defaultExt(filename, [ext], [ignoreExts], [maxSize=7])`
 
     Adds `.ext` to `filename`, only if it doesn't already have _any_ *old* extension.
 
-      * (Old) extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 6).
+      * (Old) extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
 
       * An `Array` of `ignoreExts` (eg [`.min`]) will force adding default `.ext` even if one of these is present.
 
@@ -298,15 +348,13 @@ describe "\n# upath v#{VERSION}", ->
 
         `upath.defaultExt(filename, 'js')`   --returns-->\n
     """, ->
-
       inputToExpected =
         'fileWith/defaultExt': 'fileWith/defaultExt.js'
         'fileWith/defaultExt.js': 'fileWith/defaultExt.js'
         'fileWith/defaultExt.min': 'fileWith/defaultExt.min'
         'fileWith/defaultExt.longExt': 'fileWith/defaultExt.longExt.js'
 
-      runSpec inputToExpected,
-        (input, expected)-> ->
+      runSpec inputToExpected, (input, expected)-> ->
           equal upath.defaultExt(input, 'js'), expected
           equal upath.defaultExt(input, '.js'), expected
 
@@ -315,18 +363,16 @@ describe "\n# upath v#{VERSION}", ->
 
           `upath.defaultExt(filename)`       --returns-->\n
       """, ->
-
         runSpec inputToExpected,
           (input)-> [input, input]
           (input, expected)-> ->
             equal upath.defaultExt(input), input
 
       describe """\n
-      It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars (incl dot) as extensions.
+      It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
-          `upath.defaultExt(filename, 'js', ['min', 'dev'], 8)` --returns-->\n
+          `upath.defaultExt(filename, 'js', ['min', '.dev'], 8)` --returns-->\n
       """, ->
-
         inputToExpected =
           'fileWith/defaultExt': 'fileWith/defaultExt.js'
           'fileWith/defaultExt.min': 'fileWith/defaultExt.min.js'
@@ -335,5 +381,5 @@ describe "\n# upath v#{VERSION}", ->
           'fileWith/defaultExt.longRext': 'fileWith/defaultExt.longRext.js'
 
         runSpec inputToExpected, (input, expected)-> ->
-          equal upath.defaultExt(input, 'js', ['min', 'dev'], 8), expected
-          equal upath.defaultExt(input, '.js', ['min', 'dev'], 8), expected
+          equal upath.defaultExt(input, 'js', ['min', '.dev'], 8), expected
+          equal upath.defaultExt(input, '.js', ['.min', 'dev'], 8), expected
