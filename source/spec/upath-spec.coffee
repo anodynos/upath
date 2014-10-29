@@ -35,20 +35,20 @@ describe "\n# upath v#{VERSION}", ->
 
     * Add a `normalizeSafe` method to preserve any leading `./`
 
-  ** Useful note: these docs are actually auto generated from [specs](https://github.com/anodynos/upath/blob/master/source/spec/upath-spec.coffee).**
+  **Useful note: these docs are actually auto generated from [specs](https://github.com/anodynos/upath/blob/master/source/spec/upath-spec.coffee).**
 
-  # Added methods
+  ## Added methods
   """, ->
     describe """\n
-      ## `upath.normalizeSafe(path)`
+      ### `upath.normalizeSafe(path)`
 
       Exactly like `path.normalize(path)`, but it keeps the first meaningful `'./'`.
 
       Note that the unix `'/'` is returned everywhere, so windows '\\' is always converted to unix '/'.
 
-      ### Examples / specs & how it differs from vanilla `path`
+      #### Examples / specs & how it differs from vanilla `path`
 
-        `upath.normalizeSafe(path)`        --returns-->\n
+          `upath.normalizeSafe(path)`        --returns-->\n
       """, ->
 
       maxLengths = getMaxLengths inputToExpected =
@@ -82,9 +82,9 @@ describe "\n# upath v#{VERSION}", ->
             equal upath.normalizeSafe(input), expected
 
   describe """\n
-    # Added methods for *filename extension* manipulation.
+    ## Added methods for *filename extension* manipulation.
 
-    ** Happy notes: **
+    **Happy notes:**
 
       * All methods support '.ext' & 'ext' - the dot '.' on the extension is always adjusted correctly.
 
@@ -92,11 +92,11 @@ describe "\n# upath v#{VERSION}", ->
     """, ->
 
     describe """ \n
-    ## `upath.addExt(filename, [ext])`
+    ### `upath.addExt(filename, [ext])`
 
     Adds `.ext` to `filename`, but only if it doesn't already have the exact extension.
 
-    ### Examples / specs
+    #### Examples / specs
 
         `upath.addExt(filename, 'js')`     --returns-->\n
     """, ->
@@ -128,11 +128,11 @@ describe "\n# upath v#{VERSION}", ->
               equal upath.addExt(input), input
 
     describe """\n
-    ## `upath.trimExt(filename)`
+    ### `upath.trimExt(filename)`
 
     Trims a filename's extension.
 
-    ### Examples / specs
+    #### Examples / specs
 
         `upath.trimExt(filename)`          --returns-->\n
     """, ->
@@ -148,11 +148,11 @@ describe "\n# upath v#{VERSION}", ->
               equal upath.trimExt(input), expected
 
     describe """\n
-    ## `upath.changeExt(filename, [ext])`
+    ### `upath.changeExt(filename, [ext])`
 
     Changes a filename's extension to `ext`. If it has no extension, it adds it.
 
-    ### Examples / specs
+    #### Examples / specs
 
         `upath.changeExt(filename, 'js')`  --returns-->\n
     """, ->
@@ -172,7 +172,7 @@ describe "\n# upath v#{VERSION}", ->
       describe """\n
       If no `ext` param is is given, it trims the current extension (if any).
 
-        `upath.changeExt(filename)`        --returns-->\n
+          `upath.changeExt(filename)`        --returns-->\n
       """, ->
         for input, expected of inputToExpected
           do (input, expected)->
@@ -180,7 +180,7 @@ describe "\n# upath v#{VERSION}", ->
               equal upath.changeExt(input), upath.trimExt expected
 
     describe """\n
-    ## `upath.defaultExt(file, [ext], [ignoreExts], [maxSize=6])`
+    ### `upath.defaultExt(file, [ext], [ignoreExts], [maxSize=6])`
 
     Adds `.ext` to a filename, only if it doesn't already have _any_ old extension.
 
@@ -188,9 +188,9 @@ describe "\n# upath v#{VERSION}", ->
 
       * Old extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 6).
 
-    ### Examples / specs
+    #### Examples / specs
 
-      `upath.defaultExt(filename, 'js')`   --returns-->\n
+        `upath.defaultExt(filename, 'js')`   --returns-->\n
     """, ->
 
       maxLengths = getMaxLengths inputToExpected =
@@ -208,7 +208,7 @@ describe "\n# upath v#{VERSION}", ->
       describe """\n
       If no `ext` param is passed, it leaves filename intact.
 
-        `upath.defaultExt(filename)`       --returns-->\n
+          `upath.defaultExt(filename)`       --returns-->\n
       """, ->
         for input, expected of inputToExpected
           do (input, expected)->
@@ -218,7 +218,7 @@ describe "\n# upath v#{VERSION}", ->
       describe """\n
       It is ignoring '.min' & '.dev' as extensions, and considers exts with up to 8 chars (incl dot) as extensions.
 
-        `upath.defaultExt(filename, 'js', ['min', 'dev'], 8) --returns-->\n
+          `upath.defaultExt(filename, 'js', ['min', 'dev'], 8)` --returns-->\n
       """, ->
 
         maxLengths = getMaxLengths inputToExpected =
