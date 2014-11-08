@@ -16,7 +16,7 @@ getMaxLengths = (inputToExpected)->
 getDefaultLine = (input, expected, maxLengths)->
   ipad = _.pad '', (maxLengths[0] - input.length) + 5, ' '
   epad = _.pad '', (maxLengths[1] - expected.length) + 5 , ' '
-  "`'#{input}'`#{ipad}--->#{epad}`'#{expected}`'"
+  "`'#{input}'`#{ipad}--->#{epad}`'#{expected}'`"
 
 runSpec = (inputToExpected, getLine, itTest)->
   if not itTest     # can also be called as runSpec(inputToExpected, itTest) for getdefaultLine
@@ -50,6 +50,8 @@ describe "\n# upath v#{VERSION}", ->
 
     * Add a `normalizeSafe` function to preserve any meaningful leading `./` & a `normalizeTrim` which additionally trims any useless ending `/`.
 
+    * Plus a helper `toUnix` that simply converts `\` to `/` and consolidates duplicates.
+
   **Useful note: these docs are actually auto generated from [specs](https://github.com/anodynos/upath/blob/master/source/spec/upath-spec.coffee), running on Linux.**
   """, ->
 
@@ -57,7 +59,7 @@ describe "\n# upath v#{VERSION}", ->
     ## Why ?
 
     Normal `path` doesn't convert paths to a unified format (ie `/`) before calculating paths (`normalize`, `join`), which can lead to numerous problems.
-    Also path joining, normalization etc on the two formats is not consistent, depending on where it runs - last checked with nodejs 0.10.32 running on Linux.
+    Also path joining, normalization etc on the two formats is not consistent, depending on where it runs - last checked with nodejs 0.10.32 running on Linux & Windows x64.
     Running on Windows `path` yields different results.
 
     In general, if you code your paths logic while developing on Unix/Mac and it runs on Windows, you may run into problems when using `path`.
@@ -82,7 +84,7 @@ describe "\n# upath v#{VERSION}", ->
           '//windows\\unix\/mixed':         '/windows/unix/mixed'
           '\\windows//unix\/mixed':         '/windows/unix/mixed'
 
-          '//windows\\..\\unix\/mixed/':    '/unix/mixed/'
+          '////\\windows\\..\\unix\/mixed/':    '/unix/mixed/'
 
         runSpec inputToExpected,
           (input, expected)-> [ # alt line output
@@ -95,7 +97,6 @@ describe "\n# upath v#{VERSION}", ->
             ]
           (input, expected)-> ->
             equal upath.normalize(input), expected
-
 
       describe """\n
       Joining paths can also be a problem:
@@ -125,6 +126,22 @@ describe "\n# upath v#{VERSION}", ->
   ## Added functions
   """, ->
     describe """\n
+      #### `upath.toUnix(path)`
+
+      Just converts all `\` to `/` and consolidates duplicates, without performing any normalization.
+
+      ##### Examples / specs
+
+          `upath.toUnix(path)`        --returns-->\n
+      """, ->
+      inputToExpected =
+        './/windows\\//unix/\/mixed////': './windows/unix/mixed/'
+        '..///windows\\..\\\\unix\/mixed': '../windows/../unix/mixed'
+
+      runSpec inputToExpected, (input, expected)-> ->
+        equal upath.toUnix(input), expected
+
+    describe """\n
       #### `upath.normalizeSafe(path)`
 
       Exactly like `path.normalize(path)`, but it keeps the first meaningful `./`.
@@ -140,8 +157,13 @@ describe "\n# upath v#{VERSION}", ->
           '': '.'
           '.': '.'
           './': './'
+          './/': './'
+          '.\\': './'
+          '.\\//': './'
           './..': '..'
+          './/..': '..'
           './../': '../'
+          '.\\..\\': '../'
           './../dep': '../dep'
           '../dep': '../dep'
           '../path/dep': '../path/dep'
