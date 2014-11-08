@@ -4,17 +4,27 @@ path = require 'path'
 
 upath = exports
 
-upath.VERSION = VERSION # inject by grunt-concat
+upath.VERSION = if VERSION? then VERSION else 'NO-VERSION' # inject by grunt-concat
+
+toUnix = (p)->
+  p = p.replace /\\/g, '/'
+  double = /\/\//
+  while p.match double
+    p = p.replace double, '/' # node on windows doesn't replace doubles
+  p
 
 for fName, fn of path when _.isFunction fn
   upath[fName] = do (fName)->
     (args...)->
-      args = _.map args, (p)-> if !_.isString(p) then p else p.replace /\\/g, '/'
-      path[fName] args...
+      args = _.map args, (p)-> if _.isString(p) then toUnix(p) else p
+      toUnix(path[fName] args...)
 
 extraFunctions =
 
+  toUnix: toUnix
+
   normalizeSafe: (p)->
+    p = toUnix(p)
     if _.startsWith p, './'
       if _.startsWith(p, './..') or (p is './')
         upath.normalize(p)
