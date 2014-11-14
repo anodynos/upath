@@ -1,67 +1,32 @@
-_ = require 'lodash'
-S = if process.platform is 'win32' then '\\' else '/'
-startsWith = (string, substring) -> string.lastIndexOf(substring, 0) is 0
-nodeBin = "node_modules#{S}.bin#{S}"
-
-sourceDir     = "source/code"
-buildDir      = "build/code"
-sourceSpecDir = "source/spec"
-buildSpecDir  = "build/spec"
-
 module.exports = gruntFunction = (grunt) ->
-  pkg = grunt.file.readJSON 'package.json'
-
   gruntConfig =
-    pkg: pkg
+    urequire:
+      _all:
+        dependencies: imports: { lodash: ['_'] }
+        runtimeInfo: false
+        bare: true
+        template:
+          name: 'nodejs'
+          banner: true
 
-    meta:
-      banner: """
-      /*!
-      * <%= pkg.name %> - version <%= pkg.version %>
-      * Compiled on <%= grunt.template.today(\"yyyy-mm-dd\") %>
-      * <%= pkg.repository.url %>
-      * Copyright(c) <%= grunt.template.today(\"yyyy\") %> <%= pkg.author.name %> (<%= pkg.author.email %> )
-      * Licensed <%= pkg.licenses[0].type %> <%= pkg.licenses[0].url %>
-      */\n
-      """
-      varVERSION: "var VERSION = '<%= pkg.version %>'; //injected by grunt:concat\n"
-      mdVersion: "# <%= pkg.name %> v<%= pkg.version %>\n"
-      usrBinEnvNode: "#!/usr/bin/env node\n"
+      lib:
+        path: 'source/code'
+        dstPath: 'build/code'
+        resources: [ 'inject-version' ]
 
-    options: {sourceDir, buildDir, sourceSpecDir, buildSpecDir}
+      spec:
+        path: 'source/spec'
+        dstPath: 'build/spec'
+        main: 'upath-spec'          
+        afterBuild: require 'urequire-ab-specrunner'
 
-    clean:
-      build: 'build'
-      temp: 'temp'
+      specWatch: derive: 'spec', watch: true
 
-    concat:
-      VERSION:
-        options: banner: "<%= meta.banner %><%= meta.varVERSION %>"
-        src: [ '<%= options.buildDir %>/upath.js']
-        dest:  '<%= options.buildDir %>/upath.js'
-
-    watch:
-      dev: # requires `coffeeWatch` to compile changed only files! need a changed-only-files coffee task!
-        files: ["source/**/*"]
-        tasks: ['build', 'test']
-
-    shell:
-      coffee: command: "#{nodeBin}coffee -cb -o ./build ./source"
-      coffeeWatch: command: "#{nodeBin}coffee -cbw -o ./build ./source"
-      mochaCmd: command: "#{nodeBin}mocha #{buildSpecDir}/**/*-spec.js -R spec --recursive --bail"
-      options: verbose: true, failOnError: true, stdout: true, stderr: true
-
-  ### shortcuts generation ###
-  splitTasks = (tasks)-> if not _.isString tasks then tasks else (_.filter tasks.split(/\s/), (v)-> v)
-  grunt.registerTask cmd, splitTasks "shell:#{cmd}" for cmd of gruntConfig.shell # shortcut to all "shell:cmd"
+  splitTasks = (tasks)-> if (tasks instanceof Array) then tasks else tasks.split(/\s/).filter((f)->!!f)
+  grunt.registerTask shortCut, "urequire:#{shortCut}" for shortCut of gruntConfig.urequire
   grunt.registerTask shortCut, splitTasks tasks for shortCut, tasks of {
-    default: "clean build test"
-    build: "coffee concat"
-    test: "mochaCmd"
-
-    "alt-b": "build"
-    "alt-t": "test"
+    default: 'lib spec'
+    develop: 'lib specWatch'
   }
-
-  grunt.loadNpmTasks task for task of pkg.devDependencies when startsWith(task, 'grunt-')
+  grunt.loadNpmTasks task for task of grunt.file.readJSON('package.json').devDependencies when task.lastIndexOf('grunt-', 0) is 0
   grunt.initConfig gruntConfig

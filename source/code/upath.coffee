@@ -4,7 +4,7 @@ path = require 'path'
 
 upath = exports
 
-upath.VERSION = if VERSION? then VERSION else 'NO-VERSION' # inject by grunt-concat
+upath.VERSION = if VERSION? then VERSION else 'NO-VERSION' # injected by urequire-inject-version
 
 toUnix = (p)->
   p = p.replace /\\/g, '/'

@@ -11,7 +11,7 @@ A drop-in replacement / proxy to nodejs's `path` that:
 
   * Add a `normalizeSafe` function to preserve any meaningful leading `./` & a `normalizeTrim` which additionally trims any useless ending `/`.
 
-  * Plus a helper `toUnix` that simply converts `` to `/` and consolidates duplicates.
+  * Plus a helper `toUnix` that simply converts `\` to `/` and consolidates duplicates.
 
 **Useful note: these docs are actually auto generated from [specs](https://github.com/anodynos/upath/blob/master/source/spec/upath-spec.coffee), running on Linux.**
 
@@ -33,11 +33,11 @@ Check out the different (improved) behavior to vanilla `path`:
 
           ✓ `'c:/windows/nodejs/path'`          --->     `'c:/windows/nodejs/path'`  // equal to `path.normalize()` 
           ✓ `'c:/windows/../nodejs/path'`       --->             `'c:/nodejs/path'`  // equal to `path.normalize()` 
-          ✓ `'c:\\windows\\nodejs\\path'`       --->     `'c:/windows/nodejs/path'`  // `path.normalize()` gives `'c:\windows\nodejs\path'`                                                                                                                     
-          ✓ `'c:\\windows\\..\\nodejs\\path'`   --->             `'c:/nodejs/path'`  // `path.normalize()` gives `'c:\windows\..\nodejs\path'`                                                                                                                  
-          ✓ `'//windows\\unix/mixed'`           --->        `'/windows/unix/mixed'`  // `path.normalize()` gives `'/windows\unix/mixed'`                                                                                                                        
-          ✓ `'\\windows//unix/mixed'`           --->        `'/windows/unix/mixed'`  // `path.normalize()` gives `'\windows/unix/mixed'`                                                                                                                        
-          ✓ `'////\\windows\\..\\unix/mixed/'`  --->               `'/unix/mixed/'`  // `path.normalize()` gives `'/\windows\..\unix/mixed/'`                                                                                                                   
+          ✓ `'c:\\windows\\nodejs\\path'`       --->     `'c:/windows/nodejs/path'`  // `path.normalize()` gives `'c:\windows\nodejs\path'`                                                                                                                 
+          ✓ `'c:\\windows\\..\\nodejs\\path'`   --->             `'c:/nodejs/path'`  // `path.normalize()` gives `'c:\windows\..\nodejs\path'`                                                                                                              
+          ✓ `'//windows\\unix/mixed'`           --->        `'/windows/unix/mixed'`  // `path.normalize()` gives `'/windows\unix/mixed'`                                                                                                                    
+          ✓ `'\\windows//unix/mixed'`           --->        `'/windows/unix/mixed'`  // `path.normalize()` gives `'\windows/unix/mixed'`                                                                                                                    
+          ✓ `'////\\windows\\..\\unix/mixed/'`  --->               `'/unix/mixed/'`  // `path.normalize()` gives `'/\windows\..\unix/mixed/'`                                                                                                               
         
 
 Joining paths can also be a problem:
@@ -46,7 +46,7 @@ Joining paths can also be a problem:
 
           ✓ `'some/nodejs/deep', '../path'`      --->      `'some/nodejs/path'`  // equal to `path.join()` 
           ✓ `'some/nodejs\\windows', '../path'`  --->      `'some/nodejs/path'`  // `path.join()` gives `'some/path'` 
-          ✓ `'some\\windows\\only', '..\\path'`  --->     `'some/windows/path'`  // `path.join()` gives `'some\windows\only/..\path'`                                                                                                                           
+          ✓ `'some\\windows\\only', '..\\path'`  --->     `'some/windows/path'`  // `path.join()` gives `'some\windows\only/..\path'`                                                                                                                       
     
 
 ## Added functions
@@ -60,8 +60,8 @@ Just converts all `` to `/` and consolidates duplicates, without performing any 
 
     `upath.toUnix(path)`        --returns-->
 
-        ✓ `'.//windows\//unix//mixed////'`     --->      `'./windows/unix/mixed/'`
-        ✓ `'..///windows\..\\unix/mixed'`      --->      `'../windows/../unix/mixed'`
+        ✓ `'.//windows\//unix//mixed////'`     --->        `'./windows/unix/mixed/'` 
+        ✓ `'..///windows\..\\unix/mixed'`      --->     `'../windows/../unix/mixed'` 
       
 
 #### `upath.normalizeSafe(path)`
@@ -93,10 +93,10 @@ Note that the unix `/` is returned everywhere, so windows `\` is always converte
         ✓ `'./dep'`                         --->                     `'./dep'`  // `path.normalize()` gives `'dep'` 
         ✓ `'./path/dep'`                    --->                `'./path/dep'`  // `path.normalize()` gives `'path/dep'` 
         ✓ `'./path/../dep'`                 --->                     `'./dep'`  // `path.normalize()` gives `'dep'` 
-        ✓ `'.//windows\\unix/mixed/'`       --->     `'./windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`                                                                                                                             
-        ✓ `'..//windows\\unix/mixed'`       --->     `'../windows/unix/mixed'`  // `path.normalize()` gives `'../windows\unix/mixed'`                                                                                                                           
-        ✓ `'windows\\unix/mixed/'`          --->       `'windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`                                                                                                                             
-        ✓ `'..//windows\\..\\unix/mixed'`   --->             `'../unix/mixed'`  // `path.normalize()` gives `'../windows\..\unix/mixed'`                                                                                                                        
+        ✓ `'.//windows\\unix/mixed/'`       --->     `'./windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`                                                                                                                         
+        ✓ `'..//windows\\unix/mixed'`       --->     `'../windows/unix/mixed'`  // `path.normalize()` gives `'../windows\unix/mixed'`                                                                                                                       
+        ✓ `'windows\\unix/mixed/'`          --->       `'windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`                                                                                                                         
+        ✓ `'..//windows\\..\\unix/mixed'`   --->             `'../unix/mixed'`  // `path.normalize()` gives `'../windows\..\unix/mixed'`                                                                                                                    
       
 
 #### `upath.normalizeTrim(path)`
@@ -111,7 +111,7 @@ Exactly like `path.normalizeSafe(path)`, but it trims any useless ending `/`.
         ✓ `'./../'`                      --->                       `'..'`  // `upath.normalizeSafe()` gives `'../'` 
         ✓ `'./../dep/'`                  --->                   `'../dep'`  // `upath.normalizeSafe()` gives `'../dep/'` 
         ✓ `'path//dep\\'`                --->                 `'path/dep'`  // `upath.normalizeSafe()` gives `'path/dep/'` 
-        ✓ `'.//windows\\unix/mixed/'`    --->     `'./windows/unix/mixed'`  // `upath.normalizeSafe()` gives `'./windows/unix/mixed/'`                                                                                                                          
+        ✓ `'.//windows\\unix/mixed/'`    --->     `'./windows/unix/mixed'`  // `upath.normalizeSafe()` gives `'./windows/unix/mixed/'`                                                                                                                      
     
 
 ## Added functions for *filename extension* manipulation.
@@ -261,5 +261,26 @@ It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 ch
           ✓ `'fileWith/defaultExt.longExt'`      --->         `'fileWith/defaultExt.longExt'` 
           ✓ `'fileWith/defaultExt.longRext'`     --->     `'fileWith/defaultExt.longRext.js'` 
 
+  
+Copyright(c) 2014 Agelos Pikoulas (agelos.pikoulas@gmail.com)
 
-  87 passing (37ms)
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

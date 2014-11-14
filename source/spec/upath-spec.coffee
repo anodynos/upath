@@ -3,11 +3,12 @@ _.mixin (require 'underscore.string').exports()
 
 chai = require 'chai'
 expect = chai.expect
-{ equal, notEqual, ok, notOk, tru, fals, deepEqual, notDeepEqual, exact, notExact, iqual, notIqual
-  ixact, notIxact, like, notLike, likeBA, notLikeBA, equalSet, notEqualSet } = require './specHelpers'
 
-upath = require '../code/upath'
+{ equal } = require './specHelpers'
+
+upath = require 'upath'
 path = require 'path'
+fs = require 'fs'
 
 getMaxLengths = (inputToExpected)->
   [ _.max _.pluck(_.keys(inputToExpected), 'length')
@@ -32,8 +33,8 @@ runSpec = (inputToExpected, getLine, itTest)->
         finalLine += line[2] if line[2] # extra line info
       # call the actual `it`
       it finalLine, itTest(input, expected)
-  
-VERSION = JSON.parse(require('fs').readFileSync('package.json')).version
+
+VERSION = JSON.parse(fs.readFileSync('package.json')).version
 
 describe "\n# upath v#{VERSION}", ->
   it "", -> equal upath.VERSION, VERSION
@@ -50,7 +51,7 @@ describe "\n# upath v#{VERSION}", ->
 
     * Add a `normalizeSafe` function to preserve any meaningful leading `./` & a `normalizeTrim` which additionally trims any useless ending `/`.
 
-    * Plus a helper `toUnix` that simply converts `\` to `/` and consolidates duplicates.
+    * Plus a helper `toUnix` that simply converts `\\` to `/` and consolidates duplicates.
 
   **Useful note: these docs are actually auto generated from [specs](https://github.com/anodynos/upath/blob/master/source/spec/upath-spec.coffee), running on Linux.**
   """, ->
@@ -405,3 +406,5 @@ describe "\n# upath v#{VERSION}", ->
         runSpec inputToExpected, (input, expected)-> ->
           equal upath.defaultExt(input, 'js', ['min', '.dev'], 8), expected
           equal upath.defaultExt(input, '.js', ['.min', 'dev'], 8), expected
+
+describe '\n' + fs.readFileSync('LICENSE', 'utf8'), -> it "", -> # print it
