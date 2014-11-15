@@ -17,7 +17,6 @@ module.exports = gruntFunction = (grunt) ->
       spec:
         path: 'source/spec'
         dstPath: 'build/spec'
-        main: 'upath-spec'          
         afterBuild: require 'urequire-ab-specrunner'
 
       specWatch: derive: 'spec', watch: true

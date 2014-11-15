@@ -1,4 +1,4 @@
-_ = (_B = require 'uberscore')._
+_B = require 'uberscore'
 l = new _B.Logger 'uRequire/specHelpers'
 chai = require 'chai'
 expect = chai.expect

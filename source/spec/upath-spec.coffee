@@ -1,4 +1,3 @@
-_ = require 'lodash'
 _.mixin (require 'underscore.string').exports()
 
 chai = require 'chai'
