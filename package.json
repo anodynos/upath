@@ -1,7 +1,7 @@
 {
   "name": "upath",
   "description": "A proxy to `path`, replacing `\\` with `/` for all results & methods to add, change, default, trim file extensions.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "homepage": "http://github.com/anodynos/upath/",
   "author": {
     "name": "Agelos Pikoulas",
@@ -57,7 +57,7 @@
     "grunt-urequire": "0.7.x",
     "urequire": "0.7.x",
     "uberscore": "0.0.16",
-    "urequire-ab-specrunner": "^0.1.8",
+    "urequire-ab-specrunner": "^0.1.9",
     "urequire-rc-inject-version": "^0.1.2"
   }
 }

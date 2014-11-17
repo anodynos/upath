@@ -17,7 +17,8 @@ module.exports = gruntFunction = (grunt) ->
       spec:
         path: 'source/spec'
         dstPath: 'build/spec'
-        afterBuild: require 'urequire-ab-specrunner'
+        afterBuild: require('urequire-ab-specrunner').options
+          mochaOptions: '--bail'
 
       specWatch: derive: 'spec', watch: true
 
