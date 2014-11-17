@@ -46,7 +46,7 @@ describe "\n# upath v#{VERSION}", ->
 
     * Replaces the windows `\\` with the unix `/` in all string params & results. This has significant positives - see below.
 
-    * Adds **filename extensions** functions `addExt`, `trimExt`, `changeExt`, and `defaultExt`.
+    * Adds **filename extensions** functions `addExt`, `trimExt`, `removeExt`, `changeExt`, and `defaultExt`.
 
     * Add a `normalizeSafe` function to preserve any meaningful leading `./` & a `normalizeTrim` which additionally trims any useless ending `/`.
 
@@ -292,7 +292,7 @@ describe "\n# upath v#{VERSION}", ->
       describe """\n
       It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
-          `upath.trimExt(filename, ['min', '.dev'], 8)`          --returns-->\n
+          `upath.removeExt(filename, ['min', '.dev'], 8)`          --returns-->\n
       """, ->
         inputToExpected =
           'my/trimedExt.txt': 'my/trimedExt'
@@ -303,6 +303,25 @@ describe "\n# upath v#{VERSION}", ->
 
         runSpec inputToExpected, (input, expected)-> ->
           equal upath.trimExt(input, ['min', '.dev'], 8), expected
+
+    describe """\n
+    #### `upath.removeExt(filename, ext)`
+
+    Removes the specific `ext` extension from filename, if it has it. Otherwise it leaves it as is.
+    As in all upath functions, it be `.ext` or `ext`.
+
+    ##### Examples / specs
+
+        `upath.removeExt(filename, '.js')`          --returns-->\n
+    """, ->
+      inputToExpected =
+        'removedExt.js': 'removedExt'
+        'removedExt.txt.js': 'removedExt.txt'
+        'notRemoved.txt': 'notRemoved.txt'
+
+      runSpec inputToExpected, (input, expected)-> ->
+        equal upath.removeExt(input, '.js'), expected
+        equal upath.removeExt(input, 'js'), expected
 
     describe """\n
     #### `upath.changeExt(filename, [ext], [ignoreExts], [maxSize=7])`

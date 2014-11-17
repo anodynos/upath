@@ -1,4 +1,4 @@
-# upath v0.1.4
+# upath v0.1.5
 
 [![Build Status](https://travis-ci.org/anodynos/upath.svg?branch=master)](https://travis-ci.org/anodynos/upath)
 [![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath.png)
@@ -7,7 +7,7 @@ A drop-in replacement / proxy to nodejs's `path` that:
 
   * Replaces the windows `\` with the unix `/` in all string params & results. This has significant positives - see below.
 
-  * Adds **filename extensions** functions `addExt`, `trimExt`, `changeExt`, and `defaultExt`.
+  * Adds **filename extensions** functions `addExt`, `trimExt`, `removeExt`, `changeExt`, and `defaultExt`.
 
   * Add a `normalizeSafe` function to preserve any meaningful leading `./` & a `normalizeTrim` which additionally trims any useless ending `/`.
 
@@ -173,13 +173,27 @@ Trims a filename's extension.
 
 It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
-    `upath.trimExt(filename, ['min', '.dev'], 8)`          --returns-->
+    `upath.removeExt(filename, ['min', '.dev'], 8)`          --returns-->
 
           ✓ `'my/trimedExt.txt'`             --->                 `'my/trimedExt'` 
           ✓ `'my/trimedExt.min'`             --->             `'my/trimedExt.min'` 
           ✓ `'my/trimedExt.dev'`             --->             `'my/trimedExt.dev'` 
           ✓ `'../my/trimedExt.longExt'`      --->              `'../my/trimedExt'` 
           ✓ `'../my/trimedExt.longRExt'`     --->     `'../my/trimedExt.longRExt'` 
+      
+
+#### `upath.removeExt(filename, ext)`
+
+Removes the specific `ext` extension from filename, if it has it. Otherwise it leaves it as is.
+As in all upath functions, it be `.ext` or `ext`.
+
+##### Examples / specs
+
+    `upath.removeExt(filename, '.js')`          --returns-->
+
+        ✓ `'removedExt.js'`         --->         `'removedExt'` 
+        ✓ `'removedExt.txt.js'`     --->     `'removedExt.txt'` 
+        ✓ `'notRemoved.txt'`        --->     `'notRemoved.txt'` 
       
 
 #### `upath.changeExt(filename, [ext], [ignoreExts], [maxSize=7])`

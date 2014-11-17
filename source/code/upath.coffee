@@ -53,6 +53,16 @@ extraFunctions =
     else
       filename
 
+  removeExt: (filename, ext)->
+    if not ext
+      return filename
+    else
+      ext = if ext[0] is '.' then ext else '.' + ext
+      if upath.extname(filename) is ext
+        upath.trimExt filename
+      else
+        filename
+
   changeExt: (filename, ext, ignoreExts, maxSize=7)->
     upath.trimExt(filename, ignoreExts, maxSize) +
       if not ext
