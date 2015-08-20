@@ -39,6 +39,12 @@ extraFunctions =
     else
       p
 
+  joinSafe: (p...)->
+    result = upath.join.apply null, p
+    if _.startsWith(p[0], './') && !_.startsWith(result, './')
+      result = './' + result
+    result
+
   addExt: (file, ext)->
     if not ext
       file
