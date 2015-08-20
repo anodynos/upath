@@ -38,7 +38,7 @@
     "dist": "./build"
   },
   "engines": {
-    "node": ">=0.8.x <=0.12.x"
+    "node": ">=0.10.x <=0.12.x"
   },
   "dependencies": {
     "lodash": ">=2.x",
