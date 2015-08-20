@@ -4,15 +4,10 @@
   "version": "0.1.6",
   "homepage": "http://github.com/anodynos/upath/",
   "author": {
-    "name": "Agelos Pikoulas",
+    "name": "Angelos Pikoulas",
     "email": "agelos.pikoulas@gmail.com"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
-    }
-  ],
+  "license": "MIT",
   "keywords": [
     "path",
     "unix",
@@ -46,18 +41,18 @@
     "node": ">=0.8.x <=0.12.x"
   },
   "dependencies": {
-    "lodash": "*",
-    "underscore.string": "^2.3.0"
+    "lodash": ">=2.x",
+    "underscore.string": "2.3.x"
   },
   "devDependencies": {
-    "chai": "^1.9.0",
-    "mocha": "^2.0.0",
+    "chai": "1.9.x",
+    "mocha": "2.0.x",
     "grunt": "0.4.5",
-    "grunt-contrib-watch": "~0.5.x",
+    "grunt-contrib-watch": "0.5.x",
     "grunt-urequire": "0.7.x",
-    "urequire": "0.7.x",
+    "urequire": "0.7.0-beta.20",
     "uberscore": "0.0.16",
-    "urequire-ab-specrunner": "^0.2.1",
-    "urequire-rc-inject-version": "^0.1.5"
+    "urequire-ab-specrunner": "0.2.x",
+    "urequire-rc-inject-version": "0.1.x"
   }
 }
