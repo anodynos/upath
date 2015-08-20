@@ -9,6 +9,8 @@ upath = require 'upath'
 path = require 'path'
 fs = require 'fs'
 
+splitPaths = (pathsStr)-> pathsStr.split(',').map (p)-> _.trim(p)
+
 getMaxLengths = (inputToExpected)->
   [ _.max _.pluck(_.keys(inputToExpected), 'length')
     _.max _.map(inputToExpected, 'length') ]
@@ -103,7 +105,6 @@ describe "\n# upath v#{VERSION}", ->
 
           `upath.join(paths...)`        --returns-->\n
       """, ->
-        splitPaths = (pathsStr)-> pathsStr.split(',').map (p)-> _.trim(p)
 
         inputToExpected =
           'some/nodejs/deep, ../path' :        'some/nodejs/path'
@@ -218,6 +219,35 @@ describe "\n# upath v#{VERSION}", ->
           ]
           (input, expected)-> ->
             equal upath.normalizeTrim(input), expected
+
+    describe """\n
+      #### `upath.joinSafe([path1][, path2][, ...])`
+
+      Exactly like `path.join()`, but it keeps the first meaningful `./`.
+
+      Note that the unix `/` is returned everywhere, so windows `\\` is always converted to unix `/`.
+
+      ##### Examples / specs & how it differs from vanilla `path`
+
+          `upath.joinSafe(path)`        --returns-->\n
+      """, ->
+        inputToExpected =
+          'some/nodejs/deep, ../path' :        'some/nodejs/path'
+          './some/local/unix/, ../path' :    './some/local/path'
+          './some\\current\\mixed, ..\\path' :    './some/current/path'
+          '../some/relative/destination, ..\\path' :    '../some/relative/path'
+
+        runSpec inputToExpected,
+          (input, expected)-> [ # alt line output
+            splitPaths(input.replace /\\/g, '\\\\').join("', '")
+            expected
+            if (pathResult = path.join.apply null, splitPaths input) isnt expected
+              "  // `path.join()` gives `'#{pathResult}'`"
+            else
+              "  // equal to `path.join()`"
+          ]
+          (input, expected)-> ->
+            equal upath.joinSafe.apply(null, splitPaths input), expected
 
   describe """\n
     ## Added functions for *filename extension* manipulation.
