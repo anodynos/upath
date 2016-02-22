@@ -42,7 +42,7 @@ describe "\n# upath v#{VERSION}", ->
 
   describe """\n
   [![Build Status](https://travis-ci.org/anodynos/upath.svg?branch=master)](https://travis-ci.org/anodynos/upath)
-  [![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath.png)
+  [![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath)
 
   A drop-in replacement / proxy to nodejs's `path` that:
 
