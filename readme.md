@@ -1,7 +1,7 @@
-# upath v0.1.6
+# upath v0.1.7
 
 [![Build Status](https://travis-ci.org/anodynos/upath.svg?branch=master)](https://travis-ci.org/anodynos/upath)
-[![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath.png)
+[![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath)
 
 A drop-in replacement / proxy to nodejs's `path` that:
 
@@ -14,7 +14,6 @@ A drop-in replacement / proxy to nodejs's `path` that:
   * Plus a helper `toUnix` that simply converts `\` to `/` and consolidates duplicates.
 
 **Useful note: these docs are actually auto generated from [specs](https://github.com/anodynos/upath/blob/master/source/spec/upath-spec.coffee), running on Linux.**
-      
 
 ## Why ?
 
@@ -33,22 +32,22 @@ Check out the different (improved) behavior to vanilla `path`:
 
     `upath.normalize(path)`        --returns-->
 
-          ✓ `'c:/windows/nodejs/path'`          --->     `'c:/windows/nodejs/path'`  // equal to `path.normalize()` 
-          ✓ `'c:/windows/../nodejs/path'`       --->             `'c:/nodejs/path'`  // equal to `path.normalize()` 
-          ✓ `'c:\\windows\\nodejs\\path'`       --->     `'c:/windows/nodejs/path'`  // `path.normalize()` gives `'c:\windows\nodejs\path'` 
-          ✓ `'c:\\windows\\..\\nodejs\\path'`   --->             `'c:/nodejs/path'`  // `path.normalize()` gives `'c:\windows\..\nodejs\path'` 
-          ✓ `'//windows\\unix/mixed'`           --->        `'/windows/unix/mixed'`  // `path.normalize()` gives `'/windows\unix/mixed'` 
-          ✓ `'\\windows//unix/mixed'`           --->        `'/windows/unix/mixed'`  // `path.normalize()` gives `'\windows/unix/mixed'` 
-          ✓ `'////\\windows\\..\\unix/mixed/'`  --->               `'/unix/mixed/'`  // `path.normalize()` gives `'/\windows\..\unix/mixed/'` 
+          ✓ `'c:/windows/nodejs/path'`          --->     `'c:/windows/nodejs/path'`  // equal to `path.normalize()`
+          ✓ `'c:/windows/../nodejs/path'`       --->             `'c:/nodejs/path'`  // equal to `path.normalize()`
+          ✓ `'c:\\windows\\nodejs\\path'`       --->     `'c:/windows/nodejs/path'`  // `path.normalize()` gives `'c:\windows\nodejs\path'`
+          ✓ `'c:\\windows\\..\\nodejs\\path'`   --->             `'c:/nodejs/path'`  // `path.normalize()` gives `'c:\windows\..\nodejs\path'`
+          ✓ `'//windows\\unix/mixed'`           --->        `'/windows/unix/mixed'`  // `path.normalize()` gives `'/windows\unix/mixed'`
+          ✓ `'\\windows//unix/mixed'`           --->        `'/windows/unix/mixed'`  // `path.normalize()` gives `'\windows/unix/mixed'`
+          ✓ `'////\\windows\\..\\unix/mixed/'`  --->               `'/unix/mixed/'`  // `path.normalize()` gives `'/\windows\..\unix/mixed/'`
         
 
 Joining paths can also be a problem:
 
     `upath.join(paths...)`        --returns-->
 
-          ✓ `'some/nodejs/deep', '../path'`      --->      `'some/nodejs/path'`  // equal to `path.join()` 
-          ✓ `'some/nodejs\\windows', '../path'`  --->      `'some/nodejs/path'`  // `path.join()` gives `'some/path'` 
-          ✓ `'some\\windows\\only', '..\\path'`  --->     `'some/windows/path'`  // `path.join()` gives `'some\windows\only/..\path'` 
+          ✓ `'some/nodejs/deep', '../path'`      --->      `'some/nodejs/path'`  // equal to `path.join()`
+          ✓ `'some/nodejs\\windows', '../path'`  --->      `'some/nodejs/path'`  // `path.join()` gives `'some/path'`
+          ✓ `'some\\windows\\only', '..\\path'`  --->     `'some/windows/path'`  // `path.join()` gives `'some\windows\only/..\path'`
     
 
 ## Added functions
@@ -62,8 +61,8 @@ Just converts all `` to `/` and consolidates duplicates, without performing any 
 
     `upath.toUnix(path)`        --returns-->
 
-        ✓ `'.//windows\//unix//mixed////'`     --->        `'./windows/unix/mixed/'` 
-        ✓ `'..///windows\..\\unix/mixed'`      --->     `'../windows/../unix/mixed'` 
+        ✓ `'.//windows\//unix//mixed////'`     --->        `'./windows/unix/mixed/'`
+        ✓ `'..///windows\..\\unix/mixed'`      --->     `'../windows/../unix/mixed'`
       
 
 #### `upath.normalizeSafe(path)`
@@ -76,29 +75,29 @@ Note that the unix `/` is returned everywhere, so windows `\` is always converte
 
     `upath.normalizeSafe(path)`        --returns-->
 
-        ✓ `''`                              --->                         `'.'`  // equal to `path.normalize()` 
-        ✓ `'.'`                             --->                         `'.'`  // equal to `path.normalize()` 
-        ✓ `'./'`                            --->                        `'./'`  // equal to `path.normalize()` 
-        ✓ `'.//'`                           --->                        `'./'`  // equal to `path.normalize()` 
-        ✓ `'.\\'`                           --->                        `'./'`  // `path.normalize()` gives `'.\'` 
-        ✓ `'.\\//'`                         --->                        `'./'`  // `path.normalize()` gives `'.\/'` 
-        ✓ `'./..'`                          --->                        `'..'`  // equal to `path.normalize()` 
-        ✓ `'.//..'`                         --->                        `'..'`  // equal to `path.normalize()` 
-        ✓ `'./../'`                         --->                       `'../'`  // equal to `path.normalize()` 
-        ✓ `'.\\..\\'`                       --->                       `'../'`  // `path.normalize()` gives `'.\..\'` 
-        ✓ `'./../dep'`                      --->                    `'../dep'`  // equal to `path.normalize()` 
-        ✓ `'../dep'`                        --->                    `'../dep'`  // equal to `path.normalize()` 
-        ✓ `'../path/dep'`                   --->               `'../path/dep'`  // equal to `path.normalize()` 
-        ✓ `'../path/../dep'`                --->                    `'../dep'`  // equal to `path.normalize()` 
-        ✓ `'dep'`                           --->                       `'dep'`  // equal to `path.normalize()` 
-        ✓ `'path//dep'`                     --->                  `'path/dep'`  // equal to `path.normalize()` 
-        ✓ `'./dep'`                         --->                     `'./dep'`  // `path.normalize()` gives `'dep'` 
-        ✓ `'./path/dep'`                    --->                `'./path/dep'`  // `path.normalize()` gives `'path/dep'` 
-        ✓ `'./path/../dep'`                 --->                     `'./dep'`  // `path.normalize()` gives `'dep'` 
-        ✓ `'.//windows\\unix/mixed/'`       --->     `'./windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'` 
-        ✓ `'..//windows\\unix/mixed'`       --->     `'../windows/unix/mixed'`  // `path.normalize()` gives `'../windows\unix/mixed'` 
-        ✓ `'windows\\unix/mixed/'`          --->       `'windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'` 
-        ✓ `'..//windows\\..\\unix/mixed'`   --->             `'../unix/mixed'`  // `path.normalize()` gives `'../windows\..\unix/mixed'` 
+        ✓ `''`                              --->                         `'.'`  // equal to `path.normalize()`
+        ✓ `'.'`                             --->                         `'.'`  // equal to `path.normalize()`
+        ✓ `'./'`                            --->                        `'./'`  // equal to `path.normalize()`
+        ✓ `'.//'`                           --->                        `'./'`  // equal to `path.normalize()`
+        ✓ `'.\\'`                           --->                        `'./'`  // `path.normalize()` gives `'.\'`
+        ✓ `'.\\//'`                         --->                        `'./'`  // `path.normalize()` gives `'.\/'`
+        ✓ `'./..'`                          --->                        `'..'`  // equal to `path.normalize()`
+        ✓ `'.//..'`                         --->                        `'..'`  // equal to `path.normalize()`
+        ✓ `'./../'`                         --->                       `'../'`  // equal to `path.normalize()`
+        ✓ `'.\\..\\'`                       --->                       `'../'`  // `path.normalize()` gives `'.\..\'`
+        ✓ `'./../dep'`                      --->                    `'../dep'`  // equal to `path.normalize()`
+        ✓ `'../dep'`                        --->                    `'../dep'`  // equal to `path.normalize()`
+        ✓ `'../path/dep'`                   --->               `'../path/dep'`  // equal to `path.normalize()`
+        ✓ `'../path/../dep'`                --->                    `'../dep'`  // equal to `path.normalize()`
+        ✓ `'dep'`                           --->                       `'dep'`  // equal to `path.normalize()`
+        ✓ `'path//dep'`                     --->                  `'path/dep'`  // equal to `path.normalize()`
+        ✓ `'./dep'`                         --->                     `'./dep'`  // `path.normalize()` gives `'dep'`
+        ✓ `'./path/dep'`                    --->                `'./path/dep'`  // `path.normalize()` gives `'path/dep'`
+        ✓ `'./path/../dep'`                 --->                     `'./dep'`  // `path.normalize()` gives `'dep'`
+        ✓ `'.//windows\\unix/mixed/'`       --->     `'./windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`
+        ✓ `'..//windows\\unix/mixed'`       --->     `'../windows/unix/mixed'`  // `path.normalize()` gives `'../windows\unix/mixed'`
+        ✓ `'windows\\unix/mixed/'`          --->       `'windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`
+        ✓ `'..//windows\\..\\unix/mixed'`   --->             `'../unix/mixed'`  // `path.normalize()` gives `'../windows\..\unix/mixed'`
       
 
 #### `upath.normalizeTrim(path)`
@@ -109,11 +108,11 @@ Exactly like `path.normalizeSafe(path)`, but it trims any useless ending `/`.
 
     `upath.normalizeTrim(path)`        --returns-->
 
-        ✓ `'./'`                         --->                        `'.'`  // `upath.normalizeSafe()` gives `'./'` 
-        ✓ `'./../'`                      --->                       `'..'`  // `upath.normalizeSafe()` gives `'../'` 
-        ✓ `'./../dep/'`                  --->                   `'../dep'`  // `upath.normalizeSafe()` gives `'../dep/'` 
-        ✓ `'path//dep\\'`                --->                 `'path/dep'`  // `upath.normalizeSafe()` gives `'path/dep/'` 
-        ✓ `'.//windows\\unix/mixed/'`    --->     `'./windows/unix/mixed'`  // `upath.normalizeSafe()` gives `'./windows/unix/mixed/'` 
+        ✓ `'./'`                         --->                        `'.'`  // `upath.normalizeSafe()` gives `'./'`
+        ✓ `'./../'`                      --->                       `'..'`  // `upath.normalizeSafe()` gives `'../'`
+        ✓ `'./../dep/'`                  --->                   `'../dep'`  // `upath.normalizeSafe()` gives `'../dep/'`
+        ✓ `'path//dep\\'`                --->                 `'path/dep'`  // `upath.normalizeSafe()` gives `'path/dep/'`
+        ✓ `'.//windows\\unix/mixed/'`    --->     `'./windows/unix/mixed'`  // `upath.normalizeSafe()` gives `'./windows/unix/mixed/'`
       
 
 #### `upath.joinSafe([path1][, path2][, ...])`
@@ -126,10 +125,10 @@ Note that the unix `/` is returned everywhere, so windows `\` is always converte
 
     `upath.joinSafe(path)`        --returns-->
 
-        ✓ `'some/nodejs/deep', '../path'`               --->          `'some/nodejs/path'`  // equal to `path.join()` 
-        ✓ `'./some/local/unix/', '../path'`             --->         `'./some/local/path'`  // `path.join()` gives `'some/local/path'` 
-        ✓ `'./some\\current\\mixed', '..\\path'`        --->       `'./some/current/path'`  // `path.join()` gives `'some\current\mixed/..\path'` 
-        ✓ `'../some/relative/destination', '..\\path'`  --->     `'../some/relative/path'`  // `path.join()` gives `'../some/relative/destination/..\path'` 
+        ✓ `'some/nodejs/deep', '../path'`               --->          `'some/nodejs/path'`  // equal to `path.join()`
+        ✓ `'./some/local/unix/', '../path'`             --->         `'./some/local/path'`  // `path.join()` gives `'some/local/path'`
+        ✓ `'./some\\current\\mixed', '..\\path'`        --->       `'./some/current/path'`  // `path.join()` gives `'some\current\mixed/..\path'`
+        ✓ `'../some/relative/destination', '..\\path'`  --->     `'../some/relative/path'`  // `path.join()` gives `'../some/relative/destination/..\path'`
     
 
 ## Added functions for *filename extension* manipulation.
@@ -154,20 +153,20 @@ Adds `.ext` to `filename`, but only if it doesn't already have the exact extensi
 
     `upath.addExt(filename, 'js')`     --returns-->
 
-        ✓ `'myfile/addExt'`          --->          `'myfile/addExt.js'` 
-        ✓ `'myfile/addExt.txt'`      --->      `'myfile/addExt.txt.js'` 
-        ✓ `'myfile/addExt.js'`       --->          `'myfile/addExt.js'` 
-        ✓ `'myfile/addExt.min.'`     --->     `'myfile/addExt.min..js'` 
+        ✓ `'myfile/addExt'`          --->          `'myfile/addExt.js'`
+        ✓ `'myfile/addExt.txt'`      --->      `'myfile/addExt.txt.js'`
+        ✓ `'myfile/addExt.js'`       --->          `'myfile/addExt.js'`
+        ✓ `'myfile/addExt.min.'`     --->     `'myfile/addExt.min..js'`
         
 
 It adds nothing if no `ext` param is passed.
 
     `upath.addExt(filename)`           --returns-->
 
-          ✓ `'myfile/addExt'`          --->             `'myfile/addExt'` 
-          ✓ `'myfile/addExt.txt'`      --->         `'myfile/addExt.txt'` 
-          ✓ `'myfile/addExt.js'`       --->          `'myfile/addExt.js'` 
-          ✓ `'myfile/addExt.min.'`     --->        `'myfile/addExt.min.'` 
+          ✓ `'myfile/addExt'`          --->             `'myfile/addExt'`
+          ✓ `'myfile/addExt.txt'`      --->         `'myfile/addExt.txt'`
+          ✓ `'myfile/addExt.js'`       --->          `'myfile/addExt.js'`
+          ✓ `'myfile/addExt.min.'`     --->        `'myfile/addExt.min.'`
       
 
 #### `upath.trimExt(filename, [ignoreExts], [maxSize=7])`
@@ -182,22 +181,22 @@ Trims a filename's extension.
 
     `upath.trimExt(filename)`          --returns-->
 
-        ✓ `'my/trimedExt.txt'`            --->                `'my/trimedExt'` 
-        ✓ `'my/trimedExt'`                --->                `'my/trimedExt'` 
-        ✓ `'my/trimedExt.min'`            --->                `'my/trimedExt'` 
-        ✓ `'my/trimedExt.min.js'`         --->            `'my/trimedExt.min'` 
-        ✓ `'../my/trimedExt.longExt'`     --->     `'../my/trimedExt.longExt'` 
+        ✓ `'my/trimedExt.txt'`            --->                `'my/trimedExt'`
+        ✓ `'my/trimedExt'`                --->                `'my/trimedExt'`
+        ✓ `'my/trimedExt.min'`            --->                `'my/trimedExt'`
+        ✓ `'my/trimedExt.min.js'`         --->            `'my/trimedExt.min'`
+        ✓ `'../my/trimedExt.longExt'`     --->     `'../my/trimedExt.longExt'`
         
 
 It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
     `upath.removeExt(filename, ['min', '.dev'], 8)`          --returns-->
 
-          ✓ `'my/trimedExt.txt'`             --->                 `'my/trimedExt'` 
-          ✓ `'my/trimedExt.min'`             --->             `'my/trimedExt.min'` 
-          ✓ `'my/trimedExt.dev'`             --->             `'my/trimedExt.dev'` 
-          ✓ `'../my/trimedExt.longExt'`      --->              `'../my/trimedExt'` 
-          ✓ `'../my/trimedExt.longRExt'`     --->     `'../my/trimedExt.longRExt'` 
+          ✓ `'my/trimedExt.txt'`             --->                 `'my/trimedExt'`
+          ✓ `'my/trimedExt.min'`             --->             `'my/trimedExt.min'`
+          ✓ `'my/trimedExt.dev'`             --->             `'my/trimedExt.dev'`
+          ✓ `'../my/trimedExt.longExt'`      --->              `'../my/trimedExt'`
+          ✓ `'../my/trimedExt.longRExt'`     --->     `'../my/trimedExt.longRExt'`
       
 
 #### `upath.removeExt(filename, ext)`
@@ -209,9 +208,9 @@ As in all upath functions, it be `.ext` or `ext`.
 
     `upath.removeExt(filename, '.js')`          --returns-->
 
-        ✓ `'removedExt.js'`         --->         `'removedExt'` 
-        ✓ `'removedExt.txt.js'`     --->     `'removedExt.txt'` 
-        ✓ `'notRemoved.txt'`        --->     `'notRemoved.txt'` 
+        ✓ `'removedExt.js'`         --->         `'removedExt'`
+        ✓ `'removedExt.txt.js'`     --->     `'removedExt.txt'`
+        ✓ `'notRemoved.txt'`        --->     `'notRemoved.txt'`
       
 
 #### `upath.changeExt(filename, [ext], [ignoreExts], [maxSize=7])`
@@ -226,33 +225,33 @@ Changes a filename's extension to `ext`. If it has no (valid) extension, it adds
 
     `upath.changeExt(filename, '.js')`  --returns-->
 
-        ✓ `'my/module.min'`           --->               `'my/module.js'` 
-        ✓ `'my/module.coffee'`        --->               `'my/module.js'` 
-        ✓ `'my/module'`               --->               `'my/module.js'` 
-        ✓ `'file/withDot.'`           --->            `'file/withDot.js'` 
-        ✓ `'file/change.longExt'`     --->     `'file/change.longExt.js'` 
+        ✓ `'my/module.min'`           --->               `'my/module.js'`
+        ✓ `'my/module.coffee'`        --->               `'my/module.js'`
+        ✓ `'my/module'`               --->               `'my/module.js'`
+        ✓ `'file/withDot.'`           --->            `'file/withDot.js'`
+        ✓ `'file/change.longExt'`     --->     `'file/change.longExt.js'`
         
 
 If no `ext` param is given, it trims the current extension (if any).
 
     `upath.changeExt(filename)`        --returns-->
 
-          ✓ `'my/module.min'`           --->                  `'my/module'` 
-          ✓ `'my/module.coffee'`        --->                  `'my/module'` 
-          ✓ `'my/module'`               --->                  `'my/module'` 
-          ✓ `'file/withDot.'`           --->               `'file/withDot'` 
-          ✓ `'file/change.longExt'`     --->        `'file/change.longExt'` 
+          ✓ `'my/module.min'`           --->                  `'my/module'`
+          ✓ `'my/module.coffee'`        --->                  `'my/module'`
+          ✓ `'my/module'`               --->                  `'my/module'`
+          ✓ `'file/withDot.'`           --->               `'file/withDot'`
+          ✓ `'file/change.longExt'`     --->        `'file/change.longExt'`
         
 
 It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
     `upath.changeExt(filename, 'js', ['min', '.dev'], 8)`        --returns-->
 
-          ✓ `'my/module.coffee'`         --->                `'my/module.js'` 
-          ✓ `'file/notValidExt.min'`     --->     `'file/notValidExt.min.js'` 
-          ✓ `'file/notValidExt.dev'`     --->     `'file/notValidExt.dev.js'` 
-          ✓ `'file/change.longExt'`      --->              `'file/change.js'` 
-          ✓ `'file/change.longRExt'`     --->     `'file/change.longRExt.js'` 
+          ✓ `'my/module.coffee'`         --->                `'my/module.js'`
+          ✓ `'file/notValidExt.min'`     --->     `'file/notValidExt.min.js'`
+          ✓ `'file/notValidExt.dev'`     --->     `'file/notValidExt.dev.js'`
+          ✓ `'file/change.longExt'`      --->              `'file/change.js'`
+          ✓ `'file/change.longRExt'`     --->     `'file/change.longRExt.js'`
       
 
 #### `upath.defaultExt(filename, [ext], [ignoreExts], [maxSize=7])`
@@ -267,34 +266,34 @@ Adds `.ext` to `filename`, only if it doesn't already have _any_ *old* extension
 
     `upath.defaultExt(filename, 'js')`   --returns-->
 
-        ✓ `'fileWith/defaultExt'`             --->             `'fileWith/defaultExt.js'` 
-        ✓ `'fileWith/defaultExt.js'`          --->             `'fileWith/defaultExt.js'` 
-        ✓ `'fileWith/defaultExt.min'`         --->            `'fileWith/defaultExt.min'` 
-        ✓ `'fileWith/defaultExt.longExt'`     --->     `'fileWith/defaultExt.longExt.js'` 
+        ✓ `'fileWith/defaultExt'`             --->             `'fileWith/defaultExt.js'`
+        ✓ `'fileWith/defaultExt.js'`          --->             `'fileWith/defaultExt.js'`
+        ✓ `'fileWith/defaultExt.min'`         --->            `'fileWith/defaultExt.min'`
+        ✓ `'fileWith/defaultExt.longExt'`     --->     `'fileWith/defaultExt.longExt.js'`
         
 
 If no `ext` param is passed, it leaves filename intact.
 
     `upath.defaultExt(filename)`       --returns-->
 
-          ✓ `'fileWith/defaultExt'`             --->                `'fileWith/defaultExt'` 
-          ✓ `'fileWith/defaultExt.js'`          --->             `'fileWith/defaultExt.js'` 
-          ✓ `'fileWith/defaultExt.min'`         --->            `'fileWith/defaultExt.min'` 
-          ✓ `'fileWith/defaultExt.longExt'`     --->        `'fileWith/defaultExt.longExt'` 
+          ✓ `'fileWith/defaultExt'`             --->                `'fileWith/defaultExt'`
+          ✓ `'fileWith/defaultExt.js'`          --->             `'fileWith/defaultExt.js'`
+          ✓ `'fileWith/defaultExt.min'`         --->            `'fileWith/defaultExt.min'`
+          ✓ `'fileWith/defaultExt.longExt'`     --->        `'fileWith/defaultExt.longExt'`
         
 
 It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
     `upath.defaultExt(filename, 'js', ['min', '.dev'], 8)` --returns-->
 
-          ✓ `'fileWith/defaultExt'`              --->              `'fileWith/defaultExt.js'` 
-          ✓ `'fileWith/defaultExt.min'`          --->          `'fileWith/defaultExt.min.js'` 
-          ✓ `'fileWith/defaultExt.dev'`          --->          `'fileWith/defaultExt.dev.js'` 
-          ✓ `'fileWith/defaultExt.longExt'`      --->         `'fileWith/defaultExt.longExt'` 
-          ✓ `'fileWith/defaultExt.longRext'`     --->     `'fileWith/defaultExt.longRext.js'` 
+          ✓ `'fileWith/defaultExt'`              --->              `'fileWith/defaultExt.js'`
+          ✓ `'fileWith/defaultExt.min'`          --->          `'fileWith/defaultExt.min.js'`
+          ✓ `'fileWith/defaultExt.dev'`          --->          `'fileWith/defaultExt.dev.js'`
+          ✓ `'fileWith/defaultExt.longExt'`      --->         `'fileWith/defaultExt.longExt'`
+          ✓ `'fileWith/defaultExt.longRext'`     --->     `'fileWith/defaultExt.longRext.js'`
 
   
-Copyright(c) 2014 Agelos Pikoulas (agelos.pikoulas@gmail.com)
+Copyright(c) 2014-2016 Angelos Pikoulas (agelos.pikoulas@gmail.com)
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -316,3 +315,4 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+ 
