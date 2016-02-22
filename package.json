@@ -40,6 +40,9 @@
   "engines": {
     "node": ">=0.10 <=5"
   },
+  "typescript": {
+    "definition": "upath.d.ts"
+  },
   "dependencies": {
     "lodash": "3.x",
     "underscore.string": "2.3.x"
