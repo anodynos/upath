@@ -21,7 +21,7 @@ formatObjectToOneLine = (any) -> util.inspect(any, { colors:true }).replace(/\n 
 getDefaultLine = (input, expected, maxLengths)->
   ipad = _.pad '', (maxLengths[0] - input.length) + 5, ' '
   epad = _.pad '', (maxLengths[1] - expected.length) + 5 , ' '
-  "`'#{ input }'`#{ ipad } ---> #{ epad }`'#{ formatObjectToOneLine expected }'`"
+  "`'#{ input }'`#{ ipad } ---> #{ epad }`#{ formatObjectToOneLine expected }`"
 
 runSpec = (inputToExpected, getLine, itTest)->
   if not itTest     # can also be called as runSpec(inputToExpected, itTest) for getdefaultLine
