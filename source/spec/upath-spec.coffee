@@ -126,8 +126,9 @@ describe "\n# upath v#{VERSION}", ->
           (input, expected)-> ->
             equal upath.join.apply(null, splitPaths input), expected
 
-      describe """\n
-      Parsing with `path.parse()` should also be consistent across OSes:
+      # parse is not available in node v0.10
+      if not _.startsWith(process.version, 'v0.10') then describe """\n
+        Parsing with `path.parse()` should also be consistent across OSes:
 
           `upath.parse(path)`        --returns-->\n
       """, ->
