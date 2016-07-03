@@ -3,11 +3,12 @@ _.mixin (require 'underscore.string').exports()
 chai = require 'chai'
 expect = chai.expect
 
-{ equal } = require './specHelpers'
+{ equal, deepEqual } = require './specHelpers'
 
 upath = require 'upath'
 path = require 'path'
 fs = require 'fs'
+util = require 'util'
 
 splitPaths = (pathsStr)-> pathsStr.split(',').map (p)-> _.trim(p)
 
@@ -15,10 +16,12 @@ getMaxLengths = (inputToExpected)->
   [ _.max _.pluck(_.keys(inputToExpected), 'length')
     _.max _.map(inputToExpected, 'length') ]
 
+formatObjectToOneLine = (any) -> util.inspect(any, { colors:true }).replace(/\n /g, '')
+
 getDefaultLine = (input, expected, maxLengths)->
   ipad = _.pad '', (maxLengths[0] - input.length) + 5, ' '
   epad = _.pad '', (maxLengths[1] - expected.length) + 5 , ' '
-  "`'#{input}'`#{ipad}--->#{epad}`'#{expected}'`"
+  "`'#{ input }'`#{ ipad } ---> #{ epad }`'#{ formatObjectToOneLine expected }'`"
 
 runSpec = (inputToExpected, getLine, itTest)->
   if not itTest     # can also be called as runSpec(inputToExpected, itTest) for getdefaultLine
@@ -122,6 +125,31 @@ describe "\n# upath v#{VERSION}", ->
             ]
           (input, expected)-> ->
             equal upath.join.apply(null, splitPaths input), expected
+
+      describe """\n
+      Parsing with `path.parse()` should also be consistent across OSes:
+
+          `upath.parse(path)`        --returns-->\n
+      """, ->
+
+        inputToExpected =
+          'c:\\Windows\\Directory\\somefile.ext' :
+            { root: '', dir: 'c:/Windows/Directory', base: 'somefile.ext', ext: '.ext', name: 'somefile' }
+          '/root/of/unix/somefile.ext' :
+            { root: '/', dir: '/root/of/unix', base: 'somefile.ext', ext: '.ext', name: 'somefile' }
+
+
+        runSpec inputToExpected,
+          (input, expected)-> [ # alt line output
+            input
+            expected
+            if not _.isEqual (pathResult = path.parse.call null, input), expected
+              '\n' +  [1..input.length + 2].map(-> ' ').join('') + " // `path.parse()` gives `'#{ formatObjectToOneLine pathResult }'`"
+            else
+              "  // equal to `path.parse()`"
+          ]
+          (input, expected)-> ->
+            deepEqual upath.parse.call(null, input), expected
 
   describe """\n
   ## Added functions

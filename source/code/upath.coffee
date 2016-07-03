@@ -5,24 +5,37 @@ upath = exports
 
 upath.VERSION = if VERSION? then VERSION else 'NO-VERSION' # injected by urequire-inject-version
 
-toUnix = (p)->
+toUnix = (p) ->
   p = p.replace /\\/g, '/'
   double = /\/\//
   while p.match double
     p = p.replace double, '/' # node on windows doesn't replace doubles
   p
 
-for fName, fn of path when _.isFunction fn
-  upath[fName] = do (fName)->
-    (args...)->
-      args = _.map args, (p)-> if _.isString(p) then toUnix(p) else p
-      toUnix(path[fName] args...)
+for propName, propValue of path
+  if _.isFunction propValue
+    upath[propName] = do (propName) ->
+      (args...) ->
+        args = _.map args, (p) ->
+          if _.isString(p)
+            toUnix p
+          else
+            p
+
+        result = path[propName] args...
+
+        if _.isString result
+          toUnix result
+        else
+          result
+  else
+    upath[propName] = propValue
 
 extraFunctions =
 
   toUnix: toUnix
 
-  normalizeSafe: (p)->
+  normalizeSafe: (p) ->
     p = toUnix(p)
     if _.startsWith p, './'
       if _.startsWith(p, './..') or (p is './')
@@ -32,34 +45,35 @@ extraFunctions =
     else
       upath.normalize(p)
 
-  normalizeTrim: (p)->
+  normalizeTrim: (p) ->
     p = upath.normalizeSafe p
     if _.endsWith(p, '/')
       p[0..p.length-2]
     else
       p
 
-  joinSafe: (p...)->
+
+  joinSafe: (p...) ->
     result = upath.join.apply null, p
     if _.startsWith(p[0], './') && !_.startsWith(result, './')
       result = './' + result
     result
 
-  addExt: (file, ext)->
+  addExt: (file, ext) ->
     if not ext
       file
     else
       ext = '.' + ext if ext[0] isnt '.'
       file + if _.endsWith(file, ext) then '' else ext
 
-  trimExt: (filename, ignoreExts, maxSize=7)->
+  trimExt: (filename, ignoreExts, maxSize=7) ->
     oldExt = upath.extname filename
     if isValidExt oldExt, ignoreExts, maxSize
       filename[0..(filename.length - oldExt.length)-1]
     else
       filename
 
-  removeExt: (filename, ext)->
+  removeExt: (filename, ext) ->
     if not ext
       return filename
     else
@@ -69,7 +83,7 @@ extraFunctions =
       else
         filename
 
-  changeExt: (filename, ext, ignoreExts, maxSize=7)->
+  changeExt: (filename, ext, ignoreExts, maxSize=7) ->
     upath.trimExt(filename, ignoreExts, maxSize) +
       if not ext
         ''
@@ -79,16 +93,16 @@ extraFunctions =
         else
           '.' + ext
 
-  defaultExt: (filename, ext, ignoreExts, maxSize=7)->
+  defaultExt: (filename, ext, ignoreExts, maxSize=7) ->
     oldExt = upath.extname filename
     if isValidExt(oldExt, ignoreExts, maxSize)
       filename
     else
       upath.addExt filename, ext
 
-isValidExt = (ext, ignoreExts, maxSize)->
+isValidExt = (ext, ignoreExts, maxSize) ->
   ((ext) and (ext.length <= maxSize)) and
-  (ext not in _.map(ignoreExts, (e)->
+  (ext not in _.map(ignoreExts, (e) ->
     (if e and (e[0] isnt '.') then '.' else '') + e)
   )
 
