@@ -29,6 +29,7 @@
     "email": "agelos.pikoulas@gmail.com"
   },
   "main": "./build/code/upath.js",
+  "types": "./upath.d.ts",
   "preferGlobal": false,
   "scripts": {
     "test": "grunt"
@@ -39,9 +40,6 @@
   },
   "engines": {
     "node": ">=0.10 <=5"
-  },
-  "typescript": {
-    "definition": "upath.d.ts"
   },
   "dependencies": {
     "lodash": "3.x",
