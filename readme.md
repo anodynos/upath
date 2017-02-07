@@ -1,4 +1,4 @@
-# upath v0.2.0
+# upath v1.0.0
 
 [![Build Status](https://travis-ci.org/anodynos/upath.svg?branch=master)](https://travis-ci.org/anodynos/upath)
 [![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath)
@@ -14,6 +14,7 @@ A drop-in replacement / proxy to nodejs's `path` that:
   * Plus a helper `toUnix` that simply converts `\` to `/` and consolidates duplicates.
 
 **Useful note: these docs are actually auto generated from [specs](https://github.com/anodynos/upath/blob/master/source/spec/upath-spec.coffee), running on Linux.**
+      
 
 ## Why ?
 
