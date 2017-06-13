@@ -1,4 +1,4 @@
-# upath v1.0.0
+# upath v1.0.1
 
 [![Build Status](https://travis-ci.org/anodynos/upath.svg?branch=master)](https://travis-ci.org/anodynos/upath)
 [![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath)
@@ -19,12 +19,11 @@ A drop-in replacement / proxy to nodejs's `path` that:
 ## Why ?
 
 Normal `path` doesn't convert paths to a unified format (ie `/`) before calculating paths (`normalize`, `join`), which can lead to numerous problems.
-Also path joining, normalization etc on the two formats is not consistent, depending on where it runs - last checked with nodejs 0.10.32 running on Linux & Windows x64.
-Running on Windows `path` yields different results.
+Also path joining, normalization etc on the two formats is not consistent, depending on where it runs. Running `path` on Windows yields different results than when it runs on Linux / Mac.
 
 In general, if you code your paths logic while developing on Unix/Mac and it runs on Windows, you may run into problems when using `path`.
 
-Note that using **Unix `/` on Windows** works perfectly inside nodejs (and other languages), so there's no reason to stick to the legacy.
+Note that using **Unix `/` on Windows** works perfectly inside nodejs (and other languages), so there's no reason to stick to the Windows legacy at all.
 
 ##### Examples / specs
         
@@ -290,7 +289,7 @@ If no `ext` param is passed, it leaves filename intact.
           ✓ `'fileWith/defaultExt.js'`           --->              `'fileWith/defaultExt.js'`
           ✓ `'fileWith/defaultExt.min'`          --->             `'fileWith/defaultExt.min'`
           ✓ `'fileWith/defaultExt.longExt'`      --->         `'fileWith/defaultExt.longExt'`
-
+        
 
 It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
@@ -303,7 +302,7 @@ It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 ch
           ✓ `'fileWith/defaultExt.longRext'`      --->      `'fileWith/defaultExt.longRext.js'`
 
 
-Copyright(c) 2014 Agelos Pikoulas (agelos.pikoulas@gmail.com)
+Copyright(c) 2014-2017 Angelos Pikoulas (agelos.pikoulas@gmail.com)
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
