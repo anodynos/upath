@@ -13,7 +13,7 @@ util = require 'util'
 splitPaths = (pathsStr)-> pathsStr.split(',').map (p)-> _.trim(p)
 
 getMaxLengths = (inputToExpected)->
-  [ _.max _.pluck(_.keys(inputToExpected), 'length')
+  [ _.max _.map(_.keys(inputToExpected), 'length')
     _.max _.map(inputToExpected, 'length') ]
 
 formatObjectToOneLine = (any) -> util.inspect(any, { colors:true }).replace(/\n /g, '')
@@ -64,12 +64,11 @@ describe "\n# upath v#{VERSION}", ->
     ## Why ?
 
     Normal `path` doesn't convert paths to a unified format (ie `/`) before calculating paths (`normalize`, `join`), which can lead to numerous problems.
-    Also path joining, normalization etc on the two formats is not consistent, depending on where it runs - last checked with nodejs 0.10.32 running on Linux & Windows x64.
-    Running on Windows `path` yields different results.
+    Also path joining, normalization etc on the two formats is not consistent, depending on where it runs. Running `path` on Windows yields different results than when it runs on Linux / Mac.
 
     In general, if you code your paths logic while developing on Unix/Mac and it runs on Windows, you may run into problems when using `path`.
 
-    Note that using **Unix `/` on Windows** works perfectly inside nodejs (and other languages), so there's no reason to stick to the legacy.
+    Note that using **Unix `/` on Windows** works perfectly inside nodejs (and other languages), so there's no reason to stick to the Windows legacy at all.
 
     ##### Examples / specs
     """, ->
