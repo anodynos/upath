@@ -1,4 +1,9 @@
-_.mixin (require 'underscore.string').exports()
+_ =
+  startsWith: require 'lodash.startswith'
+  endsWith: require 'lodash.endswith'
+  isFunction: require 'lodash.isfunction'
+  isString: require 'lodash.isstring'
+
 path = require 'path'
 
 upath = exports
@@ -16,7 +21,7 @@ for propName, propValue of path
   if _.isFunction propValue
     upath[propName] = do (propName) ->
       (args...) ->
-        args = _.map args, (p) ->
+        args = args.map (p) ->
           if _.isString(p)
             toUnix p
           else
@@ -100,14 +105,14 @@ extraFunctions =
     else
       upath.addExt filename, ext
 
-isValidExt = (ext, ignoreExts, maxSize) ->
+isValidExt = (ext, ignoreExts = [], maxSize) ->
   ((ext) and (ext.length <= maxSize)) and
-  (ext not in _.map(ignoreExts, (e) ->
-    (if e and (e[0] isnt '.') then '.' else '') + e)
+  (ext not in ignoreExts.map (e) ->
+    (if e and (e[0] isnt '.') then '.' else '') + e
   )
 
 for name, extraFn of extraFunctions
-  if not _.isUndefined upath[name]
+  if upath[name] isnt undefined
     throw new Error "path.#{name} already exists."
   else
     upath[name] = extraFn
