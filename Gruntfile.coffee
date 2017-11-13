@@ -2,7 +2,6 @@ module.exports = gruntFunction = (grunt) ->
   gruntConfig =
     urequire:
       _all:
-        dependencies: imports: { lodash: ['_'] }
         runtimeInfo: false
         bare: true
         #debugLevel: 50
@@ -16,6 +15,7 @@ module.exports = gruntFunction = (grunt) ->
         resources: [ 'inject-version' ]
 
       spec:
+        dependencies: imports: { lodash: ['_'] }
         path: 'source/spec'
         dstPath: 'build/spec'
         afterBuild: require('urequire-ab-specrunner').options
