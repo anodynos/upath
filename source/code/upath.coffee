@@ -1,8 +1,8 @@
 _ =
-  startsWith: require 'lodash.startswith'
-  endsWith: require 'lodash.endswith'
-  isFunction: require 'lodash.isfunction'
-  isString: require 'lodash.isstring'
+  startsWith: require 'lodash/startsWith'
+  endsWith: require 'lodash/endsWith'
+  isFunction: require 'lodash/isFunction'
+  isString: require 'lodash/isString'
 
 path = require 'path'
 
