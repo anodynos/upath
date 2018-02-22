@@ -1,6 +1,5 @@
-_ =
-  isFunction: require 'lodash.isfunction'
-  isString: require 'lodash.isstring'
+isFunction = require 'lodash.isfunction'
+isString = require 'lodash.isstring'
 
 path = require 'path'
 
@@ -16,18 +15,18 @@ toUnix = (p) ->
   p
 
 for propName, propValue of path
-  if _.isFunction propValue
+  if isFunction propValue
     upath[propName] = do (propName) ->
       (args...) ->
         args = args.map (p) ->
-          if _.isString(p)
+          if isString(p)
             toUnix p
           else
             p
 
         result = path[propName] args...
 
-        if _.isString result
+        if isString result
           toUnix result
         else
           result
