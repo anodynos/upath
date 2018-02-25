@@ -1,8 +1,5 @@
-_ =
-  startsWith: require 'lodash.startswith'
-  endsWith: require 'lodash.endswith'
-  isFunction: require 'lodash.isfunction'
-  isString: require 'lodash.isstring'
+isFunction = require 'lodash.isfunction'
+isString = require 'lodash.isstring'
 
 path = require 'path'
 
@@ -18,18 +15,18 @@ toUnix = (p) ->
   p
 
 for propName, propValue of path
-  if _.isFunction propValue
+  if isFunction propValue
     upath[propName] = do (propName) ->
       (args...) ->
         args = args.map (p) ->
-          if _.isString(p)
+          if isString(p)
             toUnix p
           else
             p
 
         result = path[propName] args...
 
-        if _.isString result
+        if isString result
           toUnix result
         else
           result
@@ -44,8 +41,8 @@ extraFunctions =
 
   normalizeSafe: (p) ->
     p = toUnix(p)
-    if _.startsWith p, './'
-      if _.startsWith(p, './..') or (p is './')
+    if p.startsWith './'
+      if p.startsWith('./..') or (p is './')
         upath.normalize(p)
       else
         './' + upath.normalize(p)
@@ -54,7 +51,7 @@ extraFunctions =
 
   normalizeTrim: (p) ->
     p = upath.normalizeSafe p
-    if _.endsWith(p, '/')
+    if p.endsWith('/')
       p[0..p.length-2]
     else
       p
@@ -62,7 +59,7 @@ extraFunctions =
 
   joinSafe: (p...) ->
     result = upath.join.apply null, p
-    if _.startsWith(p[0], './') && !_.startsWith(result, './')
+    if p[0].startsWith('./') && !result.startsWith('./')
       result = './' + result
     result
 
@@ -71,7 +68,7 @@ extraFunctions =
       file
     else
       ext = '.' + ext if ext[0] isnt '.'
-      file + if _.endsWith(file, ext) then '' else ext
+      file + if file.endsWith(ext) then '' else ext
 
   trimExt: (filename, ignoreExts, maxSize=7) ->
     oldExt = upath.extname filename

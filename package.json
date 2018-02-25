@@ -43,8 +43,6 @@
     "node": ">=4 <=9"
   },
   "dependencies": {
-    "lodash.endswith": "^4.2.1",
-    "lodash.startswith": "^4.2.1",
     "lodash.isfunction": "^3.0.8",
     "lodash.isstring": "^4.0.1"
   },
