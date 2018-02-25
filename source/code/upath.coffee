@@ -36,6 +36,8 @@ for propName, propValue of path
   else
     upath[propName] = propValue
 
+upath.sep = '/'
+
 extraFunctions =
 
   toUnix: toUnix
