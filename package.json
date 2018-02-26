@@ -1,7 +1,7 @@
 {
   "name": "upath",
   "description": "A proxy to `path`, replacing `\\` with `/` for all results & new methods to normalize & join keeping leading `./` and add, change, default, trim file extensions.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "homepage": "http://github.com/anodynos/upath/",
   "author": {
     "name": "Angelos Pikoulas",
@@ -41,10 +41,6 @@
   },
   "engines": {
     "node": ">=4 <=9"
-  },
-  "dependencies": {
-    "lodash.isfunction": "^3.0.8",
-    "lodash.isstring": "^4.0.1"
   },
   "devDependencies": {
     "chai": "~4.0.2",
