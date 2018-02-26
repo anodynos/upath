@@ -58,6 +58,12 @@ describe "\n# upath v#{VERSION}", ->
     * Plus a helper `toUnix` that simply converts `\\` to `/` and consolidates duplicates.
 
   **Useful note: these docs are actually auto generated from [specs](https://github.com/anodynos/upath/blob/master/source/spec/upath-spec.coffee), running on Linux.**
+
+  Notes:
+
+   * `upath.sep` is set to `'/'` for seamless replacement (as of 1.0.3).
+
+   * upath has no runtime dependencies, except built-in `path` (as of 1.0.4)
   """, ->
 
     describe """\n

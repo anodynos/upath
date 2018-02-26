@@ -1,7 +1,10 @@
-isFunction = require 'lodash.isfunction'
-isString = require 'lodash.isstring'
-
 path = require 'path'
+
+isFunction = (val) -> val instanceof Function
+
+isString = (val) ->
+  typeof val == 'string' or
+    (!!val and typeof val == 'object' and Object::toString.call(val) == '[object String]')
 
 upath = exports
 
