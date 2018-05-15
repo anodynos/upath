@@ -113,7 +113,7 @@ isValidExt = (ext, ignoreExts = [], maxSize) ->
     (if e and (e[0] isnt '.') then '.' else '') + e
   )
 
-for name, extraFn of extraFunctions
+for own name, extraFn of extraFunctions
   if upath[name] isnt undefined
     throw new Error "path.#{name} already exists."
   else

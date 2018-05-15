@@ -64,6 +64,8 @@ describe "\n# upath v#{VERSION}", ->
    * `upath.sep` is set to `'/'` for seamless replacement (as of 1.0.3).
 
    * upath has no runtime dependencies, except built-in `path` (as of 1.0.4)
+
+   * travis-ci tested in node versions 4 to 10
   """, ->
 
     describe """\n
