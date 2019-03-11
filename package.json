@@ -41,7 +41,7 @@
   },
   "engines": {
     "node": ">=4",
-    "yarn": ">=1"
+    "yarn": "*"
   },
   "devDependencies": {
     "chai": "~4.0.2",
