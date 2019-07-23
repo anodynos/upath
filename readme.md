@@ -227,7 +227,15 @@ As in all upath functions, it be `.ext` or `ext`.
         ✓ `'removedExt.js'`          --->          `'removedExt'`
         ✓ `'removedExt.txt.js'`      --->      `'removedExt.txt'`
         ✓ `'notRemoved.txt'`         --->      `'notRemoved.txt'`
-      
+
+It does not care about the length of exts.
+
+    `upath.removeExt(filename, '.longExt')`          --returns-->
+
+        ✓ `'removedExt.longExt'`          --->          `'removedExt'`
+        ✓ `'removedExt.txt.longExt'`      --->      `'removedExt.txt'`
+        ✓ `'notRemoved.txt'`              --->      `'notRemoved.txt'`
+
 
 #### `upath.changeExt(filename, [ext], [ignoreExts], [maxSize=7])`
 
