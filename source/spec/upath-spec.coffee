@@ -358,7 +358,7 @@ describe "\n# upath v#{VERSION}", ->
       describe """\n
       It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
-          `upath.removeExt(filename, ['min', '.dev'], 8)`          --returns-->\n
+          `upath.trimExt(filename, ['min', '.dev'], 8)`          --returns-->\n
       """, ->
         inputToExpected =
           'my/trimedExt.txt': 'my/trimedExt'

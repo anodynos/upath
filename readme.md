@@ -206,7 +206,7 @@ Trims a filename's extension.
 
 It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
-    `upath.removeExt(filename, ['min', '.dev'], 8)`          --returns-->
+    `upath.trimExt(filename, ['min', '.dev'], 8)`          --returns-->
 
           ✓ `'my/trimedExt.txt'`              --->                  `'my/trimedExt'`
           ✓ `'my/trimedExt.min'`              --->              `'my/trimedExt.min'`
