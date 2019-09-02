@@ -1,4 +1,4 @@
-# upath v1.1.2
+# upath v1.2.0
 
 [![Build Status](https://travis-ci.org/anodynos/upath.svg?branch=master)](https://travis-ci.org/anodynos/upath)
 [![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath)
@@ -20,8 +20,9 @@ Notes:
  * `upath.sep` is set to `'/'` for seamless replacement (as of 1.0.3).
 
  * upath has no runtime dependencies, except built-in `path` (as of 1.0.4)
- 
- * travis-ci tested in node versions 4 to 10      
+
+ * travis-ci tested in node versions 4 to 12
+      
 
 ## Why ?
 
@@ -304,7 +305,7 @@ If no `ext` param is passed, it leaves filename intact.
           ✓ `'fileWith/defaultExt.js'`           --->              `'fileWith/defaultExt.js'`
           ✓ `'fileWith/defaultExt.min'`          --->             `'fileWith/defaultExt.min'`
           ✓ `'fileWith/defaultExt.longExt'`      --->         `'fileWith/defaultExt.longExt'`
-
+        
 
 It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
@@ -317,7 +318,7 @@ It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 ch
           ✓ `'fileWith/defaultExt.longRext'`      --->      `'fileWith/defaultExt.longRext.js'`
 
 
-Copyright(c) 2014-2017 Angelos Pikoulas (agelos.pikoulas@gmail.com)
+Copyright(c) 2014-2019 Angelos Pikoulas (agelos.pikoulas@gmail.com)
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -339,5 +340,3 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-
-97 passing (33ms)

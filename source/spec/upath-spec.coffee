@@ -65,7 +65,7 @@ describe "\n# upath v#{VERSION}", ->
 
    * upath has no runtime dependencies, except built-in `path` (as of 1.0.4)
 
-   * travis-ci tested in node versions 4 to 10
+   * travis-ci tested in node versions 4 to 12
   """, ->
 
     describe """\n
