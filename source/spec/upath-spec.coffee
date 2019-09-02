@@ -358,7 +358,7 @@ describe "\n# upath v#{VERSION}", ->
       describe """\n
       It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
-          `upath.removeExt(filename, ['min', '.dev'], 8)`          --returns-->\n
+          `upath.trimExt(filename, ['min', '.dev'], 8)`          --returns-->\n
       """, ->
         inputToExpected =
           'my/trimedExt.txt': 'my/trimedExt'
@@ -388,6 +388,20 @@ describe "\n# upath v#{VERSION}", ->
       runSpec inputToExpected, (input, expected)-> ->
         equal upath.removeExt(input, '.js'), expected
         equal upath.removeExt(input, 'js'), expected
+    
+    describe """\n
+    It does not care about the length of exts.
+
+        `upath.removeExt(filename, '.longExt')`          --returns-->\n
+    """, ->
+      inputToExpected =
+        'removedExt.longExt': 'removedExt'
+        'removedExt.txt.longExt': 'removedExt.txt'
+        'notRemoved.txt': 'notRemoved.txt'
+      
+      runSpec inputToExpected, (input, expected)-> ->
+        equal upath.removeExt(input, '.longExt'), expected
+        equal upath.removeExt(input, 'longExt'), expected
 
     describe """\n
     #### `upath.changeExt(filename, [ext], [ignoreExts], [maxSize=7])`
