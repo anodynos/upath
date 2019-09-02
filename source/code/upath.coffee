@@ -86,7 +86,7 @@ extraFunctions =
     else
       ext = if ext[0] is '.' then ext else '.' + ext
       if upath.extname(filename) is ext
-        upath.trimExt filename
+        upath.trimExt filename, [], ext.length
       else
         filename
 

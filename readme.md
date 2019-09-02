@@ -206,7 +206,7 @@ Trims a filename's extension.
 
 It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
 
-    `upath.removeExt(filename, ['min', '.dev'], 8)`          --returns-->
+    `upath.trimExt(filename, ['min', '.dev'], 8)`          --returns-->
 
           ✓ `'my/trimedExt.txt'`              --->                  `'my/trimedExt'`
           ✓ `'my/trimedExt.min'`              --->              `'my/trimedExt.min'`
@@ -227,7 +227,15 @@ As in all upath functions, it be `.ext` or `ext`.
         ✓ `'removedExt.js'`          --->          `'removedExt'`
         ✓ `'removedExt.txt.js'`      --->      `'removedExt.txt'`
         ✓ `'notRemoved.txt'`         --->      `'notRemoved.txt'`
-      
+
+It does not care about the length of exts.
+
+    `upath.removeExt(filename, '.longExt')`          --returns-->
+
+        ✓ `'removedExt.longExt'`          --->          `'removedExt'`
+        ✓ `'removedExt.txt.longExt'`      --->      `'removedExt.txt'`
+        ✓ `'notRemoved.txt'`              --->      `'notRemoved.txt'`
+
 
 #### `upath.changeExt(filename, [ext], [ignoreExts], [maxSize=7])`
 
