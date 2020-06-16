@@ -1,10 +1,6 @@
 language: node_js
 
 node_js:
-  - 4
-# - 5 npm ERR! typeerror This is an error with npm itself. Please report this error at:: `npm ERR! typeerror Error: Missing required argument #1`
-  - 6
-  - 7
   - 8
   - 9
   - 10

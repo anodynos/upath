@@ -19,7 +19,7 @@ module.exports = gruntFunction = (grunt) ->
         path: 'source/spec'
         dstPath: 'build/spec'
         afterBuild: require('urequire-ab-specrunner').options
-          mochaOptions: '--bail'
+          mochaOptions: '--bail --no-colors'
 
       specWatch: derive: 'spec', watch: true
 

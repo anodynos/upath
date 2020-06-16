@@ -32,8 +32,8 @@
   "types": "./upath.d.ts",
   "preferGlobal": false,
   "scripts": {
-    "test": "grunt",
-    "build": "grunt lib"
+    "test": "npx grunt",
+    "build": "npx grunt lib"
   },
   "directories": {
     "doc": "./doc",
