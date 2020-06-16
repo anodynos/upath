@@ -65,7 +65,9 @@ describe "\n# upath v#{VERSION}", ->
 
    * upath has no runtime dependencies, except built-in `path` (as of 1.0.4)
 
-   * travis-ci tested in node versions 4 to 12
+   * travis-ci tested in node versions 6 to 14 (linux)
+
+   * Also tested on Windows / node@12.18.0
   """, ->
 
     describe """\n
@@ -134,30 +136,39 @@ describe "\n# upath v#{VERSION}", ->
             equal upath.join.apply(null, splitPaths input), expected
 
       # parse is not available in node v0.10
-      if not _.startsWith(process.version, 'v0.10') then describe """\n
-        Parsing with `path.parse()` should also be consistent across OSes:
+      if not _.startsWith(process.version, 'v0.10')
+        describe """\n
+          Parsing with `path.parse()` should also be consistent across OSes:
 
-          `upath.parse(path)`        --returns-->\n
-      """, ->
+            `upath.parse(path)`        --returns-->\n
+          """, ->
 
-        inputToExpected =
-          'c:\\Windows\\Directory\\somefile.ext' :
-            { root: '', dir: 'c:/Windows/Directory', base: 'somefile.ext', ext: '.ext', name: 'somefile' }
-          '/root/of/unix/somefile.ext' :
-            { root: '/', dir: '/root/of/unix', base: 'somefile.ext', ext: '.ext', name: 'somefile' }
+            inputToExpected =
+              'c:\\Windows\\Directory\\somefile.ext' :
+                root: if path.sep is '\\' then 'c:/' else '' # parsing windows dirs not working on linux
+                dir: 'c:/Windows/Directory'
+                base: 'somefile.ext'
+                ext: '.ext'
+                name: 'somefile'
 
+              '/root/of/unix/somefile.ext' :
+                root: '/'
+                dir: '/root/of/unix'
+                base: 'somefile.ext'
+                ext: '.ext'
+                name: 'somefile'
 
-        runSpec inputToExpected,
-          (input, expected)-> [ # alt line output
-            input
-            expected
-            if not _.isEqual (pathResult = path.parse.call null, input), expected
-              '\n' +  [1..input.length + 2].map(-> ' ').join('') + " // `path.parse()` gives `'#{ formatObjectToOneLine pathResult }'`"
-            else
-              "  // equal to `path.parse()`"
-          ]
-          (input, expected)-> ->
-            deepEqual upath.parse.call(null, input), expected
+            runSpec inputToExpected,
+              (input, expected)-> [ # alt line output
+                input
+                expected
+                if not _.isEqual (pathResult = path.parse.call null, input), expected
+                  '\n' +  [1..input.length + 2].map(-> ' ').join('') + " // `path.parse()` gives `'#{ formatObjectToOneLine pathResult }'`"
+                else
+                  "  // equal to `path.parse()`"
+              ]
+              (input, expected)-> ->
+                deepEqual upath.parse.call(null, input), expected
 
   describe """\n
   ## Added functions
