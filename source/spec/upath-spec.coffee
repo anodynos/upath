@@ -170,34 +170,35 @@ describe "\n# upath v#{VERSION}", ->
               (input, expected)-> ->
                 deepEqual upath.parse(input), expected
 
-        describe.only """\n
-          Using `path.resolve()` also is working as one expects across OSes:
+        if path.sep is '\\'
+          describe """\n
+            Using `path.resolve()` also is working as one expects across OSes (this test alone was executed on Windows):
 
-            `upath.resolve(...paths)`        --returns-->\n
-          """, ->
+              `upath.resolve(...paths)`        --returns-->\n
+            """, ->
 
-          inputToExpected =
-            '"C:\\Windows\\path\\only", "../../reports"' :
-              "C:/Windows/reports"
+            inputToExpected =
+              '"C:\\Windows\\path\\only", "../../reports"' :
+                "C:/Windows/reports"
 
-            '"C:\\Windows\\long\\path\\mixed/with/unix", "../..", "..\\../reports"' :
-              "C:/Windows/long/reports"
+              '"C:\\Windows\\long\\path\\mixed/with/unix", "../..", "..\\../reports"' :
+                "C:/Windows/long/reports"
 
-          getInputAsArray = (pathsAsString) ->
-            pathsAsString.split(', ')
-              .map((aPath) -> _.slice(aPath, 1, aPath.length-1).join(''))
+            getInputAsArray = (pathsAsString) ->
+              pathsAsString.split(', ')
+                .map((aPath) -> _.slice(aPath, 1, aPath.length-1).join(''))
 
-          runSpec inputToExpected,
-            (input, expected)-> [ # alt line output
-              input
-              expected
-              if not _.isEqual (pathResult = path.resolve.apply(null, getInputAsArray input)), expected
-                '\n' +  [1..input.length + 2].map(-> ' ').join('') + " // `path.resolve()` gives `'#{ formatObjectToOneLine pathResult }'`"
-              else
-                "  // equal to `path.resolve()`"
-            ]
-            (input, expected)-> ->
-              deepEqual upath.resolve.apply(null, getInputAsArray(input)), expected
+            runSpec inputToExpected,
+              (input, expected)-> [ # alt line output
+                input
+                expected
+                if not _.isEqual (pathResult = path.resolve.apply(null, getInputAsArray input)), expected
+                  '\n' +  [1..input.length + 2].map(-> ' ').join('') + " // `path.resolve()` gives `'#{ formatObjectToOneLine pathResult }'`"
+                else
+                  "  // equal to `path.resolve()`"
+              ]
+              (input, expected)-> ->
+                deepEqual upath.resolve.apply(null, getInputAsArray(input)), expected
 
   describe """\n
   ## Added functions
@@ -428,7 +429,7 @@ describe "\n# upath v#{VERSION}", ->
       runSpec inputToExpected, (input, expected)-> ->
         equal upath.removeExt(input, '.js'), expected
         equal upath.removeExt(input, 'js'), expected
-    
+
     describe """\n
     It does not care about the length of exts.
 
@@ -438,7 +439,7 @@ describe "\n# upath v#{VERSION}", ->
         'removedExt.longExt': 'removedExt'
         'removedExt.txt.longExt': 'removedExt.txt'
         'notRemoved.txt': 'notRemoved.txt'
-      
+
       runSpec inputToExpected, (input, expected)-> ->
         equal upath.removeExt(input, '.longExt'), expected
         equal upath.removeExt(input, 'longExt'), expected

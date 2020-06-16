@@ -21,8 +21,9 @@ Notes:
 
  * upath has no runtime dependencies, except built-in `path` (as of 1.0.4)
 
- * travis-ci tested in node versions 4 to 12
-      
+ * travis-ci tested in node versions 6 to 14 (on linux)
+
+ * Also tested on Windows / node@12.18.0 (without CI)      
 
 ## Why ?
 
@@ -65,7 +66,16 @@ Parsing with `path.parse()` should also be consistent across OSes:
           ✓ `'c:\Windows\Directory\somefile.ext'`      ---> `{ root: '', dir: 'c:/Windows/Directory', base: 'somefile.ext', ext: '.ext', name: 'somefile' }`
                                     // `path.parse()` gives `'{ root: '', dir: '', base: 'c:\\Windows\\Directory\\somefile.ext', ext: '.ext', name: 'c:\\Windows\\Directory\\somefile' }'`
           ✓ `'/root/of/unix/somefile.ext'`             ---> `{ root: '/', dir: '/root/of/unix', base: 'somefile.ext', ext: '.ext', name: 'somefile' }`  // equal to `path.parse()`
-    
+
+
+Using `path.resolve()` also is working as one expects across OSes (this test alone was executed on Windows):
+
+  `upath.resolve(...paths)`        --returns-->
+
+          √ `'"C:\Windows\path\only", "../../reports"'`                               --->           `'C:/Windows/reports'`
+                                                                          // `path.resolve()` gives `''C:\\Windows\\reports''`
+          √ `'"C:\Windows\long\path\mixed/with/unix", "../..", "..\../reports"'`      --->      `'C:/Windows/long/reports'`
+                                                                          // `path.resolve()` gives `''C:\\Windows\\long\\reports''`    
 
 ## Added functions
       
