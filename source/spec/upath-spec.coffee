@@ -162,13 +162,42 @@ describe "\n# upath v#{VERSION}", ->
               (input, expected)-> [ # alt line output
                 input
                 expected
-                if not _.isEqual (pathResult = path.parse.call null, input), expected
+                if not _.isEqual (pathResult = path.parse input), expected
                   '\n' +  [1..input.length + 2].map(-> ' ').join('') + " // `path.parse()` gives `'#{ formatObjectToOneLine pathResult }'`"
                 else
                   "  // equal to `path.parse()`"
               ]
               (input, expected)-> ->
-                deepEqual upath.parse.call(null, input), expected
+                deepEqual upath.parse(input), expected
+
+        describe.only """\n
+          Using `path.resolve()` also is working as one expects across OSes:
+
+            `upath.resolve(...paths)`        --returns-->\n
+          """, ->
+
+          inputToExpected =
+            '"C:\\Windows\\path\\only", "../../reports"' :
+              "C:/Windows/reports"
+
+            '"C:\\Windows\\long\\path\\mixed/with/unix", "../..", "..\\../reports"' :
+              "C:/Windows/long/reports"
+
+          getInputAsArray = (pathsAsString) ->
+            pathsAsString.split(', ')
+              .map((aPath) -> _.slice(aPath, 1, aPath.length-1).join(''))
+
+          runSpec inputToExpected,
+            (input, expected)-> [ # alt line output
+              input
+              expected
+              if not _.isEqual (pathResult = path.resolve.apply(null, getInputAsArray input)), expected
+                '\n' +  [1..input.length + 2].map(-> ' ').join('') + " // `path.resolve()` gives `'#{ formatObjectToOneLine pathResult }'`"
+              else
+                "  // equal to `path.resolve()`"
+            ]
+            (input, expected)-> ->
+              deepEqual upath.resolve.apply(null, getInputAsArray(input)), expected
 
   describe """\n
   ## Added functions
