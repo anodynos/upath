@@ -21,7 +21,7 @@ Notes:
 
  * upath has no runtime dependencies, except built-in `path` (as of 1.0.4)
 
- * travis-ci tested in node versions 6 to 14 (on linux)
+ * travis-ci tested in node versions 8 to 14 (on linux)
 
  * Also tested on Windows / node@12.18.0 (without CI)      
 
