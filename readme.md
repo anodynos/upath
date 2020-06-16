@@ -70,10 +70,13 @@ Parsing with `path.parse()` should also be consistent across OSes:
 
 Using `path.resolve()` also is working as one expects across OSes (this test alone was executed on Windows):
 
+
 ```
   `upath.resolve(...paths)`        --returns-->
+
      √ `'"C:\Windows\path\only", "../../reports"'`                               --->           `'C:/Windows/reports'`
                                                                      // `path.resolve()` gives `''C:\\Windows\\reports''`
+
      √ `'"C:\Windows\long\path\mixed/with/unix", "../..", "..\../reports"'`      --->      `'C:/Windows/long/reports'`
                                                                 // `path.resolve()` gives `''C:\\Windows\\long\\reports''`
 ```
