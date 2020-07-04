@@ -11,10 +11,17 @@ upath = exports
 upath.VERSION = if VERSION? then VERSION else 'NO-VERSION' # injected by urequire-inject-version
 
 toUnix = (p) ->
-  p = p.replace /\\/g, '/'
-  double = /\/\//
-  while p.match double
-    p = p.replace double, '/' # node on windows doesn't replace doubles
+  # handle the edge-case of Window's long file names
+  # See: https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#short-vs-long-names
+  p = p.replace /^\\\\\?\\/, ""
+  
+  # convert the separator from \ to /
+  p = p.replace(/\\/g, '/')
+  
+  # node on windows doesn't replace back-to-back separators
+  # this also handles/fixes poorly made joins, e.g. path1+path2
+  p = p.replace(/\/+/g, '/')
+  
   p
 
 for propName, propValue of path
