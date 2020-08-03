@@ -100,6 +100,24 @@ describe "\n# upath v#{VERSION}", ->
 
           '\\windows\\..\\unix\/mixed/':    '/unix/mixed/'
 
+        runSpec inputToExpected,
+          (input, expected)-> [ # alt line output
+              input.replace(/\\/g, '\\\\')
+              expected
+              if (pathResult = path.normalize input) isnt expected
+                "  // `path.normalize()` gives `'#{pathResult}'`"
+              else
+                "  // equal to `path.normalize()`"
+            ]
+          (input, expected)-> ->
+            equal upath.normalize(input), expected
+
+      describe """\n
+      Special Windows paths beginning with double (back)slashes:
+
+          `upath.normalizeSafe(path)`        --returns-->\n
+      """, ->
+        inputToExpected =
           '\\\\server\\share\\file':        '//server/share/file'
           '\\\\?\\UNC\\server\\share\\file': '//?/UNC/server/share/file'
           '\\\\LOCALHOST\\c$\\temp\\file':  '//LOCALHOST/c$/temp/file'
@@ -117,7 +135,7 @@ describe "\n# upath v#{VERSION}", ->
                 "  // equal to `path.normalize()`"
             ]
           (input, expected)-> ->
-            equal upath.normalize(input), expected
+            equal upath.normalizeSafe(input), expected
 
       describe """\n
       Joining paths can also be a problem:

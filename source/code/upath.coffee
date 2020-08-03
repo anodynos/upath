@@ -47,6 +47,11 @@ extraFunctions =
         upath.normalize(p)
       else
         './' + upath.normalize(p)
+    else if p.startsWith '//'
+      if p.startsWith '//./'
+        upath.normalize(p).replace /^\/+(\.\/+)?(?!$)/, '//./'
+      else
+        upath.normalize(p).replace /^\/+(?!$)/, '//'
     else
       upath.normalize(p)
 
