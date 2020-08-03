@@ -95,10 +95,17 @@ describe "\n# upath v#{VERSION}", ->
           'c:\\windows\\nodejs\\path':      'c:/windows/nodejs/path'
           'c:\\windows\\..\\nodejs\\path':  'c:/nodejs/path'
 
-          '//windows\\unix\/mixed':         '/windows/unix/mixed'
+          '/windows\\unix\/mixed':          '/windows/unix/mixed'
           '\\windows//unix\/mixed':         '/windows/unix/mixed'
 
-          '////\\windows\\..\\unix\/mixed/':    '/unix/mixed/'
+          '\\windows\\..\\unix\/mixed/':    '/unix/mixed/'
+
+          '\\\\server\\share\\file':        '//server/share/file'
+          '\\\\?\\UNC\\server\\share\\file': '//?/UNC/server/share/file'
+          '\\\\LOCALHOST\\c$\\temp\\file':  '//LOCALHOST/c$/temp/file'
+          '\\\\?\\c:\\temp\\file':          '//?/c:/temp/file'
+          '\\\\.\\c:\\temp\\file':          '//./c:/temp/file'
+          '////\\.\\c:/temp\\//file':       '//./c:/temp/file'
 
         runSpec inputToExpected,
           (input, expected)-> [ # alt line output
