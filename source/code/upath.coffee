@@ -42,18 +42,15 @@ extraFunctions =
 
   normalizeSafe: (p) ->
     p = toUnix(p)
-    if p.startsWith './'
-      if p.startsWith('./..') or (p is './')
-        upath.normalize(p)
+    result = upath.normalize(p)
+    if p.startsWith('./') && !result.startsWith('./') && !result.startsWith('..')
+      result = './' + result
+    else if p.startsWith('//') && !result.startsWith('//')
+      if p.startsWith('//./')
+        result = '//.' + result
       else
-        './' + upath.normalize(p)
-    else if p.startsWith '//'
-      if p.startsWith '//./'
-        upath.normalize(p).replace /^\/+(\.\/+)?(?!$)/, '//./'
-      else
-        upath.normalize(p).replace /^\/+(?!$)/, '//'
-    else
-      upath.normalize(p)
+        result = '/' + result
+    result
 
   normalizeTrim: (p) ->
     p = upath.normalizeSafe p
@@ -65,8 +62,15 @@ extraFunctions =
 
   joinSafe: (p...) ->
     result = upath.join.apply null, p
-    if p[0].startsWith('./') && !result.startsWith('./')
-      result = './' + result
+    if p.length > 0
+      p0 = toUnix(p[0])
+      if p0.startsWith('./') && !result.startsWith('./') && !result.startsWith('..')
+        result = './' + result
+      else if p0.startsWith('//') && !result.startsWith('//')
+        if p0.startsWith('//./')
+          result = '//.' + result
+        else
+          result = '/' + result
     result
 
   addExt: (file, ext) ->
