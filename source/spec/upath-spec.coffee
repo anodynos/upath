@@ -95,10 +95,10 @@ describe "\n# upath v#{VERSION}", ->
           'c:\\windows\\nodejs\\path':      'c:/windows/nodejs/path'
           'c:\\windows\\..\\nodejs\\path':  'c:/nodejs/path'
 
-          '//windows\\unix\/mixed':         '/windows/unix/mixed'
+          '/windows\\unix\/mixed':          '/windows/unix/mixed'
           '\\windows//unix\/mixed':         '/windows/unix/mixed'
 
-          '////\\windows\\..\\unix\/mixed/':    '/unix/mixed/'
+          '\\windows\\..\\unix\/mixed/':    '/unix/mixed/'
 
         runSpec inputToExpected,
           (input, expected)-> [ # alt line output
@@ -222,7 +222,7 @@ describe "\n# upath v#{VERSION}", ->
     describe """\n
       #### `upath.normalizeSafe(path)`
 
-      Exactly like `path.normalize(path)`, but it keeps the first meaningful `./`.
+      Exactly like `path.normalize(path)`, but it keeps the first meaningful `./` or `//`.
 
       Note that the unix `/` is returned everywhere, so windows `\\` is always converted to unix `/`.
 
@@ -256,6 +256,15 @@ describe "\n# upath v#{VERSION}", ->
           '..//windows\\unix\/mixed': '../windows/unix/mixed'
           'windows\\unix\/mixed/': 'windows/unix/mixed/'
           '..//windows\\..\\unix\/mixed': '../unix/mixed'
+          # UNC paths
+          '\\\\server\\share\\file':          '//server/share/file'
+          '//server/share/file':              '//server/share/file'
+          '\\\\?\\UNC\\server\\share\\file':  '//?/UNC/server/share/file'
+          '\\\\LOCALHOST\\c$\\temp\\file':    '//LOCALHOST/c$/temp/file'
+          '\\\\?\\c:\\temp\\file':            '//?/c:/temp/file'
+          '\\\\.\\c:\\temp\\file':            '//./c:/temp/file'
+          '//./c:/temp/file':                 '//./c:/temp/file'
+          '////\\.\\c:/temp\\//file':         '//./c:/temp/file'
 
         runSpec inputToExpected,
           (input, expected)-> [ # alt line output
@@ -300,7 +309,7 @@ describe "\n# upath v#{VERSION}", ->
     describe """\n
       #### `upath.joinSafe([path1][, path2][, ...])`
 
-      Exactly like `path.join()`, but it keeps the first meaningful `./`.
+      Exactly like `path.join()`, but it keeps the first meaningful `./` or `//`.
 
       Note that the unix `/` is returned everywhere, so windows `\\` is always converted to unix `/`.
 
@@ -313,6 +322,11 @@ describe "\n# upath v#{VERSION}", ->
           './some/local/unix/, ../path' :    './some/local/path'
           './some\\current\\mixed, ..\\path' :    './some/current/path'
           '../some/relative/destination, ..\\path' :    '../some/relative/path'
+          # UNC paths
+          '\\\\server\\share\\file, ..\\path' : '//server/share/path'
+          '\\\\.\\c:\\temp\\file, ..\\path' :   '//./c:/temp/path'
+          '//server/share/file, ../path' :      '//server/share/path'
+          '//./c:/temp/file, ../path' :         '//./c:/temp/path'
 
         runSpec inputToExpected,
           (input, expected)-> [ # alt line output
