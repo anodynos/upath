@@ -1,4 +1,4 @@
-# upath v1.2.0
+# upath v2.0.0
 
 [![Build Status](https://travis-ci.org/anodynos/upath.svg?branch=master)](https://travis-ci.org/anodynos/upath)
 [![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath)
@@ -23,7 +23,13 @@ Notes:
 
  * travis-ci tested in node versions 8 to 14 (on linux)
 
- * Also tested on Windows / node@12.18.0 (without CI)      
+ * Also tested on Windows / node@12.18.0 (without CI)  
+
+History brief:
+
+ * 1.x   : Initial release and various features / fixes
+
+ * 2.0.0 : Adding UNC paths support - see https://github.com/anodynos/upath/pull/38
 
 ## Why ?
 
@@ -41,13 +47,13 @@ Check out the different (improved) behavior to vanilla `path`:
 
     `upath.normalize(path)`        --returns-->
 
-          ✓ `'c:/windows/nodejs/path'`           --->      `'c:/windows/nodejs/path'`  // equal to `path.normalize()`
-          ✓ `'c:/windows/../nodejs/path'`        --->              `'c:/nodejs/path'`  // equal to `path.normalize()`
-          ✓ `'c:\\windows\\nodejs\\path'`        --->      `'c:/windows/nodejs/path'`  // `path.normalize()` gives `'c:\windows\nodejs\path'`
-          ✓ `'c:\\windows\\..\\nodejs\\path'`    --->              `'c:/nodejs/path'`  // `path.normalize()` gives `'c:\windows\..\nodejs\path'`
-          ✓ `'//windows\\unix/mixed'`            --->         `'/windows/unix/mixed'`  // `path.normalize()` gives `'/windows\unix/mixed'`
-          ✓ `'\\windows//unix/mixed'`            --->         `'/windows/unix/mixed'`  // `path.normalize()` gives `'\windows/unix/mixed'`
-          ✓ `'////\\windows\\..\\unix/mixed/'`   --->                `'/unix/mixed/'`  // `path.normalize()` gives `'/\windows\..\unix/mixed/'`
+          ✓ `'c:/windows/nodejs/path'`         --->      `'c:/windows/nodejs/path'`  // equal to `path.normalize()`
+          ✓ `'c:/windows/../nodejs/path'`      --->              `'c:/nodejs/path'`  // equal to `path.normalize()`
+          ✓ `'c:\\windows\\nodejs\\path'`      --->      `'c:/windows/nodejs/path'`  // `path.normalize()` gives `'c:\windows\nodejs\path'`
+          ✓ `'c:\\windows\\..\\nodejs\\path'`  --->              `'c:/nodejs/path'`  // `path.normalize()` gives `'c:\windows\..\nodejs\path'`
+          ✓ `'/windows\\unix/mixed'`           --->         `'/windows/unix/mixed'`  // `path.normalize()` gives `'/windows\unix/mixed'`
+          ✓ `'\\windows//unix/mixed'`          --->         `'/windows/unix/mixed'`  // `path.normalize()` gives `'\windows/unix/mixed'`
+          ✓ `'\\windows\\..\\unix/mixed/'`     --->                `'/unix/mixed/'`  // `path.normalize()` gives `'\windows\..\unix/mixed/'`
         
 
 Joining paths can also be a problem:
@@ -63,27 +69,19 @@ Parsing with `path.parse()` should also be consistent across OSes:
 
   `upath.parse(path)`        --returns-->
 
-          ✓ `'c:\Windows\Directory\somefile.ext'`      ---> `{ root: '', dir: 'c:/Windows/Directory', base: 'somefile.ext', ext: '.ext', name: 'somefile' }`
-                                    // `path.parse()` gives `'{ root: '', dir: '', base: 'c:\\Windows\\Directory\\somefile.ext', ext: '.ext', name: 'c:\\Windows\\Directory\\somefile' }'`
-          ✓ `'/root/of/unix/somefile.ext'`             ---> `{ root: '/', dir: '/root/of/unix', base: 'somefile.ext', ext: '.ext', name: 'somefile' }`  // equal to `path.parse()`
+          ✓ `'c:\Windows\Directory\somefile.ext'`      ---> `{ root: '', dir: 'c:/Windows/Directory', base: 'somefile.ext', ext: '.ext', name: 'somefile'
+}`
+                                    // `path.parse()` gives `'{ root: '', dir: '', base: 'c:\\Windows\\Directory\\somefile.ext', ext: '.ext', name: 'c:\\Windows\\Directory\\somefile'
+}'`
+          ✓ `'/root/of/unix/somefile.ext'`             ---> `{ root: '/', dir: '/root/of/unix', base: 'somefile.ext', ext: '.ext', name: 'somefile'
+}`  // equal to `path.parse()`
+    
 
-
-Using `path.resolve()` also is working as one expects across OSes (this test alone was executed on Windows):
-
-
-```
-  `upath.resolve(...paths)`        --returns-->
-
-     √ `'"C:\Windows\path\only", "../../reports"'`                               --->           `'C:/Windows/reports'`
-                                                                     // `path.resolve()` gives `''C:\\Windows\\reports''`
-
-     √ `'"C:\Windows\long\path\mixed/with/unix", "../..", "..\../reports"'`      --->      `'C:/Windows/long/reports'`
-                                                                // `path.resolve()` gives `''C:\\Windows\\long\\reports''`
-```
-
-## Added functions      
+## Added functions
+      
 
 #### `upath.toUnix(path)`
+
 Just converts all `` to `/` and consolidates duplicates, without performing any normalization.
 
 ##### Examples / specs
@@ -96,7 +94,7 @@ Just converts all `` to `/` and consolidates duplicates, without performing any 
 
 #### `upath.normalizeSafe(path)`
 
-Exactly like `path.normalize(path)`, but it keeps the first meaningful `./`.
+Exactly like `path.normalize(path)`, but it keeps the first meaningful `./` or `//`.
 
 Note that the unix `/` is returned everywhere, so windows `\` is always converted to unix `/`.
 
@@ -104,29 +102,37 @@ Note that the unix `/` is returned everywhere, so windows `\` is always converte
 
     `upath.normalizeSafe(path)`        --returns-->
 
-        ✓ `''`                               --->                          `'.'`  // equal to `path.normalize()`
-        ✓ `'.'`                              --->                          `'.'`  // equal to `path.normalize()`
-        ✓ `'./'`                             --->                         `'./'`  // equal to `path.normalize()`
-        ✓ `'.//'`                            --->                         `'./'`  // equal to `path.normalize()`
-        ✓ `'.\\'`                            --->                         `'./'`  // `path.normalize()` gives `'.\'`
-        ✓ `'.\\//'`                          --->                         `'./'`  // `path.normalize()` gives `'.\/'`
-        ✓ `'./..'`                           --->                         `'..'`  // equal to `path.normalize()`
-        ✓ `'.//..'`                          --->                         `'..'`  // equal to `path.normalize()`
-        ✓ `'./../'`                          --->                        `'../'`  // equal to `path.normalize()`
-        ✓ `'.\\..\\'`                        --->                        `'../'`  // `path.normalize()` gives `'.\..\'`
-        ✓ `'./../dep'`                       --->                     `'../dep'`  // equal to `path.normalize()`
-        ✓ `'../dep'`                         --->                     `'../dep'`  // equal to `path.normalize()`
-        ✓ `'../path/dep'`                    --->                `'../path/dep'`  // equal to `path.normalize()`
-        ✓ `'../path/../dep'`                 --->                     `'../dep'`  // equal to `path.normalize()`
-        ✓ `'dep'`                            --->                        `'dep'`  // equal to `path.normalize()`
-        ✓ `'path//dep'`                      --->                   `'path/dep'`  // equal to `path.normalize()`
-        ✓ `'./dep'`                          --->                      `'./dep'`  // `path.normalize()` gives `'dep'`
-        ✓ `'./path/dep'`                     --->                 `'./path/dep'`  // `path.normalize()` gives `'path/dep'`
-        ✓ `'./path/../dep'`                  --->                      `'./dep'`  // `path.normalize()` gives `'dep'`
-        ✓ `'.//windows\\unix/mixed/'`        --->      `'./windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`
-        ✓ `'..//windows\\unix/mixed'`        --->      `'../windows/unix/mixed'`  // `path.normalize()` gives `'../windows\unix/mixed'`
-        ✓ `'windows\\unix/mixed/'`           --->        `'windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`
-        ✓ `'..//windows\\..\\unix/mixed'`    --->              `'../unix/mixed'`  // `path.normalize()` gives `'../windows\..\unix/mixed'`
+        ✓ `''`                               --->                              `'.'`  // equal to `path.normalize()`
+        ✓ `'.'`                              --->                              `'.'`  // equal to `path.normalize()`
+        ✓ `'./'`                             --->                             `'./'`  // equal to `path.normalize()`
+        ✓ `'.//'`                            --->                             `'./'`  // equal to `path.normalize()`
+        ✓ `'.\\'`                            --->                             `'./'`  // `path.normalize()` gives `'.\'`
+        ✓ `'.\\//'`                          --->                             `'./'`  // `path.normalize()` gives `'.\/'`
+        ✓ `'./..'`                           --->                             `'..'`  // equal to `path.normalize()`
+        ✓ `'.//..'`                          --->                             `'..'`  // equal to `path.normalize()`
+        ✓ `'./../'`                          --->                            `'../'`  // equal to `path.normalize()`
+        ✓ `'.\\..\\'`                        --->                            `'../'`  // `path.normalize()` gives `'.\..\'`
+        ✓ `'./../dep'`                       --->                         `'../dep'`  // equal to `path.normalize()`
+        ✓ `'../dep'`                         --->                         `'../dep'`  // equal to `path.normalize()`
+        ✓ `'../path/dep'`                    --->                    `'../path/dep'`  // equal to `path.normalize()`
+        ✓ `'../path/../dep'`                 --->                         `'../dep'`  // equal to `path.normalize()`
+        ✓ `'dep'`                            --->                            `'dep'`  // equal to `path.normalize()`
+        ✓ `'path//dep'`                      --->                       `'path/dep'`  // equal to `path.normalize()`
+        ✓ `'./dep'`                          --->                          `'./dep'`  // `path.normalize()` gives `'dep'`
+        ✓ `'./path/dep'`                     --->                     `'./path/dep'`  // `path.normalize()` gives `'path/dep'`
+        ✓ `'./path/../dep'`                  --->                          `'./dep'`  // `path.normalize()` gives `'dep'`
+        ✓ `'.//windows\\unix/mixed/'`        --->          `'./windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`
+        ✓ `'..//windows\\unix/mixed'`        --->          `'../windows/unix/mixed'`  // `path.normalize()` gives `'../windows\unix/mixed'`
+        ✓ `'windows\\unix/mixed/'`           --->            `'windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`
+        ✓ `'..//windows\\..\\unix/mixed'`    --->                  `'../unix/mixed'`  // `path.normalize()` gives `'../windows\..\unix/mixed'`
+        ✓ `'\\\\server\\share\\file'`        --->            `'//server/share/file'`  // `path.normalize()` gives `'\\server\share\file'`
+        ✓ `'//server/share/file'`            --->            `'//server/share/file'`  // `path.normalize()` gives `'/server/share/file'`
+        ✓ `'\\\\?\\UNC\\server\\share\\file'` --->      `'//?/UNC/server/share/file'`  // `path.normalize()` gives `'\\?\UNC\server\share\file'`
+        ✓ `'\\\\LOCALHOST\\c$\\temp\\file'`  --->       `'//LOCALHOST/c$/temp/file'`  // `path.normalize()` gives `'\\LOCALHOST\c$\temp\file'`
+        ✓ `'\\\\?\\c:\\temp\\file'`          --->               `'//?/c:/temp/file'`  // `path.normalize()` gives `'\\?\c:\temp\file'`
+        ✓ `'\\\\.\\c:\\temp\\file'`          --->               `'//./c:/temp/file'`  // `path.normalize()` gives `'\\.\c:\temp\file'`
+        ✓ `'//./c:/temp/file'`               --->               `'//./c:/temp/file'`  // `path.normalize()` gives `'/c:/temp/file'`
+        ✓ `'////\\.\\c:/temp\\//file'`       --->               `'//./c:/temp/file'`  // `path.normalize()` gives `'/\.\c:/temp\/file'`
       
 
 #### `upath.normalizeTrim(path)`
@@ -146,7 +152,7 @@ Exactly like `path.normalizeSafe(path)`, but it trims any useless ending `/`.
 
 #### `upath.joinSafe([path1][, path2][, ...])`
 
-Exactly like `path.join()`, but it keeps the first meaningful `./`.
+Exactly like `path.join()`, but it keeps the first meaningful `./` or `//`.
 
 Note that the unix `/` is returned everywhere, so windows `\` is always converted to unix `/`.
 
@@ -158,6 +164,10 @@ Note that the unix `/` is returned everywhere, so windows `\` is always converte
         ✓ `'./some/local/unix/', '../path'`              --->          `'./some/local/path'`  // `path.join()` gives `'some/local/path'`
         ✓ `'./some\\current\\mixed', '..\\path'`         --->        `'./some/current/path'`  // `path.join()` gives `'some\current\mixed/..\path'`
         ✓ `'../some/relative/destination', '..\\path'`   --->      `'../some/relative/path'`  // `path.join()` gives `'../some/relative/destination/..\path'`
+        ✓ `'\\\\server\\share\\file', '..\\path'`        --->        `'//server/share/path'`  // `path.join()` gives `'\\server\share\file/..\path'`
+        ✓ `'\\\\.\\c:\\temp\\file', '..\\path'`          --->           `'//./c:/temp/path'`  // `path.join()` gives `'\\.\c:\temp\file/..\path'`
+        ✓ `'//server/share/file', '../path'`             --->        `'//server/share/path'`  // `path.join()` gives `'/server/share/path'`
+        ✓ `'//./c:/temp/file', '../path'`                --->           `'//./c:/temp/path'`  // `path.join()` gives `'/c:/temp/path'`
     
 
 ## Added functions for *filename extension* manipulation.
@@ -240,6 +250,7 @@ As in all upath functions, it be `.ext` or `ext`.
         ✓ `'removedExt.js'`          --->          `'removedExt'`
         ✓ `'removedExt.txt.js'`      --->      `'removedExt.txt'`
         ✓ `'notRemoved.txt'`         --->      `'notRemoved.txt'`
+      
 
 It does not care about the length of exts.
 
@@ -248,7 +259,7 @@ It does not care about the length of exts.
         ✓ `'removedExt.longExt'`          --->          `'removedExt'`
         ✓ `'removedExt.txt.longExt'`      --->      `'removedExt.txt'`
         ✓ `'notRemoved.txt'`              --->      `'notRemoved.txt'`
-
+      
 
 #### `upath.changeExt(filename, [ext], [ignoreExts], [maxSize=7])`
 
@@ -329,8 +340,8 @@ It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 ch
           ✓ `'fileWith/defaultExt.longExt'`       --->          `'fileWith/defaultExt.longExt'`
           ✓ `'fileWith/defaultExt.longRext'`      --->      `'fileWith/defaultExt.longRext.js'`
 
-
-Copyright(c) 2014-2019 Angelos Pikoulas (agelos.pikoulas@gmail.com)
+  
+Copyright(c) 2014-2020 Angelos Pikoulas (agelos.pikoulas@gmail.com)
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation

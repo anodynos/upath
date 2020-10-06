@@ -65,9 +65,16 @@ describe "\n# upath v#{VERSION}", ->
 
    * upath has no runtime dependencies, except built-in `path` (as of 1.0.4)
 
-   * travis-ci tested in node versions 8 to 14 (linux)
+   * travis-ci tested in node versions 8 to 14 (on linux)
 
-   * Also tested on Windows / node@12.18.0
+   * Also tested on Windows / node@12.18.0 (without CI)
+
+  History brief:
+
+   * 1.x   : Initial release and various features / fixes
+
+   * 2.0.0 : Adding UNC paths support - see https://github.com/anodynos/upath/pull/38
+
   """, ->
 
     describe """\n
