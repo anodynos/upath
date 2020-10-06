@@ -12,9 +12,7 @@ upath.VERSION = if VERSION? then VERSION else 'NO-VERSION' # injected by urequir
 
 toUnix = (p) ->
   p = p.replace /\\/g, '/'
-  double = /\/\//
-  while p.match double
-    p = p.replace double, '/' # node on windows doesn't replace doubles
+  p = p.replace /(?<!^)\/+/g, '/' # replace doubles except beginning for UNC path
   p
 
 for propName, propValue of path
@@ -44,13 +42,15 @@ extraFunctions =
 
   normalizeSafe: (p) ->
     p = toUnix(p)
-    if p.startsWith './'
-      if p.startsWith('./..') or (p is './')
-        upath.normalize(p)
+    result = upath.normalize(p)
+    if p.startsWith('./') && !result.startsWith('./') && !result.startsWith('..')
+      result = './' + result
+    else if p.startsWith('//') && !result.startsWith('//')
+      if p.startsWith('//./')
+        result = '//.' + result
       else
-        './' + upath.normalize(p)
-    else
-      upath.normalize(p)
+        result = '/' + result
+    result
 
   normalizeTrim: (p) ->
     p = upath.normalizeSafe p
@@ -62,8 +62,15 @@ extraFunctions =
 
   joinSafe: (p...) ->
     result = upath.join.apply null, p
-    if p[0].startsWith('./') && !result.startsWith('./')
-      result = './' + result
+    if p.length > 0
+      p0 = toUnix(p[0])
+      if p0.startsWith('./') && !result.startsWith('./') && !result.startsWith('..')
+        result = './' + result
+      else if p0.startsWith('//') && !result.startsWith('//')
+        if p0.startsWith('//./')
+          result = '//.' + result
+        else
+          result = '/' + result
     result
 
   addExt: (file, ext) ->
