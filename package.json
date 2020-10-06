@@ -1,7 +1,7 @@
 {
   "name": "upath",
-  "description": "A proxy to `path`, replacing `\\` with `/` for all results & new methods to normalize & join keeping leading `./` and add, change, default, trim file extensions.",
-  "version": "1.2.0",
+  "description": "A proxy to `path`, replacing `\\` with `/` for all results (supports UNC paths) & new methods to normalize & join keeping leading `./` and add, change, default, trim file extensions.",
+  "version": "2.0.0",
   "homepage": "http://github.com/anodynos/upath/",
   "author": {
     "name": "Angelos Pikoulas",
@@ -18,7 +18,8 @@
     "change extension",
     "trim extension",
     "add extension",
-    "default extension"
+    "default extension",
+    "UNC paths"
   ],
   "repository": {
     "type": "git",
