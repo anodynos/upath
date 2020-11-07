@@ -1,6 +1,6 @@
 path = require 'path'
 
-isFunction = (val) -> val instanceof Function
+isFunction = (val) -> typeof val == 'function'
 
 isString = (val) ->
   typeof val == 'string' or
