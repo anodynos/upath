@@ -11,9 +11,7 @@ upath = exports
 upath.VERSION = if VERSION? then VERSION else 'NO-VERSION' # injected by urequire-inject-version
 
 toUnix = (p) ->
-  p = p.replace /\\/g, '/'
-  p = p.replace /(?<!^)\/+/g, '/' # replace doubles except beginning for UNC path
-  p
+  p.split(path.sep).join(path.posix.sep)
 
 for propName, propValue of path
   if isFunction propValue
@@ -34,7 +32,7 @@ for propName, propValue of path
   else
     upath[propName] = propValue
 
-upath.sep = '/'
+upath.sep = path.posix.sep
 
 extraFunctions =
 
