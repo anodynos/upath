@@ -47,7 +47,7 @@
   "devDependencies": {
     "chai": "~4.0.2",
     "coffee-script": "1.12.6",
-    "grunt": "0.4.5",
+    "grunt": "1.3.0",
     "grunt-contrib-watch": "^1.1.0",
     "grunt-urequire": "0.7.x",
     "lodash": "^4.17.20",
