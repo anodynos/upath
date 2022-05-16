@@ -12,7 +12,7 @@ upath.VERSION = if VERSION? then VERSION else 'NO-VERSION' # injected by urequir
 
 toUnix = (p) ->
   p = p.replace /\\/g, '/'
-  p = p.replace /(?<!^)\/+/g, '/' # replace doubles except beginning for UNC path
+  p = p.replace /(?!^)\/+/g, '/' # replace doubles except beginning for UNC path
   p
 
 for propName, propValue of path
