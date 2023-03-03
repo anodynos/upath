@@ -51,7 +51,7 @@
     "grunt-contrib-watch": "^1.1.0",
     "grunt-urequire": "0.7.x",
     "lodash": "^4.17.20",
-    "mocha": "~3.4.2",
+    "mocha": "~10.2.0",
     "uberscore": "0.0.19",
     "underscore.string": "^3.3.5",
     "urequire": "0.7.0-beta.33",
