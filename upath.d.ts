@@ -11,7 +11,7 @@ declare module "upath" {
     /**
      * The full directory path such as '/home/user/dir' or 'c:\path\dir'
      */
-    dir: string;
+    dir: string | undefined;
     /**
      * The file name including extension (if any) such as 'index.html'
      */
