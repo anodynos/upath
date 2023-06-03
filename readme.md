@@ -1,7 +1,10 @@
 # upath v2.0.1
 
 [![Build Status](https://travis-ci.com/anodynos/upath.svg?branch=master)](https://travis-ci.com/anodynos/upath)
-[![Up to date Status](https://david-dm.org/anodynos/upath.png)](https://david-dm.org/anodynos/upath)
+
+[![Weekly downloads](https://img.shields.io/npm/dw/upath.svg)](https://github.com/anodynos/upath) [![Yearly downloads](https://img.shields.io/npm/dy/upath.svg)](https://github.com/anodynos/upath)
+[![Open Issues](https://img.shields.io/github/issues/anodynos/upath.svg)](https://github.com/anodynos/upath/issues) [![Size](https://img.shields.io/bundlephobia/minzip/upath.svg)](https://github.com/anodynos/upath) [![Node Version](https://img.shields.io/node/v/upath.svg)](https://github.com/anodynos/upath)
+
 
 A drop-in replacement / proxy to nodejs's `path` that:
 
