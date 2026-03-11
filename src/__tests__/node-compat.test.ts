@@ -10,16 +10,34 @@
  * - Shared test vectors (posix + win32 agree with `/`) also pass through upath
  * - Backslash-input tests verify upath's `\` → `/` normalization
  *
+ * NOTE: These tests only run on POSIX (Linux/macOS). On Windows, `path`
+ * delegates to `path.win32` which has different semantics — the expected
+ * values here assume `path` === `path.posix`.
+ *
  * Source: https://github.com/nodejs/node/tree/main/test/parallel/
  */
 import * as path from 'node:path';
 import upath from '../index';
 
+const isWindows = process.platform === 'win32';
+const describePosix = isWindows ? describe.skip : describe;
+
+if (isWindows) {
+  describe('Node.js compat', () => {
+    it('skipped — these tests are designed for POSIX (Linux/macOS) only', () => {
+      console.log(
+        'Node.js path compatibility tests skipped on Windows. ' +
+        'These validate upath against path.posix behavior and must run on a POSIX system.',
+      );
+    });
+  });
+}
+
 // ---------------------------------------------------------------------------
 // basename (from test-path-basename.js)
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: basename', () => {
+describePosix('Node.js compat: basename', () => {
   // POSIX vectors — these must match path.posix.basename exactly
   const posixCases: [string, string | undefined, string][] = [
     ['.js', '.js', ''],
@@ -73,7 +91,7 @@ describe('Node.js compat: basename', () => {
 // dirname (from test-path-dirname.js)
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: dirname', () => {
+describePosix('Node.js compat: dirname', () => {
   const posixCases: [string, string][] = [
     ['/a/b/', '/a'],
     ['/a/b', '/a'],
@@ -98,7 +116,7 @@ describe('Node.js compat: dirname', () => {
 // extname (from test-path-extname.js)
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: extname', () => {
+describePosix('Node.js compat: extname', () => {
   // All POSIX extname test vectors
   const cases: [string, string][] = [
     ['', ''],
@@ -158,7 +176,7 @@ describe('Node.js compat: extname', () => {
 // join (from test-path-join.js)
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: join', () => {
+describePosix('Node.js compat: join', () => {
   // Shared join vectors (identical for posix and win32 when using `/`)
   const cases: [string[], string][] = [
     [['.', 'x/b', '..', '/b/c.js'], 'x/b/c.js'],
@@ -223,7 +241,7 @@ describe('Node.js compat: join', () => {
 // normalize (from test-path-normalize.js)
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: normalize', () => {
+describePosix('Node.js compat: normalize', () => {
   const posixCases: [string, string][] = [
     ['./fixtures///b/../b/c.js', 'fixtures/b/c.js'],
     ['/foo/../../../bar', '/bar'],
@@ -268,7 +286,7 @@ describe('Node.js compat: normalize', () => {
 // relative (from test-path-relative.js)
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: relative', () => {
+describePosix('Node.js compat: relative', () => {
   const posixCases: [string, string, string][] = [
     ['/var/lib', '/var', '..'],
     ['/var/lib', '/bin', '../../bin'],
@@ -298,7 +316,7 @@ describe('Node.js compat: relative', () => {
 // resolve (from test-path-resolve.js)
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: resolve', () => {
+describePosix('Node.js compat: resolve', () => {
   const cwd = process.cwd();
 
   const posixCases: [string[], string][] = [
@@ -330,7 +348,7 @@ describe('Node.js compat: resolve', () => {
 // isAbsolute (from test-path-isabsolute.js)
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: isAbsolute', () => {
+describePosix('Node.js compat: isAbsolute', () => {
   const posixCases: [string, boolean][] = [
     ['/home/foo', true],
     ['/home/foo/..', true],
@@ -351,7 +369,7 @@ describe('Node.js compat: isAbsolute', () => {
 // parse (from test-path-parse-format.js)
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: parse', () => {
+describePosix('Node.js compat: parse', () => {
   const unixPaths: [string, string][] = [
     ['/home/user/dir/file.txt', '/'],
     ['/home/user/a dir/another File.zip', '/'],
@@ -424,7 +442,7 @@ describe('Node.js compat: parse', () => {
 // format (from test-path-parse-format.js)
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: format', () => {
+describePosix('Node.js compat: format', () => {
   const cases: [path.FormatInputPathObject, string][] = [
     [{ dir: 'some/dir' }, 'some/dir/'],
     [{ base: 'index.html' }, 'index.html'],
@@ -454,7 +472,7 @@ describe('Node.js compat: format', () => {
 // zero-length strings (from test-path-zero-length-strings.js)
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: zero-length strings', () => {
+describePosix('Node.js compat: zero-length strings', () => {
   const cwd = process.cwd();
 
   it('join returns "." for empty/zero-length inputs', () => {
@@ -491,7 +509,7 @@ describe('Node.js compat: zero-length strings', () => {
 // Backslash normalization — upath's core value-add
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: backslash normalization', () => {
+describePosix('Node.js compat: backslash normalization', () => {
   it('normalizes backslashes in basename input', () => {
     expect(upath.basename('foo\\bar\\baz.js')).toBe('baz.js');
     expect(upath.basename('foo\\bar\\baz.js', '.js')).toBe('baz');
@@ -553,7 +571,7 @@ describe('Node.js compat: backslash normalization', () => {
 // sep and delimiter
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: sep and delimiter', () => {
+describePosix('Node.js compat: sep and delimiter', () => {
   it('sep is always "/"', () => {
     expect(upath.sep).toBe('/');
   });
@@ -567,7 +585,7 @@ describe('Node.js compat: sep and delimiter', () => {
 // posix and win32 pass-through
 // ---------------------------------------------------------------------------
 
-describe('Node.js compat: posix and win32 pass-through', () => {
+describePosix('Node.js compat: posix and win32 pass-through', () => {
   it('upath.posix is path.posix', () => {
     expect(upath.posix).toBe(path.posix);
   });
