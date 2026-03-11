@@ -238,10 +238,10 @@ export const extname = upath.extname as (p: string) => string;
 export const format = upath.format as (pathObject: path.FormatInputPathObject) => string;
 export const parse = upath.parse as (p: string) => path.ParsedPath;
 export const toNamespacedPath = upath.toNamespacedPath as (p: string) => string;
-export const matchesGlob = upath.matchesGlob as (
-  p: string,
-  pattern: string,
-) => boolean;
+// matchesGlob was added in Node 22 — may be undefined on Node 20
+export const matchesGlob = upath.matchesGlob as
+  | ((p: string, pattern: string) => boolean)
+  | undefined;
 
 // String properties
 export const sep = upath.sep as '/';

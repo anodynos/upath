@@ -37,7 +37,7 @@ npm test               # jest (runs all tests)
 npm run test:coverage  # jest --coverage
 ```
 
-- 142 tests across 4 test files
+- 365 tests across 5 test files
 - Framework: Jest with `test.each` table-driven patterns
 - Custom doc reporter auto-generates `docs/API.md` from test results
 - Dynamic API coverage test discovers `path` exports at runtime — catches new Node.js additions

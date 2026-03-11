@@ -30,7 +30,7 @@ interface DocSection {
 }
 
 /** Files to skip in documentation (meta-tests, not API demos). */
-const SKIP_FILES = ['api-coverage.test.ts'];
+const SKIP_FILES = ['api-coverage.test.ts', 'node-compat.test.ts'];
 
 /**
  * Parse a test title that follows the `fn("input") -> "output"` pattern.

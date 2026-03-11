@@ -42,7 +42,7 @@ Built on top of the proxy:
 | `src/__tests__/extensions.test.ts` | Extension function tests (addExt, trimExt, etc.) | YES |
 | `src/__tests__/api-coverage.test.ts` | Dynamic path API completeness check | YES |
 | `src/__tests__/reporters/doc-reporter.ts` | Custom Jest reporter → `docs/API.md` | Rarely |
-| `src/__tests__/helpers.ts` | Test helper functions (runSpec, runMultiArgSpec) | Rarely |
+| `src/__tests__/node-compat.test.ts` | Node.js path test suite compatibility (223 tests) | YES |
 | `docs/API.md` | Auto-generated from test runs — **do not hand-edit** | NO |
 | `dist/` | Build output — **never edit directly** | NO |
 
@@ -60,7 +60,7 @@ Built on top of the proxy:
 ```bash
 npm install              # Install devDependencies
 npm run dev              # tsup --watch (rebuild on changes)
-npm test                 # Jest (142 tests + generates docs/API.md)
+npm test                 # Jest (365 tests + generates docs/API.md)
 npm run test:coverage    # Jest with coverage report
 npm run build            # tsup (one-shot build → dist/)
 npm run lint             # tsc --noEmit (type check)
@@ -72,7 +72,7 @@ npm run lint             # tsc --noEmit (type check)
 - Pattern: `test.each` with `[input, expected]` tables (ported from CoffeeScript-era `inputToExpected` pattern)
 - Custom doc reporter generates `docs/API.md` from test results
 - API coverage test dynamically discovers `path` exports — catches new Node.js additions
-- 142 tests, ~97% coverage
+- 365 tests, ~97% coverage
 
 ## Conventions
 
