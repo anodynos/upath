@@ -1,4 +1,7 @@
-.idea
 node_modules
+dist
 build
+.idea
 DRAFT
+*.tsbuildinfo
+coverage
