@@ -1,349 +1,158 @@
-# upath v2.0.1
+# upath v3.0.0
 
-[![Build Status](https://travis-ci.com/anodynos/upath.svg?branch=master)](https://travis-ci.com/anodynos/upath)
+A drop-in replacement / proxy to Node.js `path` that:
 
-[![Weekly downloads](https://img.shields.io/npm/dw/upath.svg)](https://github.com/anodynos/upath) [![Yearly downloads](https://img.shields.io/npm/dy/upath.svg)](https://github.com/anodynos/upath)
-[![Open Issues](https://img.shields.io/github/issues/anodynos/upath.svg)](https://github.com/anodynos/upath/issues) [![Size](https://img.shields.io/bundlephobia/minzip/upath.svg)](https://github.com/anodynos/upath) [![Node Version](https://img.shields.io/node/v/upath.svg)](https://github.com/anodynos/upath)
+- Replaces the Windows `\` with the Unix `/` in all string params & results.
+- Adds **filename extension** functions: `addExt`, `trimExt`, `removeExt`, `changeExt`, and `defaultExt`.
+- Adds `normalizeSafe` to preserve any meaningful leading `./` or `//` (UNC paths), and `normalizeTrim` which additionally trims any trailing `/`.
+- Adds `joinSafe` which works like `path.join` but preserves leading `./` and `//`.
+- Provides `toUnix` to simply convert `\` to `/` and consolidate duplicates.
 
+Written in **TypeScript** with dual **CJS/ESM** output. Zero runtime dependencies.
 
-A drop-in replacement / proxy to nodejs's `path` that:
+## What's New in v3
 
-  * Replaces the windows `\` with the unix `/` in all string params & results. This has significant positives - see below.
+- **TypeScript rewrite** — full type safety, source of truth types shipped with the package.
+- **Dual CJS/ESM** — works with `import` and `require()` out of the box via package.json `exports`.
+- **Node >= 20** — drops legacy Node support.
+- **Auto-generated API docs** — see [`docs/API.md`](docs/API.md) for complete input/output tables generated from the test suite.
+- **UNC path support** — carried forward from v2, with comprehensive test coverage.
 
-  * Adds **filename extensions** functions `addExt`, `trimExt`, `removeExt`, `changeExt`, and `defaultExt`.
+## Installation
 
-  * Add a `normalizeSafe` function to preserve any meaningful leading `./` & a `normalizeTrim` which additionally trims any useless ending `/`.
+```bash
+npm install upath
+```
 
-  * Plus a helper `toUnix` that simply converts `\` to `/` and consolidates duplicates.
+## Usage
 
-**Useful note: these docs are actually auto generated from [specs](https://github.com/anodynos/upath/blob/master/source/spec/upath-spec.coffee), running on Linux.**
+```typescript
+// ESM
+import upath from 'upath';
+// or import specific functions
+import { normalize, joinSafe, addExt } from 'upath';
 
-Notes:
+// CJS
+const upath = require('upath').default;
+```
 
- * `upath.sep` is set to `'/'` for seamless replacement (as of 1.0.3).
+### Quick examples
 
- * upath has no runtime dependencies, except built-in `path` (as of 1.0.4)
+```typescript
+upath.normalize('c:\\windows\\nodejs\\path');  // 'c:/windows/nodejs/path'
+upath.join('some/nodejs\\windows', '../path'); // 'some/nodejs/path'
+upath.toUnix('.//windows\\//unix//mixed////'); // './windows/unix/mixed/'
 
- * travis-ci tested in node versions 8 to 14 (on linux)
+upath.addExt('myfile', '.js');           // 'myfile.js'
+upath.changeExt('module.coffee', '.js'); // 'module.js'
+upath.removeExt('file.js', '.js');       // 'file'
+upath.defaultExt('file', '.js');         // 'file.js'
+upath.trimExt('file.min.js');            // 'file.min'
+```
 
- * Also tested on Windows / node@12.18.0 (without CI)  
+## Why?
 
-History brief:
+Normal `path` doesn't convert paths to a unified format before calculating paths (`normalize`, `join`), which leads to problems:
 
- * 1.x   : Initial release and various features / fixes
+- Running `path` on Windows yields different results than on Linux / Mac.
+- If you develop on Unix/Mac and deploy to Windows (or vice versa), `path` can produce inconsistent results.
+- Using Unix `/` on Windows works perfectly inside Node.js, so there's no reason to stick to the Windows `\` convention.
 
- * 2.0.0 : Adding UNC paths support - see https://github.com/anodynos/upath/pull/38
+upath solves this by normalizing all backslashes to forward slashes in every function result.
 
-## Why ?
+## API
 
-Normal `path` doesn't convert paths to a unified format (ie `/`) before calculating paths (`normalize`, `join`), which can lead to numerous problems.
-Also path joining, normalization etc on the two formats is not consistent, depending on where it runs. Running `path` on Windows yields different results than when it runs on Linux / Mac.
+upath proxies **all** functions and properties from Node.js `path` (`basename`, `dirname`, `extname`, `format`, `isAbsolute`, `join`, `normalize`, `parse`, `relative`, `resolve`, `toNamespacedPath`, `matchesGlob`), converting any `\` in results to `/`.
 
-In general, if you code your paths logic while developing on Unix/Mac and it runs on Windows, you may run into problems when using `path`.
+Additionally, `upath.sep` is always `'/'` and `upath.VERSION` provides the package version string.
 
-Note that using **Unix `/` on Windows** works perfectly inside nodejs (and other languages), so there's no reason to stick to the Windows legacy at all.
+### Extra functions
 
-##### Examples / specs
-        
-
-Check out the different (improved) behavior to vanilla `path`:
-
-    `upath.normalize(path)`        --returns-->
-
-          ✓ `'c:/windows/nodejs/path'`         --->      `'c:/windows/nodejs/path'`  // equal to `path.normalize()`
-          ✓ `'c:/windows/../nodejs/path'`      --->              `'c:/nodejs/path'`  // equal to `path.normalize()`
-          ✓ `'c:\\windows\\nodejs\\path'`      --->      `'c:/windows/nodejs/path'`  // `path.normalize()` gives `'c:\windows\nodejs\path'`
-          ✓ `'c:\\windows\\..\\nodejs\\path'`  --->              `'c:/nodejs/path'`  // `path.normalize()` gives `'c:\windows\..\nodejs\path'`
-          ✓ `'/windows\\unix/mixed'`           --->         `'/windows/unix/mixed'`  // `path.normalize()` gives `'/windows\unix/mixed'`
-          ✓ `'\\windows//unix/mixed'`          --->         `'/windows/unix/mixed'`  // `path.normalize()` gives `'\windows/unix/mixed'`
-          ✓ `'\\windows\\..\\unix/mixed/'`     --->                `'/unix/mixed/'`  // `path.normalize()` gives `'\windows\..\unix/mixed/'`
-        
-
-Joining paths can also be a problem:
-
-    `upath.join(paths...)`        --returns-->
-
-          ✓ `'some/nodejs/deep', '../path'`       --->       `'some/nodejs/path'`  // equal to `path.join()`
-          ✓ `'some/nodejs\\windows', '../path'`   --->       `'some/nodejs/path'`  // `path.join()` gives `'some/path'`
-          ✓ `'some\\windows\\only', '..\\path'`   --->      `'some/windows/path'`  // `path.join()` gives `'some\windows\only/..\path'`
-        
-
-Parsing with `path.parse()` should also be consistent across OSes:
-
-  `upath.parse(path)`        --returns-->
-
-          ✓ `'c:\Windows\Directory\somefile.ext'`      ---> `{ root: '', dir: 'c:/Windows/Directory', base: 'somefile.ext', ext: '.ext', name: 'somefile'
-}`
-                                    // `path.parse()` gives `'{ root: '', dir: '', base: 'c:\\Windows\\Directory\\somefile.ext', ext: '.ext', name: 'c:\\Windows\\Directory\\somefile'
-}'`
-          ✓ `'/root/of/unix/somefile.ext'`             ---> `{ root: '/', dir: '/root/of/unix', base: 'somefile.ext', ext: '.ext', name: 'somefile'
-}`  // equal to `path.parse()`
-    
-
-## Added functions
-      
+Below is a summary. See [`docs/API.md`](docs/API.md) for full input/output tables.
 
 #### `upath.toUnix(path)`
 
-Just converts all `` to `/` and consolidates duplicates, without performing any normalization.
+Converts all `\` to `/` and consolidates duplicate slashes, without any normalization.
 
-##### Examples / specs
-
-    `upath.toUnix(path)`        --returns-->
-
-        ✓ `'.//windows\//unix//mixed////'`      --->         `'./windows/unix/mixed/'`
-        ✓ `'..///windows\..\\unix/mixed'`       --->      `'../windows/../unix/mixed'`
-      
+```typescript
+upath.toUnix('.//windows\\//unix//mixed////'); // './windows/unix/mixed/'
+```
 
 #### `upath.normalizeSafe(path)`
 
-Exactly like `path.normalize(path)`, but it keeps the first meaningful `./` or `//`.
+Like `path.normalize()`, but preserves a leading `./` and leading `//` (UNC paths). All backslashes are converted to forward slashes.
 
-Note that the unix `/` is returned everywhere, so windows `\` is always converted to unix `/`.
-
-##### Examples / specs & how it differs from vanilla `path`
-
-    `upath.normalizeSafe(path)`        --returns-->
-
-        ✓ `''`                               --->                              `'.'`  // equal to `path.normalize()`
-        ✓ `'.'`                              --->                              `'.'`  // equal to `path.normalize()`
-        ✓ `'./'`                             --->                             `'./'`  // equal to `path.normalize()`
-        ✓ `'.//'`                            --->                             `'./'`  // equal to `path.normalize()`
-        ✓ `'.\\'`                            --->                             `'./'`  // `path.normalize()` gives `'.\'`
-        ✓ `'.\\//'`                          --->                             `'./'`  // `path.normalize()` gives `'.\/'`
-        ✓ `'./..'`                           --->                             `'..'`  // equal to `path.normalize()`
-        ✓ `'.//..'`                          --->                             `'..'`  // equal to `path.normalize()`
-        ✓ `'./../'`                          --->                            `'../'`  // equal to `path.normalize()`
-        ✓ `'.\\..\\'`                        --->                            `'../'`  // `path.normalize()` gives `'.\..\'`
-        ✓ `'./../dep'`                       --->                         `'../dep'`  // equal to `path.normalize()`
-        ✓ `'../dep'`                         --->                         `'../dep'`  // equal to `path.normalize()`
-        ✓ `'../path/dep'`                    --->                    `'../path/dep'`  // equal to `path.normalize()`
-        ✓ `'../path/../dep'`                 --->                         `'../dep'`  // equal to `path.normalize()`
-        ✓ `'dep'`                            --->                            `'dep'`  // equal to `path.normalize()`
-        ✓ `'path//dep'`                      --->                       `'path/dep'`  // equal to `path.normalize()`
-        ✓ `'./dep'`                          --->                          `'./dep'`  // `path.normalize()` gives `'dep'`
-        ✓ `'./path/dep'`                     --->                     `'./path/dep'`  // `path.normalize()` gives `'path/dep'`
-        ✓ `'./path/../dep'`                  --->                          `'./dep'`  // `path.normalize()` gives `'dep'`
-        ✓ `'.//windows\\unix/mixed/'`        --->          `'./windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`
-        ✓ `'..//windows\\unix/mixed'`        --->          `'../windows/unix/mixed'`  // `path.normalize()` gives `'../windows\unix/mixed'`
-        ✓ `'windows\\unix/mixed/'`           --->            `'windows/unix/mixed/'`  // `path.normalize()` gives `'windows\unix/mixed/'`
-        ✓ `'..//windows\\..\\unix/mixed'`    --->                  `'../unix/mixed'`  // `path.normalize()` gives `'../windows\..\unix/mixed'`
-        ✓ `'\\\\server\\share\\file'`        --->            `'//server/share/file'`  // `path.normalize()` gives `'\\server\share\file'`
-        ✓ `'//server/share/file'`            --->            `'//server/share/file'`  // `path.normalize()` gives `'/server/share/file'`
-        ✓ `'\\\\?\\UNC\\server\\share\\file'` --->      `'//?/UNC/server/share/file'`  // `path.normalize()` gives `'\\?\UNC\server\share\file'`
-        ✓ `'\\\\LOCALHOST\\c$\\temp\\file'`  --->       `'//LOCALHOST/c$/temp/file'`  // `path.normalize()` gives `'\\LOCALHOST\c$\temp\file'`
-        ✓ `'\\\\?\\c:\\temp\\file'`          --->               `'//?/c:/temp/file'`  // `path.normalize()` gives `'\\?\c:\temp\file'`
-        ✓ `'\\\\.\\c:\\temp\\file'`          --->               `'//./c:/temp/file'`  // `path.normalize()` gives `'\\.\c:\temp\file'`
-        ✓ `'//./c:/temp/file'`               --->               `'//./c:/temp/file'`  // `path.normalize()` gives `'/c:/temp/file'`
-        ✓ `'////\\.\\c:/temp\\//file'`       --->               `'//./c:/temp/file'`  // `path.normalize()` gives `'/\.\c:/temp\/file'`
-      
+```typescript
+upath.normalizeSafe('./path/../dep');       // './dep'  (path.normalize gives 'dep')
+upath.normalizeSafe('//server/share/file'); // '//server/share/file'
+```
 
 #### `upath.normalizeTrim(path)`
 
-Exactly like `path.normalizeSafe(path)`, but it trims any useless ending `/`.
+Like `normalizeSafe()`, but trims any trailing `/`.
 
-##### Examples / specs
-
-    `upath.normalizeTrim(path)`        --returns-->
-
-        ✓ `'./'`                          --->                         `'.'`  // `upath.normalizeSafe()` gives `'./'`
-        ✓ `'./../'`                       --->                        `'..'`  // `upath.normalizeSafe()` gives `'../'`
-        ✓ `'./../dep/'`                   --->                    `'../dep'`  // `upath.normalizeSafe()` gives `'../dep/'`
-        ✓ `'path//dep\\'`                 --->                  `'path/dep'`  // `upath.normalizeSafe()` gives `'path/dep/'`
-        ✓ `'.//windows\\unix/mixed/'`     --->      `'./windows/unix/mixed'`  // `upath.normalizeSafe()` gives `'./windows/unix/mixed/'`
-      
+```typescript
+upath.normalizeTrim('./../dep/'); // '../dep'
+```
 
 #### `upath.joinSafe([path1][, path2][, ...])`
 
-Exactly like `path.join()`, but it keeps the first meaningful `./` or `//`.
+Like `path.join()`, but preserves a leading `./` and `//`.
 
-Note that the unix `/` is returned everywhere, so windows `\` is always converted to unix `/`.
-
-##### Examples / specs & how it differs from vanilla `path`
-
-    `upath.joinSafe(path)`        --returns-->
-
-        ✓ `'some/nodejs/deep', '../path'`                --->           `'some/nodejs/path'`  // equal to `path.join()`
-        ✓ `'./some/local/unix/', '../path'`              --->          `'./some/local/path'`  // `path.join()` gives `'some/local/path'`
-        ✓ `'./some\\current\\mixed', '..\\path'`         --->        `'./some/current/path'`  // `path.join()` gives `'some\current\mixed/..\path'`
-        ✓ `'../some/relative/destination', '..\\path'`   --->      `'../some/relative/path'`  // `path.join()` gives `'../some/relative/destination/..\path'`
-        ✓ `'\\\\server\\share\\file', '..\\path'`        --->        `'//server/share/path'`  // `path.join()` gives `'\\server\share\file/..\path'`
-        ✓ `'\\\\.\\c:\\temp\\file', '..\\path'`          --->           `'//./c:/temp/path'`  // `path.join()` gives `'\\.\c:\temp\file/..\path'`
-        ✓ `'//server/share/file', '../path'`             --->        `'//server/share/path'`  // `path.join()` gives `'/server/share/path'`
-        ✓ `'//./c:/temp/file', '../path'`                --->           `'//./c:/temp/path'`  // `path.join()` gives `'/c:/temp/path'`
-    
-
-## Added functions for *filename extension* manipulation.
-
-**Happy notes:**
-
-  In all functions you can:
-
-  * use both `.ext` & `ext` - the dot `.` on the extension is always adjusted correctly.
-
-  * omit the `ext` param (pass null/undefined/empty string) and the common sense thing will happen.
-
-  * ignore specific extensions from being considered as valid ones (eg `.min`, `.dev` `.aLongExtIsNotAnExt` etc), hence no trimming or replacement takes place on them.
-
-       
+```typescript
+upath.joinSafe('./some/local/unix/', '../path');       // './some/local/path'
+upath.joinSafe('//server/share/file', '../path');      // '//server/share/path'
+```
 
 #### `upath.addExt(filename, [ext])`
 
 Adds `.ext` to `filename`, but only if it doesn't already have the exact extension.
 
-##### Examples / specs
-
-    `upath.addExt(filename, 'js')`     --returns-->
-
-        ✓ `'myfile/addExt'`           --->           `'myfile/addExt.js'`
-        ✓ `'myfile/addExt.txt'`       --->       `'myfile/addExt.txt.js'`
-        ✓ `'myfile/addExt.js'`        --->           `'myfile/addExt.js'`
-        ✓ `'myfile/addExt.min.'`      --->      `'myfile/addExt.min..js'`
-        
-
-It adds nothing if no `ext` param is passed.
-
-    `upath.addExt(filename)`           --returns-->
-
-          ✓ `'myfile/addExt'`           --->              `'myfile/addExt'`
-          ✓ `'myfile/addExt.txt'`       --->          `'myfile/addExt.txt'`
-          ✓ `'myfile/addExt.js'`        --->           `'myfile/addExt.js'`
-          ✓ `'myfile/addExt.min.'`      --->         `'myfile/addExt.min.'`
-      
+```typescript
+upath.addExt('myfile', '.js');     // 'myfile.js'
+upath.addExt('myfile.js', '.js');  // 'myfile.js' (unchanged)
+upath.addExt('myfile.txt', '.js'); // 'myfile.txt.js'
+```
 
 #### `upath.trimExt(filename, [ignoreExts], [maxSize=7])`
 
-Trims a filename's extension.
+Trims a filename's extension. Extensions longer than `maxSize` chars (including the dot) are not considered valid. Extensions listed in `ignoreExts` are not trimmed.
 
-  * Extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
-
-  * An `Array` of `ignoreExts` (eg `['.min']`) prevents these from being considered as extension, thus are not trimmed.
-
-##### Examples / specs
-
-    `upath.trimExt(filename)`          --returns-->
-
-        ✓ `'my/trimedExt.txt'`             --->                 `'my/trimedExt'`
-        ✓ `'my/trimedExt'`                 --->                 `'my/trimedExt'`
-        ✓ `'my/trimedExt.min'`             --->                 `'my/trimedExt'`
-        ✓ `'my/trimedExt.min.js'`          --->             `'my/trimedExt.min'`
-        ✓ `'../my/trimedExt.longExt'`      --->      `'../my/trimedExt.longExt'`
-        
-
-It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
-
-    `upath.trimExt(filename, ['min', '.dev'], 8)`          --returns-->
-
-          ✓ `'my/trimedExt.txt'`              --->                  `'my/trimedExt'`
-          ✓ `'my/trimedExt.min'`              --->              `'my/trimedExt.min'`
-          ✓ `'my/trimedExt.dev'`              --->              `'my/trimedExt.dev'`
-          ✓ `'../my/trimedExt.longExt'`       --->               `'../my/trimedExt'`
-          ✓ `'../my/trimedExt.longRExt'`      --->      `'../my/trimedExt.longRExt'`
-      
+```typescript
+upath.trimExt('my/file.min.js');                      // 'my/file.min'
+upath.trimExt('my/file.min', ['min'], 8);              // 'my/file.min' (ignored)
+```
 
 #### `upath.removeExt(filename, ext)`
 
-Removes the specific `ext` extension from filename, if it has it. Otherwise it leaves it as is.
-As in all upath functions, it be `.ext` or `ext`.
+Removes the specific `ext` from `filename`, if present.
 
-##### Examples / specs
-
-    `upath.removeExt(filename, '.js')`          --returns-->
-
-        ✓ `'removedExt.js'`          --->          `'removedExt'`
-        ✓ `'removedExt.txt.js'`      --->      `'removedExt.txt'`
-        ✓ `'notRemoved.txt'`         --->      `'notRemoved.txt'`
-      
-
-It does not care about the length of exts.
-
-    `upath.removeExt(filename, '.longExt')`          --returns-->
-
-        ✓ `'removedExt.longExt'`          --->          `'removedExt'`
-        ✓ `'removedExt.txt.longExt'`      --->      `'removedExt.txt'`
-        ✓ `'notRemoved.txt'`              --->      `'notRemoved.txt'`
-      
+```typescript
+upath.removeExt('file.js', '.js');  // 'file'
+upath.removeExt('file.txt', '.js'); // 'file.txt' (unchanged)
+```
 
 #### `upath.changeExt(filename, [ext], [ignoreExts], [maxSize=7])`
 
-Changes a filename's extension to `ext`. If it has no (valid) extension, it adds it.
+Changes a filename's extension to `ext`. If it has no valid extension, the new extension is added. Extensions in `ignoreExts` are not replaced.
 
-  * Valid extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
-
-  * An `Array` of `ignoreExts` (eg `['.min']`) prevents these from being considered as extension, thus are not changed - the new extension is added instead.
-
-##### Examples / specs
-
-    `upath.changeExt(filename, '.js')`  --returns-->
-
-        ✓ `'my/module.min'`            --->                `'my/module.js'`
-        ✓ `'my/module.coffee'`         --->                `'my/module.js'`
-        ✓ `'my/module'`                --->                `'my/module.js'`
-        ✓ `'file/withDot.'`            --->             `'file/withDot.js'`
-        ✓ `'file/change.longExt'`      --->      `'file/change.longExt.js'`
-        
-
-If no `ext` param is given, it trims the current extension (if any).
-
-    `upath.changeExt(filename)`        --returns-->
-
-          ✓ `'my/module.min'`            --->                   `'my/module'`
-          ✓ `'my/module.coffee'`         --->                   `'my/module'`
-          ✓ `'my/module'`                --->                   `'my/module'`
-          ✓ `'file/withDot.'`            --->                `'file/withDot'`
-          ✓ `'file/change.longExt'`      --->         `'file/change.longExt'`
-        
-
-It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
-
-    `upath.changeExt(filename, 'js', ['min', '.dev'], 8)`        --returns-->
-
-          ✓ `'my/module.coffee'`          --->                 `'my/module.js'`
-          ✓ `'file/notValidExt.min'`      --->      `'file/notValidExt.min.js'`
-          ✓ `'file/notValidExt.dev'`      --->      `'file/notValidExt.dev.js'`
-          ✓ `'file/change.longExt'`       --->               `'file/change.js'`
-          ✓ `'file/change.longRExt'`      --->      `'file/change.longRExt.js'`
-      
+```typescript
+upath.changeExt('module.coffee', '.js');                    // 'module.js'
+upath.changeExt('file.min', '.js', ['min'], 8);             // 'file.min.js'
+```
 
 #### `upath.defaultExt(filename, [ext], [ignoreExts], [maxSize=7])`
 
-Adds `.ext` to `filename`, only if it doesn't already have _any_ *old* extension.
+Adds `.ext` to `filename` only if it doesn't already have any valid extension. Extensions in `ignoreExts` are treated as if absent, so the default extension is added.
 
-  * (Old) extensions are considered to be up to `maxSize` chars long, counting the dot (defaults to 7).
+```typescript
+upath.defaultExt('file', '.js');          // 'file.js'
+upath.defaultExt('file.ts', '.js');       // 'file.ts' (already has extension)
+upath.defaultExt('file.min', '.js', ['min'], 8); // 'file.min.js' (.min ignored)
+```
 
-  * An `Array` of `ignoreExts` (eg `['.min']`) will force adding default `.ext` even if one of these is present.
+## License
 
-##### Examples / specs
-
-    `upath.defaultExt(filename, 'js')`   --returns-->
-
-        ✓ `'fileWith/defaultExt'`              --->              `'fileWith/defaultExt.js'`
-        ✓ `'fileWith/defaultExt.js'`           --->              `'fileWith/defaultExt.js'`
-        ✓ `'fileWith/defaultExt.min'`          --->             `'fileWith/defaultExt.min'`
-        ✓ `'fileWith/defaultExt.longExt'`      --->      `'fileWith/defaultExt.longExt.js'`
-        
-
-If no `ext` param is passed, it leaves filename intact.
-
-    `upath.defaultExt(filename)`       --returns-->
-
-          ✓ `'fileWith/defaultExt'`              --->                 `'fileWith/defaultExt'`
-          ✓ `'fileWith/defaultExt.js'`           --->              `'fileWith/defaultExt.js'`
-          ✓ `'fileWith/defaultExt.min'`          --->             `'fileWith/defaultExt.min'`
-          ✓ `'fileWith/defaultExt.longExt'`      --->         `'fileWith/defaultExt.longExt'`
-        
-
-It is ignoring `.min` & `.dev` as extensions, and considers exts with up to 8 chars.
-
-    `upath.defaultExt(filename, 'js', ['min', '.dev'], 8)` --returns-->
-
-          ✓ `'fileWith/defaultExt'`               --->               `'fileWith/defaultExt.js'`
-          ✓ `'fileWith/defaultExt.min'`           --->           `'fileWith/defaultExt.min.js'`
-          ✓ `'fileWith/defaultExt.dev'`           --->           `'fileWith/defaultExt.dev.js'`
-          ✓ `'fileWith/defaultExt.longExt'`       --->          `'fileWith/defaultExt.longExt'`
-          ✓ `'fileWith/defaultExt.longRext'`      --->      `'fileWith/defaultExt.longRext.js'`
-
-  
 Copyright(c) 2014-2020 Angelos Pikoulas (agelos.pikoulas@gmail.com)
 
 Permission is hereby granted, free of charge, to any person
