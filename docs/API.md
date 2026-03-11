@@ -73,6 +73,33 @@
 | `["//server/share/file","../path"]` | `"//server/share/path"` |
 | `["//./c:/temp/file","../path"]` | `"//./c:/temp/path"` |
 
+## `upath.normalize(path)`
+
+| Input | Output |
+|-------|--------|
+| `"c:/windows/nodejs/path"` | `"c:/windows/nodejs/path"` |
+| `"c:/windows/../nodejs/path"` | `"c:/nodejs/path"` |
+| `"c:\\windows\\nodejs\\path"` | `"c:/windows/nodejs/path"` |
+| `"c:\\windows\\..\\nodejs\\path"` | `"c:/nodejs/path"` |
+| `"/windows\\unix/mixed"` | `"/windows/unix/mixed"` |
+| `"\\windows//unix/mixed"` | `"/windows/unix/mixed"` |
+| `"\\windows\\..\\unix/mixed/"` | `"/unix/mixed/"` |
+
+## `upath.join(paths...)`
+
+| Input | Output |
+|-------|--------|
+| `["some/nodejs/deep","../path"]` | `"some/nodejs/path"` |
+| `["some/nodejs\\windows","../path"]` | `"some/nodejs/path"` |
+| `["some\\windows\\only","..\\path"]` | `"some/windows/path"` |
+
+## `upath.toUnix(path)`
+
+| Input | Output |
+|-------|--------|
+| `".//windows\\//unix/\\/mixed////"` | `"./windows/unix/mixed/"` |
+| `"..///windows\\..\\\\unix/mixed"` | `"../windows/../unix/mixed"` |
+
 ## `upath.addExt(filename, ext)`
 
 ### addExt(filename, 'js')
@@ -194,30 +221,3 @@
 | `"fileWith/defaultExt.dev", 'js', ['min', '.dev'], 8` | `"fileWith/defaultExt.dev.js"` |
 | `"fileWith/defaultExt.longExt", 'js', ['min', '.dev'], 8` | `"fileWith/defaultExt.longExt"` |
 | `"fileWith/defaultExt.longRext", 'js', ['min', '.dev'], 8` | `"fileWith/defaultExt.longRext.js"` |
-
-## `upath.normalize(path)`
-
-| Input | Output |
-|-------|--------|
-| `"c:/windows/nodejs/path"` | `"c:/windows/nodejs/path"` |
-| `"c:/windows/../nodejs/path"` | `"c:/nodejs/path"` |
-| `"c:\\windows\\nodejs\\path"` | `"c:/windows/nodejs/path"` |
-| `"c:\\windows\\..\\nodejs\\path"` | `"c:/nodejs/path"` |
-| `"/windows\\unix/mixed"` | `"/windows/unix/mixed"` |
-| `"\\windows//unix/mixed"` | `"/windows/unix/mixed"` |
-| `"\\windows\\..\\unix/mixed/"` | `"/unix/mixed/"` |
-
-## `upath.join(paths...)`
-
-| Input | Output |
-|-------|--------|
-| `["some/nodejs/deep","../path"]` | `"some/nodejs/path"` |
-| `["some/nodejs\\windows","../path"]` | `"some/nodejs/path"` |
-| `["some\\windows\\only","..\\path"]` | `"some/windows/path"` |
-
-## `upath.toUnix(path)`
-
-| Input | Output |
-|-------|--------|
-| `".//windows\\//unix/\\/mixed////"` | `"./windows/unix/mixed/"` |
-| `"..///windows\\..\\\\unix/mixed"` | `"../windows/../unix/mixed"` |
