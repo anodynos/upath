@@ -53,11 +53,11 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "tsup --watch",
-    "build": "tsup",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
-    "lint": "tsc --noEmit",
+    "dev": "npx tsup --watch",
+    "build": "npx tsup",
+    "test": "npx jest",
+    "test:coverage": "npx jest --coverage",
+    "lint": "npx tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
