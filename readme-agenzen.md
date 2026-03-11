@@ -14,13 +14,16 @@ upath is a drop-in replacement for Node.js's built-in `path` module. It wraps ev
 
 ### Core Pattern: Proxy Wrapper
 
-The entire library is one file (`source/code/upath.coffee`) using a single pattern:
+The entire library is one file (`src/index.ts`) using a single pattern:
 
-1. Iterate over all properties of Node's `path`
+1. Iterate over all properties of Node's `path` via `Object.entries(path)`
 2. For functions: wrap them to convert `\` → `/` on string args (pre-process) and on results (post-process)
 3. For non-functions: copy as-is (except `sep`, forced to `'/'`)
+4. `posix` and `win32` are passed through without wrapping (they're circular references)
 
 The `toUnix()` helper does the actual conversion: replace `\` with `/`, then consolidate consecutive slashes — but preserve leading `//` for UNC paths via negative lookbehind: `/(?<!^)\/+/g`.
+
+This dynamic proxy means **new `path` functions in future Node versions are automatically wrapped** without code changes.
 
 ### Extension Functions
 
@@ -33,51 +36,54 @@ Built on top of the proxy:
 
 | File | Role | Edit? |
 |------|------|-------|
-| `source/code/upath.coffee` | **Main source** — all logic | YES |
-| `source/spec/upath-spec.coffee` | **Tests + docs** — specs auto-generate README | YES |
-| `source/spec/specHelpers.coffee` | Test assertion helpers (Chai + uberscore wrappers) | Rarely |
-| `build/code/upath.js` | Compiled output — **never edit directly** | NO |
-| `build/spec/*.js` | Compiled tests — **never edit directly** | NO |
-| `upath.d.ts` | Hand-maintained TypeScript declarations | YES (if API changes) |
-| `Gruntfile.coffee` | Build config (uRequire + Grunt) | Rarely |
-| `readme.md` | Auto-generated from specs — **do not hand-edit** | NO |
+| `src/index.ts` | **Main source** — all logic, typed exports | YES |
+| `src/__tests__/upath.test.ts` | Core proxy tests (normalize, join, parse, toUnix) | YES |
+| `src/__tests__/safe.test.ts` | Safe function tests (normalizeSafe, normalizeTrim, joinSafe) | YES |
+| `src/__tests__/extensions.test.ts` | Extension function tests (addExt, trimExt, etc.) | YES |
+| `src/__tests__/api-coverage.test.ts` | Dynamic path API completeness check | YES |
+| `src/__tests__/reporters/doc-reporter.ts` | Custom Jest reporter → `docs/API.md` | Rarely |
+| `src/__tests__/helpers.ts` | Test helper functions (runSpec, runMultiArgSpec) | Rarely |
+| `docs/API.md` | Auto-generated from test runs — **do not hand-edit** | NO |
+| `dist/` | Build output — **never edit directly** | NO |
 
 ### Key Gotchas
 
-1. **CoffeeScript source, JS build** — all edits go in `source/`, then compile with `npx grunt lib`
-2. **TypeScript declarations are hand-maintained** — if you change the API in `upath.coffee`, you MUST update `upath.d.ts` manually
-3. **README is auto-generated** — never edit `readme.md` directly; change the specs instead
+1. **TypeScript source, built output** — all edits go in `src/`, then build with `npx tsup`
+2. **Types are auto-generated** — `dist/index.d.ts` comes from the source. No hand-maintained `.d.ts` file.
+3. **`docs/API.md` is auto-generated** — never edit it directly; change the test specs instead
 4. **UNC path preservation** — the negative lookbehind regex `(?<!^)` is critical; don't simplify it or you'll break `//server/share` paths
-5. **DRAFT/ directory is gitignored** — contains orphaned experimental code (a debounce utility), not part of the project
+5. **Dynamic proxy** — `Object.entries(path)` at module load time. New `path` exports in future Node versions get wrapped automatically.
+6. **Dual CJS/ESM** — `dist/index.cjs` and `dist/index.js`. Package uses `"type": "module"`.
 
 ## Development Commands
 
 ```bash
-npm install              # Install devDependencies (Grunt, CoffeeScript, Mocha, etc.)
-npm run dev              # Build + watch specs (npx grunt dev)
-npm test                 # Full build + test (npx grunt)
-npm run build            # Build library only (npx grunt lib)
+npm install              # Install devDependencies
+npm run dev              # tsup --watch (rebuild on changes)
+npm test                 # Jest (142 tests + generates docs/API.md)
+npm run test:coverage    # Jest with coverage report
+npm run build            # tsup (one-shot build → dist/)
+npm run lint             # tsc --noEmit (type check)
 ```
 
 ## Testing
 
-- Framework: Mocha + Chai (via uRequire spec runner)
-- Specs in CoffeeScript: `source/spec/upath-spec.coffee`
-- Pattern: `inputToExpected` objects map inputs → expected results
-- Specs are living documentation — test descriptions become README content
-- Custom assertion helpers in `specHelpers.coffee` use uberscore for deep comparison
+- Framework: Jest + ts-jest
+- Pattern: `test.each` with `[input, expected]` tables (ported from CoffeeScript-era `inputToExpected` pattern)
+- Custom doc reporter generates `docs/API.md` from test results
+- API coverage test dynamically discovers `path` exports — catches new Node.js additions
+- 142 tests, ~97% coverage
 
 ## Conventions
 
-- **CoffeeScript** — not TypeScript. The project predates TS adoption.
-- **No linter** — CoffeeScript era, no ESLint/Prettier configured
-- **CommonJS** — compiled output is CJS (`module.exports`), supports Node >=4
-- **Test naming** — specs use `-spec.coffee` suffix (hyphenated, not dotted)
-- **No CI** — Travis CI config exists but the service is defunct; tests run locally
+- **TypeScript** with strict mode
+- **ESM source** (`"type": "module"` in package.json)
+- **tsup** for dual CJS/ESM build
+- **Jest** for testing
+- **Node >= 20** minimum
 
 ## Integration with AgenZen
 
 - **Task prefix:** `UP`
 - **Backlog:** `project-management/0-backlog/backlog.md`
-- **Divergences:** CoffeeScript, Grunt, Mocha (vs AZ standard TypeScript/Jest)
-- **No @todos in codebase** — clean as of 2026-03-11 harvest
+- **No @todos in codebase** — clean as of 2026-03-11

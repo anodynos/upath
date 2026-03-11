@@ -6,7 +6,7 @@
 
 - **Name:** upath
 - **Task ID Prefix:** UP
-- **Version:** 2.0.1
+- **Version:** 3.0.0
 - **Author:** Angelos Pikoulas (anodynos)
 - **License:** MIT
 - **npm:** [upath](https://www.npmjs.com/package/upath)
@@ -14,49 +14,48 @@
 
 ## Tech Stack
 
-- **Language:** CoffeeScript (source) → JavaScript (build output)
-- **Build:** Grunt + uRequire (CoffeeScript → CommonJS)
-- **Testing:** Mocha + Chai (via uRequire spec runner)
+- **Language:** TypeScript
+- **Build:** tsup (dual CJS + ESM output)
+- **Testing:** Jest (ts-jest) with custom doc-generating reporter
 - **Runtime deps:** None (only built-in `path`)
-- **Node support:** >=4 (tested 8–14)
-- **Type declarations:** Hand-maintained `upath.d.ts`
+- **Node support:** >= 20
+- **Types:** Auto-generated from source (`dist/index.d.ts`)
 
 ## Development
 
 ```bash
 npm install
-npx grunt dev          # build + watch specs
-npx grunt lib          # build library only
-npx grunt spec         # run specs once
-npx grunt specWatch    # watch + run specs
+npm run dev            # tsup --watch (rebuild on changes)
+npm run build          # tsup (one-shot build)
+npm run lint           # tsc --noEmit (type check only)
 ```
-
-The Gruntfile uses uRequire to compile CoffeeScript from `source/` to `build/`.
 
 ## Testing
 
 ```bash
-npm test               # runs `npx grunt` (builds lib + runs specs)
+npm test               # jest (runs all tests)
+npm run test:coverage  # jest --coverage
 ```
 
-- Tests are CoffeeScript specs in `source/spec/upath-spec.coffee`
-- Specs double as documentation — README examples are auto-generated from them
-- Framework: Mocha + Chai assertions
+- 142 tests across 4 test files
+- Framework: Jest with `test.each` table-driven patterns
+- Custom doc reporter auto-generates `docs/API.md` from test results
+- Dynamic API coverage test discovers `path` exports at runtime — catches new Node.js additions
 
 ## Build & Deploy
 
 ```bash
-npm run build          # runs `npx grunt lib` — compiles source/code → build/code
+npm run build          # produces dist/index.cjs, dist/index.js, dist/index.d.ts
 ```
 
 - Published to npm as `upath`
-- `build/code/upath.js` is the main entry point
-- `upath.d.ts` provides TypeScript type declarations
-- No CI beyond Travis CI (legacy `.travis.yml`)
+- Dual output: CJS (`dist/index.cjs`) + ESM (`dist/index.js`)
+- Types auto-generated alongside build output
+- `prepublishOnly` runs build automatically
 
 ## Code Conventions
 
-- CoffeeScript source, compiled to JS — never edit `build/` directly
-- Specs are the source of truth for behavior documentation
-- No linter configured (CoffeeScript era project)
-- `DRAFT/` directory is gitignored experimental code
+- TypeScript source in `src/`, compiled output in `dist/` — never edit `dist/` directly
+- Tests are the source of truth for behavior documentation (doc reporter generates `docs/API.md`)
+- Dynamic proxy pattern: iterates over `path` at runtime, wraps all functions
+- UNC path regex `(?<!^)\/+` is critical — do not simplify
