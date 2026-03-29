@@ -1,0 +1,141 @@
+## Specify precise line ending behaviors
+
+# Set default behavior: tell Git to guess if a file is text or binary.
+# If it is detected as text, it will be normalized to LF.
+# This prevents binary files from being accidentally converted.
+* text=auto eol=lf
+
+# Explicitly declare known text files to always use LF,
+# bypassing the auto-detection just to be safe.
+*.sh text eol=lf
+*.ps1 text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+*.fish text eol=lf
+
+*.txt text eol=lf
+*.md text eol=lf
+*.markdown text eol=lf
+*.mdx text eol=lf
+*.rst text eol=lf
+
+*.json text eol=lf
+*.jsonc text eol=lf
+*.json5 text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.csv text eol=lf
+*.tsv text eol=lf
+
+*.js text eol=lf
+*.jsx text eol=lf
+*.cjs text eol=lf
+*.mjs text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.cts text eol=lf
+*.mts text eol=lf
+*.vue text eol=lf
+*.svelte text eol=lf
+
+*.html text eol=lf
+*.htm text eol=lf
+*.xml text eol=lf
+*.svg text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.less text eol=lf
+
+*.py text eol=lf
+*.rb text eol=lf
+*.php text eol=lf
+*.java text eol=lf
+*.c text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+*.cs text eol=lf
+*.go text eol=lf
+*.rs text eol=lf
+*.swift text eol=lf
+*.kt text eol=lf
+*.kts text eol=lf
+
+*.gitignore text eol=lf
+*.gitattributes text eol=lf
+*.editorconfig text eol=lf
+*.prettierrc text eol=lf
+*.eslintrc* text eol=lf
+*.dockerignore text eol=lf
+Dockerfile* text eol=lf
+README* text eol=lf
+LICENSE text eol=lf
+
+# Windows scripts typically need CRLF to work properly in cmd.exe.
+# Even if your editor handles LF fine, running these scripts directly
+# in the Windows command prompt often requires CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Explicitly mark known binary files just in case the auto-detection fails.
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.bmp binary
+*.tif binary
+*.tiff binary
+
+# Media
+*.mp3 binary
+*.mp4 binary
+*.avi binary
+*.mov binary
+*.webm binary
+*.wav binary
+*.ogg binary
+
+# Documents
+*.pdf binary
+*.doc binary
+*.docx binary
+*.xls binary
+*.xlsx binary
+*.ppt binary
+*.pptx binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.tar.gz binary
+*.rar binary
+*.7z binary
+
+# Executables/Compiled
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.class binary
+*.o binary
+*.a binary
+*.lib binary
+*.bin binary
+
+# Fonts
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+
+# Databases
+*.sqlite binary
+*.db binary
