@@ -28,23 +28,24 @@ This dynamic proxy means **new `path` functions in future Node versions are auto
 ### Extension Functions
 
 Built on top of the proxy:
+
 - `isValidExt()` — internal helper checking extension length (max 7 chars) and ignore lists
 - `trimExt()` → `removeExt()` → `changeExt()` → `defaultExt()` — each composes on the previous
 - `addExt()` — standalone, just appends if not already present
 
 ### File Map
 
-| File | Role | Edit? |
-|------|------|-------|
-| `src/index.ts` | **Main source** — all logic, typed exports | YES |
-| `src/__tests__/upath.test.ts` | Core proxy tests (normalize, join, parse, toUnix) | YES |
-| `src/__tests__/safe.test.ts` | Safe function tests (normalizeSafe, normalizeTrim, joinSafe) | YES |
-| `src/__tests__/extensions.test.ts` | Extension function tests (addExt, trimExt, etc.) | YES |
-| `src/__tests__/api-coverage.test.ts` | Dynamic path API completeness check | YES |
-| `src/__tests__/reporters/doc-reporter.ts` | Custom Jest reporter → `docs/API.md` | Rarely |
-| `src/__tests__/node-compat.test.ts` | Node.js path test suite compatibility (223 tests) | YES |
-| `docs/API.md` | Auto-generated from test runs — **do not hand-edit** | NO |
-| `dist/` | Build output — **never edit directly** | NO |
+| File                                      | Role                                                         | Edit?  |
+| ----------------------------------------- | ------------------------------------------------------------ | ------ |
+| `src/index.ts`                            | **Main source** — all logic, typed exports                   | YES    |
+| `src/__tests__/upath.test.ts`             | Core proxy tests (normalize, join, parse, toUnix)            | YES    |
+| `src/__tests__/safe.test.ts`              | Safe function tests (normalizeSafe, normalizeTrim, joinSafe) | YES    |
+| `src/__tests__/extensions.test.ts`        | Extension function tests (addExt, trimExt, etc.)             | YES    |
+| `src/__tests__/api-coverage.test.ts`      | Dynamic path API completeness check                          | YES    |
+| `src/__tests__/reporters/doc-reporter.ts` | Custom Jest reporter → `docs/API.md`                         | Rarely |
+| `src/__tests__/node-compat.test.ts`       | Node.js path test suite compatibility (223 tests)            | YES    |
+| `docs/API.md`                             | Auto-generated from test runs — **do not hand-edit**         | NO     |
+| `dist/`                                   | Build output — **never edit directly**                       | NO     |
 
 ### Key Gotchas
 

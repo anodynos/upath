@@ -21,6 +21,7 @@ TypeScript types are declared statically for autocomplete/IDE support, but the r
 ### Extra Functions (Static)
 
 upath-specific functions remain statically defined:
+
 - `toUnix(p)` — backslash → forward slash, consolidate duplicates (preserve UNC `//`)
 - `normalizeSafe(p)` — normalize preserving leading `./` and `//`
 - `normalizeTrim(p)` — normalizeSafe + trim trailing `/`
@@ -33,14 +34,14 @@ upath-specific functions remain statically defined:
 
 ## Build & Package
 
-| Aspect | Choice |
-|--------|--------|
-| Compiler | tsup (esbuild-based, dual output) |
-| Output | `dist/index.cjs` + `dist/index.mjs` + `dist/index.d.ts` |
-| Types | Auto-generated from source (replaces hand-maintained `upath.d.ts`) |
-| Module | `exports` field with CJS + ESM conditions |
-| Engines | `node >= 20` |
-| Version | `3.0.0` |
+| Aspect   | Choice                                                             |
+| -------- | ------------------------------------------------------------------ |
+| Compiler | tsup (esbuild-based, dual output)                                  |
+| Output   | `dist/index.cjs` + `dist/index.mjs` + `dist/index.d.ts`            |
+| Types    | Auto-generated from source (replaces hand-maintained `upath.d.ts`) |
+| Module   | `exports` field with CJS + ESM conditions                          |
+| Engines  | `node >= 20`                                                       |
+| Version  | `3.0.0`                                                            |
 
 ## Testing
 
@@ -51,16 +52,17 @@ Test files use `test.each` with `inputToExpected` tables (mirroring the original
 ```typescript
 describe('upath.normalizeSafe', () => {
   const cases: [string, string][] = [
-    ['./foo/bar',    './foo/bar'],
-    ['.\\foo\\bar',  './foo/bar'],
-  ];
+    ['./foo/bar', './foo/bar'],
+    ['.\\foo\\bar', './foo/bar'],
+  ]
   test.each(cases)('normalizeSafe(%s) → %s', (input, expected) => {
-    expect(upath.normalizeSafe(input)).toBe(expected);
-  });
-});
+    expect(upath.normalizeSafe(input)).toBe(expected)
+  })
+})
 ```
 
 Custom reporter at `src/__tests__/reporters/doc-reporter.ts`:
+
 - Hooks into `onTestResult` / `onRunComplete`
 - Extracts describe → test.each tree
 - Writes `docs/API.md` with input/output tables
@@ -69,15 +71,18 @@ Custom reporter at `src/__tests__/reporters/doc-reporter.ts`:
 ### Multi-Node-Version Testing
 
 **Layer 1 — Dynamic API coverage test** (every run):
+
 - Discovers all `path` exports at runtime
 - Asserts each exists in `upath` with correct type
 - Auto-catches new Node `path` additions
 
 **Layer 2 — CI matrix** (GitHub Actions):
+
 - Node versions: 20, 22, 24
 - Each runs full suite; dynamic test catches version-specific APIs
 
 **Layer 3 — Local script** (`npm run test:all-nodes`):
+
 - Uses Docker or npx to test across Node versions locally
 
 ## Directory Structure
@@ -110,7 +115,7 @@ package.json
 - `upath.d.ts` → auto-generated into `dist/`
 - `.travis.yml` → GitHub Actions
 - `DRAFT/` → orphaned, never integrated
-- All legacy devDeps: coffee-script, grunt, grunt-*, urequire*, mocha, chai, uberscore, underscore.string
+- All legacy devDeps: coffee-script, grunt, grunt-_, urequire_, mocha, chai, uberscore, underscore.string
 
 ## Decisions
 

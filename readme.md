@@ -28,26 +28,26 @@ npm install upath
 
 ```typescript
 // ESM
-import upath from 'upath';
+import upath from 'upath'
 // or import specific functions
-import { normalize, joinSafe, addExt } from 'upath';
+import { normalize, joinSafe, addExt } from 'upath'
 
 // CJS
-const upath = require('upath').default;
+const upath = require('upath').default
 ```
 
 ### Quick examples
 
 ```typescript
-upath.normalize('c:\\windows\\nodejs\\path');  // 'c:/windows/nodejs/path'
-upath.join('some/nodejs\\windows', '../path'); // 'some/nodejs/path'
-upath.toUnix('.//windows\\//unix//mixed////'); // './windows/unix/mixed/'
+upath.normalize('c:\\windows\\nodejs\\path') // 'c:/windows/nodejs/path'
+upath.join('some/nodejs\\windows', '../path') // 'some/nodejs/path'
+upath.toUnix('.//windows\\//unix//mixed////') // './windows/unix/mixed/'
 
-upath.addExt('myfile', '.js');           // 'myfile.js'
-upath.changeExt('module.coffee', '.js'); // 'module.js'
-upath.removeExt('file.js', '.js');       // 'file'
-upath.defaultExt('file', '.js');         // 'file.js'
-upath.trimExt('file.min.js');            // 'file.min'
+upath.addExt('myfile', '.js') // 'myfile.js'
+upath.changeExt('module.coffee', '.js') // 'module.js'
+upath.removeExt('file.js', '.js') // 'file'
+upath.defaultExt('file', '.js') // 'file.js'
+upath.trimExt('file.min.js') // 'file.min'
 ```
 
 ## Why?
@@ -75,7 +75,7 @@ Below is a summary. See [`docs/API.md`](docs/API.md) for full input/output table
 Converts all `\` to `/` and consolidates duplicate slashes, without any normalization.
 
 ```typescript
-upath.toUnix('.//windows\\//unix//mixed////'); // './windows/unix/mixed/'
+upath.toUnix('.//windows\\//unix//mixed////') // './windows/unix/mixed/'
 ```
 
 #### `upath.normalizeSafe(path)`
@@ -83,8 +83,8 @@ upath.toUnix('.//windows\\//unix//mixed////'); // './windows/unix/mixed/'
 Like `path.normalize()`, but preserves a leading `./` and leading `//` (UNC paths). All backslashes are converted to forward slashes.
 
 ```typescript
-upath.normalizeSafe('./path/../dep');       // './dep'  (path.normalize gives 'dep')
-upath.normalizeSafe('//server/share/file'); // '//server/share/file'
+upath.normalizeSafe('./path/../dep') // './dep'  (path.normalize gives 'dep')
+upath.normalizeSafe('//server/share/file') // '//server/share/file'
 ```
 
 #### `upath.normalizeTrim(path)`
@@ -92,7 +92,7 @@ upath.normalizeSafe('//server/share/file'); // '//server/share/file'
 Like `normalizeSafe()`, but trims any trailing `/`.
 
 ```typescript
-upath.normalizeTrim('./../dep/'); // '../dep'
+upath.normalizeTrim('./../dep/') // '../dep'
 ```
 
 #### `upath.joinSafe([path1][, path2][, ...])`
@@ -100,8 +100,8 @@ upath.normalizeTrim('./../dep/'); // '../dep'
 Like `path.join()`, but preserves a leading `./` and `//`.
 
 ```typescript
-upath.joinSafe('./some/local/unix/', '../path');       // './some/local/path'
-upath.joinSafe('//server/share/file', '../path');      // '//server/share/path'
+upath.joinSafe('./some/local/unix/', '../path') // './some/local/path'
+upath.joinSafe('//server/share/file', '../path') // '//server/share/path'
 ```
 
 #### `upath.addExt(filename, [ext])`
@@ -109,9 +109,9 @@ upath.joinSafe('//server/share/file', '../path');      // '//server/share/path'
 Adds `.ext` to `filename`, but only if it doesn't already have the exact extension.
 
 ```typescript
-upath.addExt('myfile', '.js');     // 'myfile.js'
-upath.addExt('myfile.js', '.js');  // 'myfile.js' (unchanged)
-upath.addExt('myfile.txt', '.js'); // 'myfile.txt.js'
+upath.addExt('myfile', '.js') // 'myfile.js'
+upath.addExt('myfile.js', '.js') // 'myfile.js' (unchanged)
+upath.addExt('myfile.txt', '.js') // 'myfile.txt.js'
 ```
 
 #### `upath.trimExt(filename, [ignoreExts], [maxSize=7])`
@@ -119,8 +119,8 @@ upath.addExt('myfile.txt', '.js'); // 'myfile.txt.js'
 Trims a filename's extension. Extensions longer than `maxSize` chars (including the dot) are not considered valid. Extensions listed in `ignoreExts` are not trimmed.
 
 ```typescript
-upath.trimExt('my/file.min.js');                      // 'my/file.min'
-upath.trimExt('my/file.min', ['min'], 8);              // 'my/file.min' (ignored)
+upath.trimExt('my/file.min.js') // 'my/file.min'
+upath.trimExt('my/file.min', ['min'], 8) // 'my/file.min' (ignored)
 ```
 
 #### `upath.removeExt(filename, ext)`
@@ -128,8 +128,8 @@ upath.trimExt('my/file.min', ['min'], 8);              // 'my/file.min' (ignored
 Removes the specific `ext` from `filename`, if present.
 
 ```typescript
-upath.removeExt('file.js', '.js');  // 'file'
-upath.removeExt('file.txt', '.js'); // 'file.txt' (unchanged)
+upath.removeExt('file.js', '.js') // 'file'
+upath.removeExt('file.txt', '.js') // 'file.txt' (unchanged)
 ```
 
 #### `upath.changeExt(filename, [ext], [ignoreExts], [maxSize=7])`
@@ -137,8 +137,8 @@ upath.removeExt('file.txt', '.js'); // 'file.txt' (unchanged)
 Changes a filename's extension to `ext`. If it has no valid extension, the new extension is added. Extensions in `ignoreExts` are not replaced.
 
 ```typescript
-upath.changeExt('module.coffee', '.js');                    // 'module.js'
-upath.changeExt('file.min', '.js', ['min'], 8);             // 'file.min.js'
+upath.changeExt('module.coffee', '.js') // 'module.js'
+upath.changeExt('file.min', '.js', ['min'], 8) // 'file.min.js'
 ```
 
 #### `upath.defaultExt(filename, [ext], [ignoreExts], [maxSize=7])`
@@ -146,9 +146,9 @@ upath.changeExt('file.min', '.js', ['min'], 8);             // 'file.min.js'
 Adds `.ext` to `filename` only if it doesn't already have any valid extension. Extensions in `ignoreExts` are treated as if absent, so the default extension is added.
 
 ```typescript
-upath.defaultExt('file', '.js');          // 'file.js'
-upath.defaultExt('file.ts', '.js');       // 'file.ts' (already has extension)
-upath.defaultExt('file.min', '.js', ['min'], 8); // 'file.min.js' (.min ignored)
+upath.defaultExt('file', '.js') // 'file.js'
+upath.defaultExt('file.ts', '.js') // 'file.ts' (already has extension)
+upath.defaultExt('file.min', '.js', ['min'], 8) // 'file.min.js' (.min ignored)
 ```
 
 ## License

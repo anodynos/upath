@@ -8,7 +8,7 @@
 
 - **Code files: 14 files** — src/index.ts, 5 test files, jest/tsup/ts configs, package.json
 - **Workflow/docs files: 7 files** — CLAUDE.md, readme-agenzen.md, LLM.md, readme.md, docs/API.md, PM docs
-- **Deleted legacy: 5 files** — .travis.yml, Gruntfile.coffee, source/**/*.coffee, upath.d.ts
+- **Deleted legacy: 5 files** — .travis.yml, Gruntfile.coffee, source/\*_/_.coffee, upath.d.ts
 - **Reviews dispatched:** Code review + workflow review
 
 ## Pre-Review Gate
@@ -19,17 +19,17 @@
 
 ### Resolved (fixed in `b7d05db`)
 
-| ID | Issue | USEG | Resolution |
-|----|-------|------|------------|
-| I-1 | `matchesGlob` typed as always-present (Node 22+ only) | U:5 S:5 E:8 G:5 | Fixed — typed as `\| undefined` |
-| S-1 | CLAUDE.md/readme-agenzen.md stale test count (142 → 365) | U:3 S:2 E:13 G:3 | Fixed |
-| S-2 | node-compat.test.ts not in doc reporter SKIP_FILES | U:1 S:1 E:13 G:2 | Fixed |
-| S-3 | helpers.ts unused dead code | U:2 S:2 E:13 G:3 | Removed |
+| ID  | Issue                                                    | USEG             | Resolution                      |
+| --- | -------------------------------------------------------- | ---------------- | ------------------------------- |
+| I-1 | `matchesGlob` typed as always-present (Node 22+ only)    | U:5 S:5 E:8 G:5  | Fixed — typed as `\| undefined` |
+| S-1 | CLAUDE.md/readme-agenzen.md stale test count (142 → 365) | U:3 S:2 E:13 G:3 | Fixed                           |
+| S-2 | node-compat.test.ts not in doc reporter SKIP_FILES       | U:1 S:1 E:13 G:2 | Fixed                           |
+| S-3 | helpers.ts unused dead code                              | U:2 S:2 E:13 G:3 | Removed                         |
 
 ### Skipped (false positive)
 
-| ID | Issue | Reason |
-|----|-------|--------|
+| ID  | Issue                            | Reason                                                 |
+| --- | -------------------------------- | ------------------------------------------------------ |
 | I-2 | ts-node "unnecessary" dependency | Needed for jest.config.ts + doc reporter transpilation |
 
 ### Positive Observations
