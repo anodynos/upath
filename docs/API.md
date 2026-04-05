@@ -4,6 +4,81 @@
 >
 > **Note:** Node.js compatibility tests (200+ vectors in [`node-compat.test.ts`](../src/__tests__/node-compat.test.ts)) are excluded from this document for brevity. Those tests verify that every proxied `path` function produces identical results to Node.js built-in `path`.
 
+## `upath.normalizeSafe(path)`
+
+### equal to path.normalize
+
+| Input | Output |
+|-------|--------|
+| `""` | `"."` |
+| `"."` | `"."` |
+| `"./"` | `"./"` |
+| `".//"` | `"./"` |
+| `".\\"` | `"./"` |
+| `".\\//"` | `"./"` |
+| `"./.."` | `".."` |
+| `".//.."` | `".."` |
+| `"./../"` | `"../"` |
+| `".\\..\\"` | `"../"` |
+| `"./../dep"` | `"../dep"` |
+| `"../dep"` | `"../dep"` |
+| `"../path/dep"` | `"../path/dep"` |
+| `"../path/../dep"` | `"../dep"` |
+| `"dep"` | `"dep"` |
+| `"path//dep"` | `"path/dep"` |
+
+### different to path.normalize (preserves leading ./ and //)
+
+| Input | Output |
+|-------|--------|
+| `"./dep"` | `"./dep"` |
+| `"./path/dep"` | `"./path/dep"` |
+| `"./path/../dep"` | `"./dep"` |
+| `".//windows\\unix/mixed/"` | `"./windows/unix/mixed/"` |
+| `"..//windows\\unix/mixed"` | `"../windows/unix/mixed"` |
+| `"windows\\unix/mixed/"` | `"windows/unix/mixed/"` |
+| `"..//windows\\..\\unix/mixed"` | `"../unix/mixed"` |
+
+### UNC paths
+
+| Input | Output |
+|-------|--------|
+| `"\\\\server\\share\\file"` | `"//server/share/file"` |
+| `"//server/share/file"` | `"//server/share/file"` |
+| `"\\\\?\\UNC\\server\\share\\file"` | `"//?/UNC/server/share/file"` |
+| `"\\\\LOCALHOST\\c$\\temp\\file"` | `"//LOCALHOST/c$/temp/file"` |
+| `"\\\\?\\c:\\temp\\file"` | `"//?/c:/temp/file"` |
+| `"\\\\.\\c:\\temp\\file"` | `"//./c:/temp/file"` |
+| `"//./c:/temp/file"` | `"//./c:/temp/file"` |
+| `"////\\.\\c:/temp\\//file"` | `"//./c:/temp/file"` |
+
+## `upath.normalizeTrim(path)`
+
+| Input | Output |
+|-------|--------|
+| `"./"` | `"."` |
+| `"./../"` | `".."` |
+| `"./../dep/"` | `"../dep"` |
+| `"path//dep\\"` | `"path/dep"` |
+| `".//windows\\unix/mixed/"` | `"./windows/unix/mixed"` |
+| `"/"` | `"/"` |
+| `"//"` | `"/"` |
+
+## `upath.joinSafe(path1, path2, ...)`
+
+| Input | Output |
+|-------|--------|
+| `["some/nodejs/deep","../path"]` | `"some/nodejs/path"` |
+| `["./some/local/unix/","../path"]` | `"./some/local/path"` |
+| `["./some\\current\\mixed","..\\path"]` | `"./some/current/path"` |
+| `["../some/relative/destination","..\\path"]` | `"../some/relative/path"` |
+| `["\\\\server\\share\\file","..\\path"]` | `"//server/share/path"` |
+| `["\\\\.\\c:\\temp\\file","..\\path"]` | `"//./c:/temp/path"` |
+| `["//server/share/file","../path"]` | `"//server/share/path"` |
+| `["//./c:/temp/file","../path"]` | `"//./c:/temp/path"` |
+| `["",""]` | `"."` |
+| `["./foo","","bar"]` | `"./foo/bar"` |
+
 ## `upath.addExt(filename, ext)`
 
 ### addExt(filename, 'js')
@@ -125,81 +200,6 @@
 | `"fileWith/defaultExt.dev", 'js', ['min', '.dev'], 8` | `"fileWith/defaultExt.dev.js"` |
 | `"fileWith/defaultExt.longExt", 'js', ['min', '.dev'], 8` | `"fileWith/defaultExt.longExt"` |
 | `"fileWith/defaultExt.longRext", 'js', ['min', '.dev'], 8` | `"fileWith/defaultExt.longRext.js"` |
-
-## `upath.normalizeSafe(path)`
-
-### equal to path.normalize
-
-| Input | Output |
-|-------|--------|
-| `""` | `"."` |
-| `"."` | `"."` |
-| `"./"` | `"./"` |
-| `".//"` | `"./"` |
-| `".\\"` | `"./"` |
-| `".\\//"` | `"./"` |
-| `"./.."` | `".."` |
-| `".//.."` | `".."` |
-| `"./../"` | `"../"` |
-| `".\\..\\"` | `"../"` |
-| `"./../dep"` | `"../dep"` |
-| `"../dep"` | `"../dep"` |
-| `"../path/dep"` | `"../path/dep"` |
-| `"../path/../dep"` | `"../dep"` |
-| `"dep"` | `"dep"` |
-| `"path//dep"` | `"path/dep"` |
-
-### different to path.normalize (preserves leading ./ and //)
-
-| Input | Output |
-|-------|--------|
-| `"./dep"` | `"./dep"` |
-| `"./path/dep"` | `"./path/dep"` |
-| `"./path/../dep"` | `"./dep"` |
-| `".//windows\\unix/mixed/"` | `"./windows/unix/mixed/"` |
-| `"..//windows\\unix/mixed"` | `"../windows/unix/mixed"` |
-| `"windows\\unix/mixed/"` | `"windows/unix/mixed/"` |
-| `"..//windows\\..\\unix/mixed"` | `"../unix/mixed"` |
-
-### UNC paths
-
-| Input | Output |
-|-------|--------|
-| `"\\\\server\\share\\file"` | `"//server/share/file"` |
-| `"//server/share/file"` | `"//server/share/file"` |
-| `"\\\\?\\UNC\\server\\share\\file"` | `"//?/UNC/server/share/file"` |
-| `"\\\\LOCALHOST\\c$\\temp\\file"` | `"//LOCALHOST/c$/temp/file"` |
-| `"\\\\?\\c:\\temp\\file"` | `"//?/c:/temp/file"` |
-| `"\\\\.\\c:\\temp\\file"` | `"//./c:/temp/file"` |
-| `"//./c:/temp/file"` | `"//./c:/temp/file"` |
-| `"////\\.\\c:/temp\\//file"` | `"//./c:/temp/file"` |
-
-## `upath.normalizeTrim(path)`
-
-| Input | Output |
-|-------|--------|
-| `"./"` | `"."` |
-| `"./../"` | `".."` |
-| `"./../dep/"` | `"../dep"` |
-| `"path//dep\\"` | `"path/dep"` |
-| `".//windows\\unix/mixed/"` | `"./windows/unix/mixed"` |
-| `"/"` | `"/"` |
-| `"//"` | `"/"` |
-
-## `upath.joinSafe(path1, path2, ...)`
-
-| Input | Output |
-|-------|--------|
-| `["some/nodejs/deep","../path"]` | `"some/nodejs/path"` |
-| `["./some/local/unix/","../path"]` | `"./some/local/path"` |
-| `["./some\\current\\mixed","..\\path"]` | `"./some/current/path"` |
-| `["../some/relative/destination","..\\path"]` | `"../some/relative/path"` |
-| `["\\\\server\\share\\file","..\\path"]` | `"//server/share/path"` |
-| `["\\\\.\\c:\\temp\\file","..\\path"]` | `"//./c:/temp/path"` |
-| `["//server/share/file","../path"]` | `"//server/share/path"` |
-| `["//./c:/temp/file","../path"]` | `"//./c:/temp/path"` |
-| `["",""]` | `"."` |
-| `["./foo","","bar"]` | `"./foo/bar"` |
 
 ## `upath.normalize(path)`
 
