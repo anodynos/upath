@@ -1,4 +1,7 @@
 import type { Config } from 'jest'
+import { readFileSync } from 'node:fs'
+
+const { version } = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
 const config: Config = {
   preset: 'ts-jest',
@@ -7,6 +10,9 @@ const config: Config = {
   testMatch: ['**/*.test.ts'],
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.test.ts', '!src/__tests__/**'],
   reporters: ['default', '<rootDir>/src/__tests__/reporters/doc-reporter.ts'],
+  globals: {
+    __UPATH_VERSION__: version,
+  },
 }
 
 export default config

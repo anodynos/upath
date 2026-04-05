@@ -20,7 +20,9 @@
     "trim extension",
     "add extension",
     "default extension",
-    "UNC paths"
+    "UNC paths",
+    "typescript",
+    "esm"
   ],
   "repository": {
     "type": "git",

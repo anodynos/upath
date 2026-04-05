@@ -1,9 +1,12 @@
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import upath from '../index'
 
+const pkg = JSON.parse(readFileSync(path.resolve(__dirname, '../../package.json'), 'utf-8'))
+
 describe('upath core proxy functions', () => {
   test('VERSION is set', () => {
-    expect(upath.VERSION).toBe('3.0.0')
+    expect(upath.VERSION).toBe(pkg.version)
   })
 
   test('sep is /', () => {
