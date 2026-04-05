@@ -8,6 +8,16 @@
     "email": "agelos.pikoulas@gmail.com"
   },
   "license": "MIT",
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/anodynos"
+    },
+    {
+      "type": "tidelift",
+      "url": "https://tidelift.com/subscription/pkg/npm-upath"
+    }
+  ],
   "keywords": [
     "path",
     "unix",
