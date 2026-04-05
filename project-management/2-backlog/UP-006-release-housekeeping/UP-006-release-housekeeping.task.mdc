@@ -1,0 +1,43 @@
+---
+task: UP-006
+title: "Release housekeeping — API.md commit, cleanup, keywords, VERSION injection, doc reporter"
+status: backlog
+tags: [release, housekeeping]
+discovery: pre-release-audit 2026-04-05
+clickup_id: 86c96mry8
+parent: UP-001-WHALE
+usagcd: { U: 21, S: 13, A: 144, G: 89, D: 144, C: 89, USAG: 267 }
+---
+
+# UP-006 — Release housekeeping — API.md commit, cleanup, keywords, VERSION injection, doc reporter
+
+> Small cleanup items that improve polish. None are blockers, all are trivial mechanical work.
+
+## Problem
+
+Minor issues found during pre-release audit:
+1. `docs/API.md` has unstaged formatting change from test regeneration — needs commit
+2. Stray `--version/` directory in working tree (untracked, from accidental `npx --version`)
+3. package.json keywords missing `"typescript"` and `"esm"` for npm discoverability
+4. `VERSION` hardcoded as `'3.0.0'` in `src/index.ts:199` — requires manual sync with package.json on every bump
+5. Doc reporter skips `node-compat.test.ts` (200+ vectors excluded from API.md)
+
+## Proposed Solution
+
+1. `git add docs/API.md && git commit` the regenerated version
+2. `rm -rf -- '--version/'` to remove stray directory
+3. Add `"typescript"`, `"esm"`, `"forward-slash"` to keywords array
+4. Use tsup `define` to inject version from package.json at build time, or read it dynamically
+5. Either include `node-compat.test.ts` in doc reporter or add a note to API.md linking to test file
+
+## Acceptance Criteria
+
+- API.md committed
+- Stray directory deleted
+- Keywords updated
+- VERSION sourced from package.json (not hardcoded)
+- Doc reporter decision made (include or link)
+
+## Discovery Context
+
+Pre-release audit 2026-04-05 — docs/publish agent flagged as LOW severity items.
