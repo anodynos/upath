@@ -61,6 +61,7 @@
     "test:coverage": "npx jest --coverage",
     "lint": "npx tsc --noEmit",
     "prepublishOnly": "npm run build",
+    "test:integration": "npm run build && node test/integration/cjs-test.cjs && node test/integration/esm-test.mjs",
     "prepare": "husky"
   },
   "lint-staged": {
