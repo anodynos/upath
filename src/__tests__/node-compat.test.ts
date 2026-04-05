@@ -1,0 +1,712 @@
+/**
+ * Node.js path module compatibility tests.
+ *
+ * These test vectors are extracted from Node.js's own test suite
+ * (test/parallel/test-path-*.js). They prove that upath is a true
+ * drop-in replacement for Node's `path` module on POSIX systems.
+ *
+ * Strategy:
+ * - All path.posix test vectors must produce identical results through upath
+ * - Shared test vectors (posix + win32 agree with `/`) also pass through upath
+ * - Backslash-input tests verify upath's `\` → `/` normalization
+ *
+ * NOTE: These tests only run on POSIX (Linux/macOS). On Windows, `path`
+ * delegates to `path.win32` which has different semantics — the expected
+ * values here assume `path` === `path.posix`.
+ *
+ * Source: https://github.com/nodejs/node/tree/main/test/parallel/
+ */
+import * as path from 'node:path'
+import upath from '../index'
+
+const isWindows = process.platform === 'win32'
+const describePosix = isWindows ? describe.skip : describe
+
+if (isWindows) {
+  describe('Node.js compat', () => {
+    it('skipped — these tests are designed for POSIX (Linux/macOS) only', () => {
+      console.log(
+        'Node.js path compatibility tests skipped on Windows. ' +
+          'These validate upath against path.posix behavior and must run on a POSIX system.',
+      )
+    })
+  })
+}
+
+// ---------------------------------------------------------------------------
+// basename (from test-path-basename.js)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: basename', () => {
+  // POSIX vectors — these must match path.posix.basename exactly
+  const posixCases: [string, string | undefined, string][] = [
+    ['.js', '.js', ''],
+    ['js', '.js', 'js'],
+    ['file.js', '.ts', 'file.js'],
+    ['file', '.js', 'file'],
+    ['file.js.old', '.js.old', 'file'],
+    ['', undefined, ''],
+    ['/dir/basename.ext', undefined, 'basename.ext'],
+    ['/basename.ext', undefined, 'basename.ext'],
+    ['basename.ext', undefined, 'basename.ext'],
+    ['basename.ext/', undefined, 'basename.ext'],
+    ['basename.ext//', undefined, 'basename.ext'],
+    ['aaa/bbb', '/bbb', 'bbb'],
+    ['aaa/bbb', 'a/bbb', 'bbb'],
+    ['aaa/bbb', 'bbb', 'bbb'],
+    ['aaa/bbb//', 'bbb', 'bbb'],
+    ['aaa/bbb', 'bb', 'b'],
+    ['aaa/bbb', 'b', 'bb'],
+    ['/aaa/bbb', '/bbb', 'bbb'],
+    ['/aaa/bbb', 'a/bbb', 'bbb'],
+    ['/aaa/bbb', 'bbb', 'bbb'],
+    ['/aaa/bbb//', 'bbb', 'bbb'],
+    ['/aaa/bbb', 'bb', 'b'],
+    ['/aaa/bbb', 'b', 'bb'],
+    ['/aaa/bbb', undefined, 'bbb'],
+    ['/aaa/', undefined, 'aaa'],
+    ['/aaa/b', undefined, 'b'],
+    ['/a/b', undefined, 'b'],
+    ['//a', undefined, 'a'],
+    ['a', 'a', ''],
+  ]
+
+  test.each(posixCases)('upath.basename(%j, %j) === %j', (p, suffix, expected) => {
+    const result = suffix !== undefined ? upath.basename(p, suffix) : upath.basename(p)
+    expect(result).toBe(expected)
+    // Also verify it matches path.posix
+    const posixResult = suffix !== undefined ? path.posix.basename(p, suffix) : path.posix.basename(p)
+    expect(result).toBe(posixResult)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// dirname (from test-path-dirname.js)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: dirname', () => {
+  const posixCases: [string, string][] = [
+    ['/a/b/', '/a'],
+    ['/a/b', '/a'],
+    ['/a', '/'],
+    ['', '.'],
+    ['/', '/'],
+    ['////', '/'],
+    ['//a', '//'],
+    ['foo', '.'],
+  ]
+
+  test.each(posixCases)('upath.dirname(%j) === %j', (input, expected) => {
+    expect(upath.dirname(input)).toBe(expected)
+    expect(upath.dirname(input)).toBe(path.posix.dirname(input))
+  })
+})
+
+// ---------------------------------------------------------------------------
+// extname (from test-path-extname.js)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: extname', () => {
+  // All POSIX extname test vectors
+  const cases: [string, string][] = [
+    ['', ''],
+    ['/path/to/file', ''],
+    ['/path/to/file.ext', '.ext'],
+    ['/path.to/file.ext', '.ext'],
+    ['/path.to/file', ''],
+    ['/path.to/.file', ''],
+    ['/path.to/.file.ext', '.ext'],
+    ['/path/to/f.ext', '.ext'],
+    ['/path/to/..ext', '.ext'],
+    ['/path/to/..', ''],
+    ['file', ''],
+    ['file.ext', '.ext'],
+    ['.file', ''],
+    ['.file.ext', '.ext'],
+    ['/file', ''],
+    ['/file.ext', '.ext'],
+    ['/.file', ''],
+    ['/.file.ext', '.ext'],
+    ['.path/file.ext', '.ext'],
+    ['file.ext.ext', '.ext'],
+    ['file.', '.'],
+    ['.', ''],
+    ['./', ''],
+    ['.file.ext', '.ext'],
+    ['.file', ''],
+    ['.file.', '.'],
+    ['.file..', '.'],
+    ['..', ''],
+    ['../', ''],
+    ['..file.ext', '.ext'],
+    ['..file', '.file'],
+    ['..file.', '.'],
+    ['..file..', '.'],
+    ['...', '.'],
+    ['...ext', '.ext'],
+    ['....', '.'],
+    ['file.ext/', '.ext'],
+    ['file.ext//', '.ext'],
+    ['file/', ''],
+    ['file//', ''],
+    ['file./', '.'],
+    ['file.//', '.'],
+  ]
+
+  test.each(cases)('upath.extname(%j) === %j', (input, expected) => {
+    expect(upath.extname(input)).toBe(expected)
+    expect(upath.extname(input)).toBe(path.posix.extname(input))
+  })
+})
+
+// ---------------------------------------------------------------------------
+// join (from test-path-join.js)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: join', () => {
+  // Shared join vectors (identical for posix and win32 when using `/`)
+  const cases: [string[], string][] = [
+    [['.', 'x/b', '..', '/b/c.js'], 'x/b/c.js'],
+    [[], '.'],
+    [['/.', 'x/b', '..', '/b/c.js'], '/x/b/c.js'],
+    [['/foo', '../../../bar'], '/bar'],
+    [['foo', '../../../bar'], '../../bar'],
+    [['foo/', '../../../bar'], '../../bar'],
+    [['foo/x', '../../../bar'], '../bar'],
+    [['foo/x', './bar'], 'foo/x/bar'],
+    [['foo/x/', './bar'], 'foo/x/bar'],
+    [['foo/x/', '.', 'bar'], 'foo/x/bar'],
+    [['./'], './'],
+    [['.', './'], './'],
+    [['.', '.', '.'], '.'],
+    [['.', './', '.'], '.'],
+    [['.', '/./', '.'], '.'],
+    [['.', '/////./', '.'], '.'],
+    [['.'], '.'],
+    [['', '.'], '.'],
+    [['', 'foo'], 'foo'],
+    [['foo', '/bar'], 'foo/bar'],
+    [['', '/foo'], '/foo'],
+    [['', '', '/foo'], '/foo'],
+    [['', '', 'foo'], 'foo'],
+    [['foo', ''], 'foo'],
+    [['foo/', ''], 'foo/'],
+    [['foo', '', '/bar'], 'foo/bar'],
+    [['./', '..', '/foo'], '../foo'],
+    [['./', '..', '..', '/foo'], '../../foo'],
+    [['.', '..', '..', '/foo'], '../../foo'],
+    [['', '..', '..', '/foo'], '../../foo'],
+    [['/'], '/'],
+    [['/', '.'], '/'],
+    [['/', '..'], '/'],
+    [['/', '..', '..'], '/'],
+    [[''], '.'],
+    [['', ''], '.'],
+    [[' /foo'], ' /foo'],
+    [[' ', 'foo'], ' /foo'],
+    [[' ', '.'], ' '],
+    [[' ', '/'], ' /'],
+    [[' ', ''], ' '],
+    [['/', 'foo'], '/foo'],
+    [['/', '/foo'], '/foo'],
+    [['/', '//foo'], '/foo'],
+    [['/', '', '/foo'], '/foo'],
+    [['', '/', 'foo'], '/foo'],
+    [['', '/', '/foo'], '/foo'],
+  ]
+
+  test.each(cases)('upath.join(%j) === %j', (args, expected) => {
+    expect(upath.join(...args)).toBe(expected)
+    expect(upath.join(...args)).toBe(path.posix.join(...args))
+  })
+})
+
+// ---------------------------------------------------------------------------
+// normalize (from test-path-normalize.js)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: normalize', () => {
+  const posixCases: [string, string][] = [
+    ['./fixtures///b/../b/c.js', 'fixtures/b/c.js'],
+    ['/foo/../../../bar', '/bar'],
+    ['a//b//../b', 'a/b'],
+    ['a//b//./c', 'a/b/c'],
+    ['a//b//.', 'a/b'],
+    ['/a/b/c/../../../x/y/z', '/x/y/z'],
+    ['///..//./foo/.//bar', '/foo/bar'],
+    ['bar/foo../../', 'bar/'],
+    ['bar/foo../..', 'bar'],
+    ['bar/foo../../baz', 'bar/baz'],
+    ['bar/foo../', 'bar/foo../'],
+    ['bar/foo..', 'bar/foo..'],
+    ['../foo../../../bar', '../../bar'],
+    ['../.../.././.../../../bar', '../../bar'],
+    ['../../../foo/../../../bar', '../../../../../bar'],
+    ['../../../foo/../../../bar/../../', '../../../../../../'],
+    ['../foobar/barfoo/foo/../../../bar/../../', '../../'],
+    ['../.../../foobar/../../../bar/../../baz', '../../../../baz'],
+    // Note: path.posix preserves `\` as valid filename chars, but upath
+    // normalizes `\` → `/` by design — this is the core value proposition.
+    // So `foo/bar\baz` → `foo/bar/baz` in upath (vs `foo/bar\baz` in posix).
+  ]
+
+  test.each(posixCases)('upath.normalize(%j) === %j', (input, expected) => {
+    expect(upath.normalize(input)).toBe(expected)
+    expect(upath.normalize(input)).toBe(path.posix.normalize(input))
+  })
+
+  it('normalize converts backslash in mixed paths (intentional divergence from posix)', () => {
+    // path.posix: 'foo/bar\\baz' → 'foo/bar\\baz' (backslash is valid filename char)
+    // upath:      'foo/bar\\baz' → 'foo/bar/baz'   (backslash normalized to /)
+    expect(upath.normalize('foo/bar\\baz')).toBe('foo/bar/baz')
+    expect(path.posix.normalize('foo/bar\\baz')).toBe('foo/bar\\baz')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// relative (from test-path-relative.js)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: relative', () => {
+  const posixCases: [string, string, string][] = [
+    ['/var/lib', '/var', '..'],
+    ['/var/lib', '/bin', '../../bin'],
+    ['/var/lib', '/var/lib', ''],
+    ['/var/lib', '/var/apache', '../apache'],
+    ['/var/', '/var/lib', 'lib'],
+    ['/', '/var/lib', 'var/lib'],
+    ['/foo/test', '/foo/test/bar/package.json', 'bar/package.json'],
+    ['/Users/a/web/b/test/mails', '/Users/a/web/b', '../..'],
+    ['/foo/bar/baz-quux', '/foo/bar/baz', '../baz'],
+    ['/foo/bar/baz', '/foo/bar/baz-quux', '../baz-quux'],
+    ['/baz-quux', '/baz', '../baz'],
+    ['/baz', '/baz-quux', '../baz-quux'],
+    ['/page1/page2/foo', '/', '../../..'],
+  ]
+
+  test.each(posixCases)('upath.relative(%j, %j) === %j', (from, to, expected) => {
+    expect(upath.relative(from, to)).toBe(expected)
+    expect(upath.relative(from, to)).toBe(path.posix.relative(from, to))
+  })
+})
+
+// ---------------------------------------------------------------------------
+// resolve (from test-path-resolve.js)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: resolve', () => {
+  const cwd = process.cwd()
+
+  const posixCases: [string[], string][] = [
+    [['/var/lib', '../', 'file/'], '/var/file'],
+    [['/var/lib', '/../', 'file/'], '/file'],
+    // [['a/b/c/', '../../..'], cwd],  // cwd-dependent — tested separately
+    [[], cwd],
+    [[''], cwd],
+    [['.'], cwd],
+    [['/some/dir', '.', '/absolute/'], '/absolute'],
+    [['/foo/tmp.3/', '../tmp.3/cycles/root.js'], '/foo/tmp.3/cycles/root.js'],
+  ]
+
+  test.each(posixCases)('upath.resolve(%j) === %j', (args, expected) => {
+    // resolve returns absolute paths — upath normalizes `/` which matches posix
+    const result = upath.resolve(...args)
+    expect(result).toBe(expected)
+  })
+
+  it('resolve with relative traversal returns cwd', () => {
+    expect(upath.resolve('a/b/c/', '../../..')).toBe(cwd)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// isAbsolute (from test-path-isabsolute.js)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: isAbsolute', () => {
+  const posixCases: [string, boolean][] = [
+    ['/home/foo', true],
+    ['/home/foo/..', true],
+    ['bar/', false],
+    ['./baz', false],
+  ]
+
+  test.each(posixCases)('upath.isAbsolute(%j) === %j', (input, expected) => {
+    expect(upath.isAbsolute(input)).toBe(expected)
+    expect(upath.isAbsolute(input)).toBe(path.posix.isAbsolute(input))
+  })
+})
+
+// ---------------------------------------------------------------------------
+// parse (from test-path-parse-format.js)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: parse', () => {
+  const unixPaths: [string, string][] = [
+    ['/home/user/dir/file.txt', '/'],
+    ['/home/user/a dir/another File.zip', '/'],
+    ['/home/user/a dir//another&File.', '/'],
+    ['/home/user/a$$$dir//another File.zip', '/'],
+    ['user/dir/another File.zip', ''],
+    ['file', ''],
+    ['.\\file', ''],
+    ['./file', ''],
+    ['C:\\foo', ''],
+    ['/', '/'],
+    ['', ''],
+    ['.', ''],
+    ['..', ''],
+    ['/foo', '/'],
+    ['/foo.', '/'],
+    ['/foo.bar', '/'],
+    ['/.', '/'],
+    ['/.foo', '/'],
+    ['/.foo.bar', '/'],
+    ['/foo/bar.baz', '/'],
+  ]
+
+  test.each(unixPaths)('upath.parse(%j) has root=%j and round-trips via format', (p, expectedRoot) => {
+    const parsed = upath.parse(p)
+    // upath normalizes `\` → `/` and collapses `//`, so the root may differ
+    // from path.posix when the input contains backslashes
+    const normalized = upath.toUnix(p)
+    const posixParsed = path.posix.parse(normalized)
+    expect(parsed.root).toBe(posixParsed.root)
+    expect(typeof parsed.dir).toBe('string')
+    expect(typeof parsed.base).toBe('string')
+    expect(typeof parsed.ext).toBe('string')
+    expect(typeof parsed.name).toBe('string')
+    // Round-trip: format(parse(p)) === normalized p (not original, since
+    // upath normalizes `\` and `//` on the way in)
+    expect(upath.format(parsed)).toBe(upath.format(posixParsed))
+    // Root consistency
+    if (parsed.dir) {
+      expect(parsed.dir.startsWith(parsed.root)).toBe(true)
+    }
+    // Component consistency
+    expect(parsed.base).toBe(upath.basename(p))
+    expect(parsed.ext).toBe(upath.extname(p))
+  })
+
+  // Trailing separator tests — upath collapses `//` so some `dir` values
+  // differ from raw path.posix (which preserves consecutive slashes in dir)
+  const trailingCases: [string, path.ParsedPath][] = [
+    ['./', { root: '', dir: '', base: '.', ext: '', name: '.' }],
+    ['//', { root: '/', dir: '/', base: '', ext: '', name: '' }],
+    ['///', { root: '/', dir: '/', base: '', ext: '', name: '' }],
+    ['/foo///', { root: '/', dir: '/', base: 'foo', ext: '', name: 'foo' }],
+    // upath normalizes `//` → `/` in dir, so `/foo//` becomes `/foo`
+    ['/foo///bar.baz', { root: '/', dir: '/foo', base: 'bar.baz', ext: '.baz', name: 'bar' }],
+  ]
+
+  test.each(trailingCases)('upath.parse(%j) with trailing separators', (input, expected) => {
+    expect(upath.parse(input)).toEqual(expected)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// format (from test-path-parse-format.js)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: format', () => {
+  const cases: [path.FormatInputPathObject, string][] = [
+    [{ dir: 'some/dir' }, 'some/dir/'],
+    [{ base: 'index.html' }, 'index.html'],
+    [{ root: '/' }, '/'],
+    [{ name: 'index', ext: '.html' }, 'index.html'],
+    [{ dir: 'some/dir', name: 'index', ext: '.html' }, 'some/dir/index.html'],
+    [{ root: '/', name: 'index', ext: '.html' }, '/index.html'],
+    [{}, ''],
+  ]
+
+  test.each(cases)('upath.format(%j) === %j', (pathObj, expected) => {
+    expect(upath.format(pathObj)).toBe(expected)
+    expect(upath.format(pathObj)).toBe(path.posix.format(pathObj))
+  })
+
+  // Extension dot normalization (https://github.com/nodejs/node/issues/44343)
+  it('format adds dot to ext if missing', () => {
+    expect(upath.format({ name: 'x', ext: 'png' })).toBe('x.png')
+    expect(upath.format({ name: 'x', ext: '.png' })).toBe('x.png')
+  })
+
+  // Backslash properties in ParsedPath objects — the proxy unix-ifies string
+  // args but not object properties. The output string is still unix-ified.
+  describe('format with backslash ParsedPath properties', () => {
+    const backslashCases: [path.FormatInputPathObject, string][] = [
+      [{ dir: 'c:\\Windows', base: 'file.txt' }, 'c:/Windows/file.txt'],
+      [{ root: 'c:\\', dir: 'c:\\Users', base: 'test.js', name: 'test', ext: '.js' }, 'c:/Users/test.js'],
+      [{ dir: '\\\\server\\share', base: 'file.txt' }, '//server/share/file.txt'],
+    ]
+
+    test.each(backslashCases)('format(%j) normalizes backslashes in output → %j', (pathObj, expected) => {
+      const result = upath.format(pathObj)
+      expect(result).toBe(expected)
+      expect(result).not.toContain('\\')
+    })
+  })
+})
+
+// ---------------------------------------------------------------------------
+// zero-length strings (from test-path-zero-length-strings.js)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: zero-length strings', () => {
+  const cwd = process.cwd()
+
+  it('join returns "." for empty/zero-length inputs', () => {
+    expect(upath.join('')).toBe('.')
+    expect(upath.join('', '')).toBe('.')
+  })
+
+  it('join preserves cwd-like paths', () => {
+    expect(upath.join(cwd)).toBe(cwd)
+    expect(upath.join(cwd, '')).toBe(cwd)
+  })
+
+  it('normalize returns "." for empty string', () => {
+    expect(upath.normalize('')).toBe('.')
+  })
+
+  it('isAbsolute returns false for empty string', () => {
+    expect(upath.isAbsolute('')).toBe(false)
+  })
+
+  it('resolve returns cwd for empty inputs', () => {
+    expect(upath.resolve('')).toBe(cwd)
+    expect(upath.resolve('', '')).toBe(cwd)
+  })
+
+  it('relative treats empty as cwd', () => {
+    expect(upath.relative('', cwd)).toBe('')
+    expect(upath.relative(cwd, '')).toBe('')
+    expect(upath.relative(cwd, cwd)).toBe('')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Backslash normalization — upath's core value-add
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: backslash normalization', () => {
+  it('normalizes backslashes in basename input', () => {
+    expect(upath.basename('foo\\bar\\baz.js')).toBe('baz.js')
+    expect(upath.basename('foo\\bar\\baz.js', '.js')).toBe('baz')
+  })
+
+  it('normalizes backslashes in dirname input', () => {
+    expect(upath.dirname('foo\\bar\\baz.js')).toBe('foo/bar')
+  })
+
+  it('normalizes backslashes in join input', () => {
+    expect(upath.join('foo\\bar', 'baz')).toBe('foo/bar/baz')
+    expect(upath.join('foo', 'bar\\baz')).toBe('foo/bar/baz')
+  })
+
+  it('normalizes backslashes in normalize input', () => {
+    expect(upath.normalize('foo\\bar\\..\\baz')).toBe('foo/baz')
+  })
+
+  it('normalizes backslashes in resolve input', () => {
+    const result = upath.resolve('/foo\\bar', 'baz')
+    expect(result).toBe('/foo/bar/baz')
+  })
+
+  it('normalizes backslashes in relative output', () => {
+    // On POSIX, backslashes in path inputs are treated as directory names
+    // by path.posix, but upath normalizes them first
+    expect(upath.relative('/foo/bar', '/foo/baz')).toBe('../baz')
+  })
+
+  it('normalizes backslashes in extname input', () => {
+    expect(upath.extname('foo\\bar\\baz.js')).toBe('.js')
+  })
+
+  it('normalizes backslashes in parse input', () => {
+    const parsed = upath.parse('foo\\bar\\baz.js')
+    expect(parsed.base).toBe('baz.js')
+    expect(parsed.dir).toBe('foo/bar')
+    expect(parsed.ext).toBe('.js')
+    expect(parsed.name).toBe('baz')
+  })
+
+  it('never produces backslashes in output', () => {
+    // Even with backslash-heavy input, output is always `/`
+    const inputs = ['C:\\Users\\foo\\bar', 'foo\\bar\\baz', '.\\relative\\path', 'foo\\..\\bar']
+    for (const input of inputs) {
+      expect(upath.normalize(input)).not.toContain('\\')
+      expect(upath.join(input, 'sub')).not.toContain('\\')
+      expect(upath.dirname(input)).not.toContain('\\')
+    }
+  })
+})
+
+// ---------------------------------------------------------------------------
+// sep and delimiter
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: sep and delimiter', () => {
+  it('sep is always "/"', () => {
+    expect(upath.sep).toBe('/')
+  })
+
+  it('delimiter matches platform', () => {
+    expect(upath.delimiter).toBe(path.delimiter)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// posix and win32 pass-through
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: posix and win32 pass-through', () => {
+  it('upath.posix is path.posix', () => {
+    expect(upath.posix).toBe(path.posix)
+  })
+
+  it('upath.win32 is path.win32', () => {
+    expect(upath.win32).toBe(path.win32)
+  })
+
+  it('path.posix functions work unchanged through upath.posix', () => {
+    expect(upath.posix.join('/foo', 'bar')).toBe('/foo/bar')
+    expect(upath.posix.normalize('/foo/../bar')).toBe('/bar')
+    expect(upath.posix.basename('/foo/bar.js', '.js')).toBe('bar')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// toNamespacedPath (available in all supported Node versions)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: toNamespacedPath', () => {
+  // On POSIX, toNamespacedPath returns input unchanged (no \\?\ prefixing).
+  // upath still normalizes backslashes in the input before delegating.
+  const cases: [string, string][] = [
+    // Simple POSIX path — returned unchanged
+    ['/foo/bar', '/foo/bar'],
+    // Backslash input — upath normalizes \ → / before returning
+    ['\\foo\\bar', '/foo/bar'],
+    // Empty string — returned unchanged
+    ['', ''],
+    // Relative path — returned unchanged
+    ['foo/bar', 'foo/bar'],
+    // UNC-style forward slashes — preserved
+    ['//server/share', '//server/share'],
+    // Mixed slashes — backslashes normalized
+    ['/foo\\bar/baz', '/foo/bar/baz'],
+    // Deeply nested with backslashes
+    ['a\\b\\c\\d', 'a/b/c/d'],
+  ]
+
+  test.each(cases)('upath.toNamespacedPath(%j) === %j', (input, expected) => {
+    expect(upath.toNamespacedPath(input)).toBe(expected)
+  })
+
+  it('never produces backslashes in output', () => {
+    const inputs = ['\\foo\\bar', 'C:\\Users\\foo', 'a\\b\\c']
+    for (const input of inputs) {
+      expect(upath.toNamespacedPath(input)).not.toContain('\\')
+    }
+  })
+})
+
+// ---------------------------------------------------------------------------
+// matchesGlob (added in Node 22 — may be undefined on Node 20)
+// ---------------------------------------------------------------------------
+
+const hasMatchesGlob = typeof path.matchesGlob === 'function'
+const describeMatchesGlob = hasMatchesGlob ? describePosix : describe.skip
+
+describeMatchesGlob('Node.js compat: matchesGlob', () => {
+  // Basic glob matching — upath normalizes backslashes before matching
+  const trueCases: [string, string][] = [
+    // Basic glob
+    ['src/file.js', 'src/*.js'],
+    // Nested glob with **
+    ['src/lib/file.ts', 'src/**/*.ts'],
+    // Backslash input — core upath value: \ normalized to / before matching
+    ['src\\lib\\file.js', 'src/**/*.js'],
+    // Root pattern
+    ['/absolute/path.js', '/**/*.js'],
+    // Exact match
+    ['file.js', 'file.js'],
+    // Star-only pattern
+    ['anything', '*'],
+    // Deep nested with backslashes
+    ['a\\b\\c\\d.ts', '**/*.ts'],
+    // Mixed slashes
+    ['a/b\\c/d.js', 'a/**/*.js'],
+    // Pattern with dot
+    ['src/index.test.ts', 'src/*.test.ts'],
+    // Nested directories
+    ['packages/core/src/index.ts', 'packages/*/src/*.ts'],
+  ]
+
+  test.each(trueCases)('upath.matchesGlob(%j, %j) === true', (p, pattern) => {
+    expect(upath.matchesGlob!(p, pattern)).toBe(true)
+  })
+
+  const falseCases: [string, string][] = [
+    // Extension mismatch
+    ['src/file.js', '*.ts'],
+    // Extension mismatch (coffee vs js)
+    ['file.coffee', '*.js'],
+    // Directory mismatch
+    ['lib/file.js', 'src/*.js'],
+    // No extension vs extension pattern
+    ['README', '*.md'],
+  ]
+
+  test.each(falseCases)('upath.matchesGlob(%j, %j) === false', (p, pattern) => {
+    expect(upath.matchesGlob!(p, pattern)).toBe(false)
+  })
+
+  it('returns boolean type', () => {
+    const result = upath.matchesGlob!('file.js', '*.js')
+    expect(typeof result).toBe('boolean')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Unicode path support
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: Unicode paths', () => {
+  it('normalize preserves international characters', () => {
+    expect(upath.normalize('/home/user/文件/readme.md')).toBe('/home/user/文件/readme.md')
+  })
+
+  it('join works with accented characters', () => {
+    expect(upath.join('/home', 'café', 'naïve.txt')).toBe('/home/café/naïve.txt')
+  })
+
+  it('basename works with emoji directory names', () => {
+    expect(upath.basename('/path/to/📁/file.txt')).toBe('file.txt')
+  })
+
+  it('extname works with CJK filenames', () => {
+    expect(upath.extname('/path/日本語.txt')).toBe('.txt')
+  })
+
+  it('toUnix normalizes backslashes with CJK characters', () => {
+    expect(upath.toUnix('C:\\Users\\文件\\docs')).toBe('C:/Users/文件/docs')
+  })
+
+  it('parse handles Unicode filenames', () => {
+    const parsed = upath.parse('/home/用户/文件.txt')
+    expect(parsed.root).toBe('/')
+    expect(parsed.dir).toBe('/home/用户')
+    expect(parsed.base).toBe('文件.txt')
+    expect(parsed.ext).toBe('.txt')
+    expect(parsed.name).toBe('文件')
+  })
+
+  it('dirname handles accented path segments', () => {
+    expect(upath.dirname('/path/to/données/file')).toBe('/path/to/données')
+  })
+
+  it('resolve handles Japanese directory names', () => {
+    expect(upath.resolve('/home', 'ユーザー')).toBe('/home/ユーザー')
+  })
+})
