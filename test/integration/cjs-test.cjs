@@ -1,8 +1,22 @@
 // Test CJS require() against built output
 'use strict'
 
+const fs = require('node:fs')
+const path = require('node:path')
 const assert = require('node:assert')
+
+const distPath = path.resolve(__dirname, '../../dist/index.cjs')
+if (!fs.existsSync(distPath)) {
+  console.error('dist/ not found — run `npm run build` first')
+  process.exit(1)
+}
+
 const upath = require('../../dist/index.cjs')
+
+// CJS module shape: __esModule marker and default property
+assert.strictEqual(upath.__esModule, true, '__esModule should be true')
+assert.strictEqual(typeof upath.default, 'object', 'default property should exist')
+assert.strictEqual(typeof upath.default.normalize, 'function', 'default.normalize should work')
 
 // Default export has all functions
 assert.strictEqual(typeof upath.normalize, 'function', 'normalize should be a function')

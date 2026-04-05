@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **Node >= 20 required** — dropped support for Node 4–18. Update your CI matrix and `engines` field.
 - **CJS exports now include `__esModule` and `default` properties** — `require('upath')` still works for all standard usage (no `.default` needed). However, `Object.keys(require('upath'))` now includes `"__esModule"` and `"default"`. Bundlers using Babel-style interop (`mod.__esModule ? mod.default : mod`) will resolve to `.default`, which IS the full upath object, so it works correctly.
 - **TypeScript type params narrowed** — `join(...paths: any[])` → `join(...paths: string[])`, same for `resolve` and `joinSafe`. If you pass non-string args, add explicit casts: `join(myVar as string)`.
-- **`_makeLong` removed from top-level exports** — this was a deprecated Node.js internal. Use `toNamespacedPath` instead (available in upath v2+ and Node.js 8.3+).
+- **`_makeLong` removed from top-level exports** — this was a deprecated Node.js internal. Use `toNamespacedPath` instead (available in upath v2+ and Node.js 8.3+). Note: `_makeLong` remains accessible via the `.default` property on CJS exports (it's part of the full `path` proxy), but this is not a supported API.
 - **Boxed `String` objects no longer accepted** — `new String('foo')` is rejected; use plain string primitives. This is unlikely to affect anyone.
 
 ### Added

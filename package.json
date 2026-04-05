@@ -22,7 +22,8 @@
     "default extension",
     "UNC paths",
     "typescript",
-    "esm"
+    "esm",
+    "forward-slash"
   ],
   "repository": {
     "type": "git",
@@ -49,7 +50,8 @@
   },
   "files": [
     "dist",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "engines": {
     "node": ">=20"

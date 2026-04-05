@@ -1,4 +1,6 @@
 // Test ESM import against built output
+// Note: static imports are hoisted — if dist/ is missing, Node will throw a clear
+// MODULE_NOT_FOUND error before any code runs. Run `npm run build` first.
 import assert from 'node:assert'
 
 // Default import
