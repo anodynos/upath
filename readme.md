@@ -1,5 +1,15 @@
 # upath v3.0.0
 
+[![npm version](https://img.shields.io/npm/v/upath.svg)](https://www.npmjs.com/package/upath)
+[![npm downloads](https://img.shields.io/npm/dw/upath.svg)](https://www.npmjs.com/package/upath)
+[![CI](https://img.shields.io/github/actions/workflow/status/anodynos/upath/ci.yml?branch=master&label=CI)](https://github.com/anodynos/upath/actions/workflows/ci.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5+-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/node/v/upath.svg)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Zero Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](https://www.npmjs.com/package/upath)
+[![Bundle Size](https://img.shields.io/bundlephobia/minzip/upath)](https://bundlephobia.com/package/upath)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/anodynos?label=Sponsors)](https://github.com/sponsors/anodynos)
+
 A drop-in replacement / proxy to Node.js `path` that:
 
 - Replaces the Windows `\` with the Unix `/` in all string params & results.
@@ -162,27 +172,22 @@ upath.defaultExt('file.ts', '.js') // 'file.ts' (already has extension)
 upath.defaultExt('file.min', '.js', ['min'], 8) // 'file.min.js' (.min ignored)
 ```
 
+## Contributing
+
+Contributions are welcome! Please open an issue or pull request on [GitHub](https://github.com/anodynos/upath).
+
+```bash
+git clone https://github.com/anodynos/upath.git
+cd upath
+npm install
+npm test          # 421 tests
+npm run test:integration  # CJS/ESM integration tests
+```
+
+## Sponsor
+
+If upath is useful to you or your company, please consider [sponsoring](https://github.com/sponsors/anodynos) its continued maintenance.
+
 ## License
 
-Copyright(c) 2014-2026 Angelos Pikoulas (agelos.pikoulas@gmail.com)
-
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+[MIT](LICENSE) -- Copyright (c) 2014-2026 [Angelos Pikoulas](https://github.com/anodynos)
