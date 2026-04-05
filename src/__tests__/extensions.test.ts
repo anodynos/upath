@@ -192,4 +192,31 @@ describe('upath extension functions', () => {
       })
     })
   })
+
+  describe('hidden file edge cases (dotfiles)', () => {
+    it('trimExt leaves .gitignore unchanged (no valid ext)', () => {
+      expect(upath.trimExt('.gitignore')).toBe('.gitignore')
+    })
+
+    it('addExt appends to .gitignore', () => {
+      expect(upath.addExt('.gitignore', '.bak')).toBe('.gitignore.bak')
+    })
+
+    it('removeExt does not remove .gitignore as ext (extname is empty)', () => {
+      // extname('.gitignore') === '' so removeExt cannot match
+      expect(upath.removeExt('.gitignore', '.gitignore')).toBe('.gitignore')
+    })
+
+    it('changeExt replaces .js on .eslintrc.js', () => {
+      expect(upath.changeExt('.eslintrc.js', '.ts')).toBe('.eslintrc.ts')
+    })
+
+    it('defaultExt appends to .gitignore (no valid ext to block it)', () => {
+      expect(upath.defaultExt('.gitignore', '.txt')).toBe('.gitignore.txt')
+    })
+
+    it('extname returns empty for hidden file with no extension', () => {
+      expect(upath.extname('.hidden')).toBe('')
+    })
+  })
 })

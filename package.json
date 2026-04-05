@@ -20,7 +20,10 @@
     "trim extension",
     "add extension",
     "default extension",
-    "UNC paths"
+    "UNC paths",
+    "typescript",
+    "esm",
+    "forward-slash"
   ],
   "repository": {
     "type": "git",
@@ -47,7 +50,8 @@
   },
   "files": [
     "dist",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "engines": {
     "node": ">=20"
@@ -59,6 +63,7 @@
     "test:coverage": "npx jest --coverage",
     "lint": "npx tsc --noEmit",
     "prepublishOnly": "npm run build",
+    "test:integration": "npm run build && node test/integration/cjs-test.cjs && node test/integration/esm-test.mjs",
     "prepare": "husky"
   },
   "lint-staged": {

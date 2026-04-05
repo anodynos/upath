@@ -1,5 +1,7 @@
 import * as path from 'node:path'
 
+declare const __UPATH_VERSION__: string
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -196,7 +198,7 @@ for (const [name, fn] of Object.entries(extraFunctions)) {
 // Version
 // ---------------------------------------------------------------------------
 
-upath.VERSION = '3.0.0'
+upath.VERSION = __UPATH_VERSION__
 
 // ---------------------------------------------------------------------------
 // Re-export path types for consumers

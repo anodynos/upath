@@ -1,0 +1,47 @@
+---
+task: UP-003
+title: "Untested Node API exports — matchesGlob + toNamespacedPath behavioral tests"
+status: backlog
+tags: [release, testing, critical]
+discovery: pre-release-audit 2026-04-05
+clickup_id: 86c96mrxy
+parent: UP-001-WHALE
+usagcd: { U: 55, S: 89, A: 89, G: 21, D: 89, C: 89, USAG: 254 }
+---
+
+# UP-003 — Untested Node API exports — matchesGlob + toNamespacedPath behavioral tests
+
+> Both APIs are exported and proxied by upath but have ZERO behavioral tests. This is the highest-severity gap.
+
+## Problem
+
+- `matchesGlob` (Node 22+): exported at `src/index.ts:224`, discovered by `api-coverage.test.ts`, confirmed to exist as a function — but no test verifies it works, handles backslashes, or produces correct results for glob patterns.
+- `toNamespacedPath`: exported at `src/index.ts:222`, verified to exist — but no test proves backslash normalization interacts correctly with Windows namespace path conversion (`\\?\` prefix).
+
+Users will call `upath.matchesGlob()` expecting backslash normalization. If it silently fails or behaves unexpectedly, there's no test to catch it.
+
+## Proposed Solution
+
+### matchesGlob tests (in `node-compat.test.ts` or new file)
+- Basic glob patterns: `*.js`, `**/*.ts`, `src/**`
+- Backslash inputs: `src\\lib\\file.js` matching `src/**/*.js`
+- Edge cases: empty pattern, no match, root path
+- Node version guard: skip on Node < 22 where `path.matchesGlob` doesn't exist
+- At least 10 test vectors
+
+### toNamespacedPath tests
+- POSIX input passthrough (returns unchanged on non-Windows)
+- Backslash Windows paths: `C:\\foo\\bar` → verify normalization
+- UNC paths: `\\\\server\\share` → verify interaction
+- At least 5 test vectors
+
+## Acceptance Criteria
+
+- `matchesGlob` has >= 10 behavioral test cases with Node version guard
+- `toNamespacedPath` has >= 5 behavioral test cases
+- Both test backslash input normalization (the core upath value prop)
+- All tests pass on Node 20 (matchesGlob tests skip gracefully) and Node 22+
+
+## Discovery Context
+
+Pre-release audit 2026-04-05 — test quality agent rated both as CRITICAL (zero behavioral coverage for exported functions).

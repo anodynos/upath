@@ -1,0 +1,56 @@
+---
+task: UP-001-WHALE
+title: "upath v3.0.0 Release Preparation — audit gaps, docs, test hardening before npm publish"
+status: backlog
+tags: [release, testing, documentation, whale]
+discovery: pre-release-audit 2026-04-05
+clickup_id: 86c96mruy
+usagcd: { U: 55, S: 55, A: 89, G: 34, D: 89, C: 89, USAG: 233 }
+---
+
+# UP-001-WHALE — upath v3.0.0 Release Preparation
+
+> Comprehensive pre-release audit found 12 action items across 3 priority tiers. Code is solid (365 tests, 97% coverage, zero behavioral regressions from v2), but documentation and test coverage have real gaps that could burn millions of users.
+
+## Problem
+
+upath has millions of weekly npm downloads. v3.0.0 is a TypeScript rewrite with dual CJS/ESM, Node >= 20, and type narrowing — all breaking changes. The audit found:
+
+- **No CHANGELOG.md** at all
+- **No migration guide** from v2
+- **Two exported APIs completely untested** (matchesGlob, toNamespacedPath)
+- **Built dist/ output never tested** from the consumer side (only TS source via ts-jest)
+- Several test coverage gaps (Unicode, hidden files, format() with ParsedPath objects, etc.)
+
+## Proposed Solution
+
+5 subtasks, ordered by priority:
+
+1. **UP-002** Release docs — CHANGELOG.md + "Migrating from v2" README section
+2. **UP-003** Untested API exports — matchesGlob + toNamespacedPath behavioral tests (CRITICAL)
+3. **UP-004** CJS/ESM integration tests — verify built dist/ works for require() and import
+4. **UP-005** Test coverage hardening — format(), isAbsolute(), Unicode, hidden files, toUnix, edge cases
+5. **UP-006** Release housekeeping — API.md commit, cleanup, keywords, VERSION injection
+
+## Acceptance Criteria
+
+- All 5 subtasks completed
+- `npm test` passes with expanded test suite
+- CHANGELOG.md documents all breaking changes
+- README has explicit v2 migration section
+- `npm pack` produces clean tarball
+- Confident publish to npm
+
+## Discovery Context
+
+Pre-release audit 2026-04-05 — five parallel deep-dive agents covering tests, breaking changes, docs, security, and behavioral diff. Security/build audit was CLEAR. Behavioral parity with v2 is perfect.
+
+## Breaking Changes Identified
+
+| Change | Severity | Impact |
+|--------|----------|--------|
+| Node >= 20 (was >= 4) | HIGH | ~5-10% long-tail users |
+| Type params `any[]` → `string[]` | HIGH | TS compile errors for sloppy consumers |
+| CJS adds `__esModule` + `default` props | MEDIUM | Bundler interop edge cases |
+| `_makeLong` removed from top-level | MEDIUM | Deprecated Node internal |
+| `new String()` no longer accepted | LOW | Nobody does this |

@@ -1,0 +1,56 @@
+---
+task: UP-004
+title: "CJS/ESM integration tests — verify built dist/ output works for consumers"
+status: backlog
+tags: [release, testing]
+discovery: pre-release-audit 2026-04-05
+clickup_id: 86c96mry1
+parent: UP-001-WHALE
+usagcd: { U: 55, S: 55, A: 55, G: 34, D: 89, C: 55, USAG: 199 }
+---
+
+# UP-004 — CJS/ESM integration tests — verify built dist/ output works for consumers
+
+> All 365 tests run against TypeScript source via ts-jest. Nobody has tested the actual published artifacts.
+
+## Problem
+
+The package ships dual CJS (`dist/index.cjs`) + ESM (`dist/index.js`) output with separate type declarations. But:
+- All tests import from `../index` (the TS source via ts-jest)
+- No test verifies `require('upath')` from CJS output works
+- No test verifies `import upath from 'upath'` from ESM output works
+- No test verifies named exports are accessible from both entry points
+- The `exports` field in package.json has never been integration-tested
+
+For a major release with millions of users, this is a real risk of publish-time breakage.
+
+## Proposed Solution
+
+Create integration test scripts (outside the Jest suite, since they need to test built output):
+
+1. **CJS test** (`test/integration/cjs-test.cjs`):
+   - `const upath = require('../dist/index.cjs')`
+   - Verify default export has all expected functions
+   - Verify `upath.normalize`, `upath.toUnix`, `upath.addExt` work
+   - Verify `upath.sep === '/'`
+
+2. **ESM test** (`test/integration/esm-test.mjs`):
+   - `import upath from '../dist/index.js'`
+   - `import { normalize, toUnix, addExt } from '../dist/index.js'`
+   - Verify default + named exports work
+   - Verify types are accessible (tsc compile check)
+
+3. **npm script**: `"test:integration": "node test/integration/cjs-test.cjs && node test/integration/esm-test.mjs"`
+
+A=55 because this requires a different testing approach than the existing Jest suite.
+
+## Acceptance Criteria
+
+- CJS `require()` test passes against `dist/index.cjs`
+- ESM `import` test passes against `dist/index.js`
+- Named exports accessible from both entry points
+- Integration tests added to CI/prepublish pipeline
+
+## Discovery Context
+
+Pre-release audit 2026-04-05 — test quality agent rated as HIGH (built output never consumer-tested).

@@ -1,0 +1,44 @@
+---
+task: UP-005
+title: "Test coverage hardening — format(), isAbsolute(), Unicode, hidden files, toUnix, edge cases"
+status: backlog
+tags: [release, testing]
+discovery: pre-release-audit 2026-04-05
+clickup_id: 86c96mry2
+parent: UP-001-WHALE
+usagcd: { U: 34, S: 34, A: 89, G: 55, D: 89, C: 89, USAG: 212 }
+---
+
+# UP-005 — Test coverage hardening — format(), isAbsolute(), Unicode, hidden files, toUnix, edge cases
+
+> Six distinct test gap areas identified by the pre-release audit. All are "add more test vectors" work.
+
+## Problem
+
+The test suite has 365 tests at 97% coverage, but specific scenarios are untested:
+
+1. **format() with backslash ParsedPath objects** — the proxy doesn't unix-ify object properties, only string args. Works because output is unix-ified, but untested. If anyone refactors the proxy, this regresses silently.
+2. **isAbsolute('\\foo')** — returns `true` (differs from `path.posix`). Intentional but undocumented divergence.
+3. **Unicode paths** — zero tests for CJK, accents, emoji in filenames. Millions of international users.
+4. **Hidden files** — `.gitignore`, `.eslintrc.js` with extension functions. `extname('.gitignore')` returns `''`.
+5. **toUnix** — only 2 test vectors for the core utility function. Missing: empty string, UNC, pure forward-slash, only-slashes.
+6. **normalizeTrim('/')** — root path edge case ("unless root") untested.
+
+## Proposed Solution
+
+Add test vectors to existing test files (no new files needed):
+
+- `upath.test.ts`: expand `toUnix` to 10+ vectors, add `isAbsolute` backslash tests
+- `node-compat.test.ts`: add `format()` with backslash ParsedPath, add Unicode path section
+- `extensions.test.ts`: add hidden file cases (`.gitignore`, `.eslintrc.js`, `..hidden`)
+- `safe.test.ts`: add `normalizeTrim('/')`, `normalizeTrim('//')`, `joinSafe` empty segments
+
+## Acceptance Criteria
+
+- All 6 gap areas have test coverage
+- No existing tests broken
+- Coverage remains >= 97%
+
+## Discovery Context
+
+Pre-release audit 2026-04-05 — test quality agent rated individual items as HIGH/MEDIUM.
