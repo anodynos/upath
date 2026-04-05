@@ -18,6 +18,17 @@ Written in **TypeScript** with dual **CJS/ESM** output. Zero runtime dependencie
 - **Auto-generated API docs** — see [`docs/API.md`](docs/API.md) for complete input/output tables generated from the test suite.
 - **UNC path support** — carried forward from v2, with comprehensive test coverage.
 
+## Migrating from v2
+
+- **Node >= 20 required** — v2 supported Node >= 4. Update your CI matrix.
+- **CJS usage unchanged** — `const upath = require('upath')` works as before. All functions are available directly on the module (no `.default` needed).
+- **TypeScript: stricter params** — `join()`, `resolve()`, and `joinSafe()` params narrowed from `any[]` to `string[]`. Add explicit casts if you pass non-string args: `join(myVar as string)`.
+- **`_makeLong` removed** — use `toNamespacedPath` instead (available since Node 8.3).
+- **Named ESM imports now available** — `import { normalize, join, toUnix } from 'upath'` works in addition to the default import.
+- **Boxed `String` objects rejected** — `new String('foo')` no longer accepted; use plain string primitives.
+
+See [CHANGELOG.md](CHANGELOG.md) for the full list of changes.
+
 ## Installation
 
 ```bash
@@ -33,7 +44,7 @@ import upath from 'upath'
 import { normalize, joinSafe, addExt } from 'upath'
 
 // CJS
-const upath = require('upath').default
+const upath = require('upath')
 ```
 
 ### Quick examples
