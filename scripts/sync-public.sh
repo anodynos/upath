@@ -22,6 +22,7 @@ WHITELIST=(
   src/
   test/
   docs/
+  .github/
   .husky/
   CHANGELOG.md
   LICENSE
