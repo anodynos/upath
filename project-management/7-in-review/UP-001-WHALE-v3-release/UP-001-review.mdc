@@ -1,0 +1,46 @@
+---
+task: UP-001-WHALE
+review_date: 2026-04-05
+reviewer: code-reviewer subagent (fresh context per AZ-320)
+review_score: 8
+---
+
+# UP-001-WHALE Review — upath v3.0.0 Release Preparation
+
+## Change Classification
+
+**Code only** — 727 insertions across 22 files (source, tests, configs, docs). No workflow files.
+
+## Findings
+
+### Fixed (in commit 04b5648)
+
+| ID | Severity | Issue | Resolution |
+|----|----------|-------|------------|
+| H1 | HIGH | CHANGELOG.md not in npm tarball | Added to `files` array |
+| H2 | HIGH | `_makeLong` via `.default` not documented | Clarified in CHANGELOG |
+| M1 | MEDIUM | CJS test missing `__esModule`/`default` assertions | Added 3 assertions |
+| M4 | MEDIUM | Integration tests missing dist/ guard | Added existence check to CJS test |
+| L1 | LOW | Missing "forward-slash" keyword | Added |
+
+### Accepted (no action needed)
+
+| ID | Severity | Issue | Reason |
+|----|----------|-------|--------|
+| M2 | MEDIUM | `toUnix('////x')` → `'//x'` surprising | Correct UNC behavior, test documents it |
+| M3 | MEDIUM | Jest globals deprecation risk | Not blocking for v3.0.0 |
+| L2 | LOW | API.md link broken on npm | docs/ not in tarball, link is for GitHub only |
+| L3 | LOW | Task files reference "365 tests" | Historical records, not user-facing |
+| L4 | LOW | Task status frontmatter stale | PM artifact, not code |
+
+## Security Assessment
+
+No concerns. Zero runtime deps, no dynamic code execution, no network access.
+
+## Completeness
+
+All 12 audit items from the pre-release analysis are addressed. 421 tests + 2 integration tests pass. Tarball is 11.6 kB / 10 files.
+
+## Review Score: 8/13
+
+Solid mechanical work. The CJS `.default` README fix was a valuable discovery. Test additions are thorough and follow existing patterns. Docking points for: CHANGELOG missing from tarball (caught by review), missing integration test assertions for documented breaking changes (CJS shape).
