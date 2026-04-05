@@ -429,6 +429,22 @@ describePosix('Node.js compat: format', () => {
     expect(upath.format({ name: 'x', ext: 'png' })).toBe('x.png')
     expect(upath.format({ name: 'x', ext: '.png' })).toBe('x.png')
   })
+
+  // Backslash properties in ParsedPath objects — the proxy unix-ifies string
+  // args but not object properties. The output string is still unix-ified.
+  describe('format with backslash ParsedPath properties', () => {
+    const backslashCases: [path.FormatInputPathObject, string][] = [
+      [{ dir: 'c:\\Windows', base: 'file.txt' }, 'c:/Windows/file.txt'],
+      [{ root: 'c:\\', dir: 'c:\\Users', base: 'test.js', name: 'test', ext: '.js' }, 'c:/Users/test.js'],
+      [{ dir: '\\\\server\\share', base: 'file.txt' }, '//server/share/file.txt'],
+    ]
+
+    test.each(backslashCases)('format(%j) normalizes backslashes in output → %j', (pathObj, expected) => {
+      const result = upath.format(pathObj)
+      expect(result).toBe(expected)
+      expect(result).not.toContain('\\')
+    })
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -649,5 +665,48 @@ describeMatchesGlob('Node.js compat: matchesGlob', () => {
   it('returns boolean type', () => {
     const result = upath.matchesGlob!('file.js', '*.js')
     expect(typeof result).toBe('boolean')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Unicode path support
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: Unicode paths', () => {
+  it('normalize preserves international characters', () => {
+    expect(upath.normalize('/home/user/文件/readme.md')).toBe('/home/user/文件/readme.md')
+  })
+
+  it('join works with accented characters', () => {
+    expect(upath.join('/home', 'café', 'naïve.txt')).toBe('/home/café/naïve.txt')
+  })
+
+  it('basename works with emoji directory names', () => {
+    expect(upath.basename('/path/to/📁/file.txt')).toBe('file.txt')
+  })
+
+  it('extname works with CJK filenames', () => {
+    expect(upath.extname('/path/日本語.txt')).toBe('.txt')
+  })
+
+  it('toUnix normalizes backslashes with CJK characters', () => {
+    expect(upath.toUnix('C:\\Users\\文件\\docs')).toBe('C:/Users/文件/docs')
+  })
+
+  it('parse handles Unicode filenames', () => {
+    const parsed = upath.parse('/home/用户/文件.txt')
+    expect(parsed.root).toBe('/')
+    expect(parsed.dir).toBe('/home/用户')
+    expect(parsed.base).toBe('文件.txt')
+    expect(parsed.ext).toBe('.txt')
+    expect(parsed.name).toBe('文件')
+  })
+
+  it('dirname handles accented path segments', () => {
+    expect(upath.dirname('/path/to/données/file')).toBe('/path/to/données')
+  })
+
+  it('resolve handles Japanese directory names', () => {
+    expect(upath.resolve('/home', 'ユーザー')).toBe('/home/ユーザー')
   })
 })

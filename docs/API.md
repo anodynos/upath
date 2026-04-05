@@ -183,6 +183,8 @@
 | `"./../dep/"`               | `"../dep"`               |
 | `"path//dep\\"`             | `"path/dep"`             |
 | `".//windows\\unix/mixed/"` | `"./windows/unix/mixed"` |
+| `"/"`                       | `"/"`                    |
+| `"//"`                      | `"/"`                    |
 
 ## `upath.joinSafe(path1, path2, ...)`
 
@@ -196,6 +198,8 @@
 | `["\\\\.\\c:\\temp\\file","..\\path"]`        | `"//./c:/temp/path"`      |
 | `["//server/share/file","../path"]`           | `"//server/share/path"`   |
 | `["//./c:/temp/file","../path"]`              | `"//./c:/temp/path"`      |
+| `["",""]`                                     | `"."`                     |
+| `["./foo","","bar"]`                          | `"./foo/bar"`             |
 
 ## `upath.normalize(path)`
 
@@ -223,3 +227,20 @@
 | ----------------------------------- | ---------------------------- |
 | `".//windows\\//unix/\\/mixed////"` | `"./windows/unix/mixed/"`    |
 | `"..///windows\\..\\\\unix/mixed"`  | `"../windows/../unix/mixed"` |
+| `""`                                | `""`                         |
+| `"/"`                               | `"/"`                        |
+| `"\\\\server\\share"`               | `"//server/share"`           |
+| `"already/forward/slashes"`         | `"already/forward/slashes"`  |
+| `"\\"`                              | `"/"`                        |
+| `"////multiple///slashes"`          | `"//multiple/slashes"`       |
+| `"mixed\\back//and///slashes"`      | `"mixed/back/and/slashes"`   |
+| `"a\\b\\c"`                         | `"a/b/c"`                    |
+| `"C:\\Users\\test"`                 | `"C:/Users/test"`            |
+
+## `upath.isAbsolute(path) — backslash normalization`
+
+| Input                 | Output                         |
+| --------------------- | ------------------------------ |
+| `"\\foo"`             | `true (backslash normalized)`  |
+| `"\\\\server\\share"` | `true (backslash normalized)`  |
+| `"foo\\bar"`          | `false (backslash normalized)` |

@@ -69,10 +69,35 @@ describe('upath core proxy functions', () => {
     const cases: [string, string][] = [
       ['.//windows\\//unix/\\/mixed////', './windows/unix/mixed/'],
       ['..///windows\\..\\\\unix/mixed', '../windows/../unix/mixed'],
+      // Expanded vectors
+      ['', ''],
+      ['/', '/'],
+      ['\\\\server\\share', '//server/share'],
+      ['already/forward/slashes', 'already/forward/slashes'],
+      ['\\', '/'],
+      ['////multiple///slashes', '//multiple/slashes'],
+      ['mixed\\back//and///slashes', 'mixed/back/and/slashes'],
+      ['a\\b\\c', 'a/b/c'],
+      ['C:\\Users\\test', 'C:/Users/test'],
     ]
 
     test.each(cases)('toUnix(%j) → %j', (input, expected) => {
       expect(upath.toUnix(input)).toBe(expected)
+    })
+  })
+
+  describe('upath.isAbsolute(path) — backslash normalization', () => {
+    // upath normalizes `\` → `/` before calling path.isAbsolute, so
+    // `\foo` becomes `/foo` (absolute). This intentionally diverges from
+    // path.posix.isAbsolute which treats `\` as a valid filename character.
+    const cases: [string, boolean][] = [
+      ['\\foo', true],
+      ['\\\\server\\share', true],
+      ['foo\\bar', false],
+    ]
+
+    test.each(cases)('isAbsolute(%j) → %j (backslash normalized)', (input, expected) => {
+      expect(upath.isAbsolute(input)).toBe(expected)
     })
   })
 })
