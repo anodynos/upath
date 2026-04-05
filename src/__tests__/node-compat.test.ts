@@ -558,3 +558,96 @@ describePosix('Node.js compat: posix and win32 pass-through', () => {
     expect(upath.posix.basename('/foo/bar.js', '.js')).toBe('bar')
   })
 })
+
+// ---------------------------------------------------------------------------
+// toNamespacedPath (available in all supported Node versions)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: toNamespacedPath', () => {
+  // On POSIX, toNamespacedPath returns input unchanged (no \\?\ prefixing).
+  // upath still normalizes backslashes in the input before delegating.
+  const cases: [string, string][] = [
+    // Simple POSIX path — returned unchanged
+    ['/foo/bar', '/foo/bar'],
+    // Backslash input — upath normalizes \ → / before returning
+    ['\\foo\\bar', '/foo/bar'],
+    // Empty string — returned unchanged
+    ['', ''],
+    // Relative path — returned unchanged
+    ['foo/bar', 'foo/bar'],
+    // UNC-style forward slashes — preserved
+    ['//server/share', '//server/share'],
+    // Mixed slashes — backslashes normalized
+    ['/foo\\bar/baz', '/foo/bar/baz'],
+    // Deeply nested with backslashes
+    ['a\\b\\c\\d', 'a/b/c/d'],
+  ]
+
+  test.each(cases)('upath.toNamespacedPath(%j) === %j', (input, expected) => {
+    expect(upath.toNamespacedPath(input)).toBe(expected)
+  })
+
+  it('never produces backslashes in output', () => {
+    const inputs = ['\\foo\\bar', 'C:\\Users\\foo', 'a\\b\\c']
+    for (const input of inputs) {
+      expect(upath.toNamespacedPath(input)).not.toContain('\\')
+    }
+  })
+})
+
+// ---------------------------------------------------------------------------
+// matchesGlob (added in Node 22 — may be undefined on Node 20)
+// ---------------------------------------------------------------------------
+
+const hasMatchesGlob = typeof path.matchesGlob === 'function'
+const describeMatchesGlob = hasMatchesGlob ? describePosix : describe.skip
+
+describeMatchesGlob('Node.js compat: matchesGlob', () => {
+  // Basic glob matching — upath normalizes backslashes before matching
+  const trueCases: [string, string][] = [
+    // Basic glob
+    ['src/file.js', 'src/*.js'],
+    // Nested glob with **
+    ['src/lib/file.ts', 'src/**/*.ts'],
+    // Backslash input — core upath value: \ normalized to / before matching
+    ['src\\lib\\file.js', 'src/**/*.js'],
+    // Root pattern
+    ['/absolute/path.js', '/**/*.js'],
+    // Exact match
+    ['file.js', 'file.js'],
+    // Star-only pattern
+    ['anything', '*'],
+    // Deep nested with backslashes
+    ['a\\b\\c\\d.ts', '**/*.ts'],
+    // Mixed slashes
+    ['a/b\\c/d.js', 'a/**/*.js'],
+    // Pattern with dot
+    ['src/index.test.ts', 'src/*.test.ts'],
+    // Nested directories
+    ['packages/core/src/index.ts', 'packages/*/src/*.ts'],
+  ]
+
+  test.each(trueCases)('upath.matchesGlob(%j, %j) === true', (p, pattern) => {
+    expect(upath.matchesGlob!(p, pattern)).toBe(true)
+  })
+
+  const falseCases: [string, string][] = [
+    // Extension mismatch
+    ['src/file.js', '*.ts'],
+    // Extension mismatch (coffee vs js)
+    ['file.coffee', '*.js'],
+    // Directory mismatch
+    ['lib/file.js', 'src/*.js'],
+    // No extension vs extension pattern
+    ['README', '*.md'],
+  ]
+
+  test.each(falseCases)('upath.matchesGlob(%j, %j) === false', (p, pattern) => {
+    expect(upath.matchesGlob!(p, pattern)).toBe(false)
+  })
+
+  it('returns boolean type', () => {
+    const result = upath.matchesGlob!('file.js', '*.js')
+    expect(typeof result).toBe('boolean')
+  })
+})
