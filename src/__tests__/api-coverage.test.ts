@@ -1,5 +1,8 @@
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import upath from '../index'
+
+const pkg = JSON.parse(readFileSync(path.resolve(__dirname, '../../package.json'), 'utf-8'))
 
 describe('path API completeness', () => {
   // Discover all path exports dynamically
@@ -58,7 +61,7 @@ describe('path API completeness', () => {
   })
 
   test('upath has VERSION', () => {
-    expect(upath.VERSION).toBe('3.0.0')
+    expect(upath.VERSION).toBe(pkg.version)
   })
 
   // Report what we found (useful for CI logs across Node versions)

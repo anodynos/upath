@@ -429,6 +429,22 @@ describePosix('Node.js compat: format', () => {
     expect(upath.format({ name: 'x', ext: 'png' })).toBe('x.png')
     expect(upath.format({ name: 'x', ext: '.png' })).toBe('x.png')
   })
+
+  // Backslash properties in ParsedPath objects — the proxy unix-ifies string
+  // args but not object properties. The output string is still unix-ified.
+  describe('format with backslash ParsedPath properties', () => {
+    const backslashCases: [path.FormatInputPathObject, string][] = [
+      [{ dir: 'c:\\Windows', base: 'file.txt' }, 'c:/Windows/file.txt'],
+      [{ root: 'c:\\', dir: 'c:\\Users', base: 'test.js', name: 'test', ext: '.js' }, 'c:/Users/test.js'],
+      [{ dir: '\\\\server\\share', base: 'file.txt' }, '//server/share/file.txt'],
+    ]
+
+    test.each(backslashCases)('format(%j) normalizes backslashes in output → %j', (pathObj, expected) => {
+      const result = upath.format(pathObj)
+      expect(result).toBe(expected)
+      expect(result).not.toContain('\\')
+    })
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -556,5 +572,141 @@ describePosix('Node.js compat: posix and win32 pass-through', () => {
     expect(upath.posix.join('/foo', 'bar')).toBe('/foo/bar')
     expect(upath.posix.normalize('/foo/../bar')).toBe('/bar')
     expect(upath.posix.basename('/foo/bar.js', '.js')).toBe('bar')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// toNamespacedPath (available in all supported Node versions)
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: toNamespacedPath', () => {
+  // On POSIX, toNamespacedPath returns input unchanged (no \\?\ prefixing).
+  // upath still normalizes backslashes in the input before delegating.
+  const cases: [string, string][] = [
+    // Simple POSIX path — returned unchanged
+    ['/foo/bar', '/foo/bar'],
+    // Backslash input — upath normalizes \ → / before returning
+    ['\\foo\\bar', '/foo/bar'],
+    // Empty string — returned unchanged
+    ['', ''],
+    // Relative path — returned unchanged
+    ['foo/bar', 'foo/bar'],
+    // UNC-style forward slashes — preserved
+    ['//server/share', '//server/share'],
+    // Mixed slashes — backslashes normalized
+    ['/foo\\bar/baz', '/foo/bar/baz'],
+    // Deeply nested with backslashes
+    ['a\\b\\c\\d', 'a/b/c/d'],
+  ]
+
+  test.each(cases)('upath.toNamespacedPath(%j) === %j', (input, expected) => {
+    expect(upath.toNamespacedPath(input)).toBe(expected)
+  })
+
+  it('never produces backslashes in output', () => {
+    const inputs = ['\\foo\\bar', 'C:\\Users\\foo', 'a\\b\\c']
+    for (const input of inputs) {
+      expect(upath.toNamespacedPath(input)).not.toContain('\\')
+    }
+  })
+})
+
+// ---------------------------------------------------------------------------
+// matchesGlob (added in Node 22 — may be undefined on Node 20)
+// ---------------------------------------------------------------------------
+
+const hasMatchesGlob = typeof path.matchesGlob === 'function'
+const describeMatchesGlob = hasMatchesGlob ? describePosix : describe.skip
+
+describeMatchesGlob('Node.js compat: matchesGlob', () => {
+  // Basic glob matching — upath normalizes backslashes before matching
+  const trueCases: [string, string][] = [
+    // Basic glob
+    ['src/file.js', 'src/*.js'],
+    // Nested glob with **
+    ['src/lib/file.ts', 'src/**/*.ts'],
+    // Backslash input — core upath value: \ normalized to / before matching
+    ['src\\lib\\file.js', 'src/**/*.js'],
+    // Root pattern
+    ['/absolute/path.js', '/**/*.js'],
+    // Exact match
+    ['file.js', 'file.js'],
+    // Star-only pattern
+    ['anything', '*'],
+    // Deep nested with backslashes
+    ['a\\b\\c\\d.ts', '**/*.ts'],
+    // Mixed slashes
+    ['a/b\\c/d.js', 'a/**/*.js'],
+    // Pattern with dot
+    ['src/index.test.ts', 'src/*.test.ts'],
+    // Nested directories
+    ['packages/core/src/index.ts', 'packages/*/src/*.ts'],
+  ]
+
+  test.each(trueCases)('upath.matchesGlob(%j, %j) === true', (p, pattern) => {
+    expect(upath.matchesGlob!(p, pattern)).toBe(true)
+  })
+
+  const falseCases: [string, string][] = [
+    // Extension mismatch
+    ['src/file.js', '*.ts'],
+    // Extension mismatch (coffee vs js)
+    ['file.coffee', '*.js'],
+    // Directory mismatch
+    ['lib/file.js', 'src/*.js'],
+    // No extension vs extension pattern
+    ['README', '*.md'],
+  ]
+
+  test.each(falseCases)('upath.matchesGlob(%j, %j) === false', (p, pattern) => {
+    expect(upath.matchesGlob!(p, pattern)).toBe(false)
+  })
+
+  it('returns boolean type', () => {
+    const result = upath.matchesGlob!('file.js', '*.js')
+    expect(typeof result).toBe('boolean')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Unicode path support
+// ---------------------------------------------------------------------------
+
+describePosix('Node.js compat: Unicode paths', () => {
+  it('normalize preserves international characters', () => {
+    expect(upath.normalize('/home/user/文件/readme.md')).toBe('/home/user/文件/readme.md')
+  })
+
+  it('join works with accented characters', () => {
+    expect(upath.join('/home', 'café', 'naïve.txt')).toBe('/home/café/naïve.txt')
+  })
+
+  it('basename works with emoji directory names', () => {
+    expect(upath.basename('/path/to/📁/file.txt')).toBe('file.txt')
+  })
+
+  it('extname works with CJK filenames', () => {
+    expect(upath.extname('/path/日本語.txt')).toBe('.txt')
+  })
+
+  it('toUnix normalizes backslashes with CJK characters', () => {
+    expect(upath.toUnix('C:\\Users\\文件\\docs')).toBe('C:/Users/文件/docs')
+  })
+
+  it('parse handles Unicode filenames', () => {
+    const parsed = upath.parse('/home/用户/文件.txt')
+    expect(parsed.root).toBe('/')
+    expect(parsed.dir).toBe('/home/用户')
+    expect(parsed.base).toBe('文件.txt')
+    expect(parsed.ext).toBe('.txt')
+    expect(parsed.name).toBe('文件')
+  })
+
+  it('dirname handles accented path segments', () => {
+    expect(upath.dirname('/path/to/données/file')).toBe('/path/to/données')
+  })
+
+  it('resolve handles Japanese directory names', () => {
+    expect(upath.resolve('/home', 'ユーザー')).toBe('/home/ユーザー')
   })
 })

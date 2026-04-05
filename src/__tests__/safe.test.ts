@@ -68,6 +68,9 @@ describe('upath safe functions', () => {
       ['./../dep/', '../dep'],
       ['path//dep\\', 'path/dep'],
       ['.//windows\\unix/mixed/', './windows/unix/mixed'],
+      // Root edge cases
+      ['/', '/'],
+      ['//', '/'],
     ]
 
     test.each(cases)('normalizeTrim(%j) → %j', (input, expected) => {
@@ -86,6 +89,9 @@ describe('upath safe functions', () => {
       [['\\\\.\\c:\\temp\\file', '..\\path'], '//./c:/temp/path'],
       [['//server/share/file', '../path'], '//server/share/path'],
       [['//./c:/temp/file', '../path'], '//./c:/temp/path'],
+      // Empty segment edge cases
+      [['', ''], '.'],
+      [['./foo', '', 'bar'], './foo/bar'],
     ]
 
     test.each(cases)('joinSafe(%j) → %j', (args, expected) => {

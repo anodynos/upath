@@ -62,6 +62,8 @@ function buildMarkdown(sections: DocSection[]): string {
     '# upath API',
     '',
     '> Auto-generated from test results by `doc-reporter.ts`. Do not edit manually.',
+    '>',
+    '> **Note:** Node.js compatibility tests (200+ vectors in [`node-compat.test.ts`](../src/__tests__/node-compat.test.ts)) are excluded from this document for brevity. Those tests verify that every proxied `path` function produces identical results to Node.js built-in `path`.',
     '',
   ]
 
