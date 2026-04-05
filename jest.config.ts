@@ -9,7 +9,7 @@ const config: Config = {
   roots: ['<rootDir>/src'],
   testMatch: ['**/*.test.ts'],
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.test.ts', '!src/__tests__/**'],
-  reporters: ['default', '<rootDir>/src/__tests__/reporters/doc-reporter.ts'],
+  reporters: ['default', '<rootDir>/src/__tests__/reporters/doc-reporter.cjs'],
   globals: {
     __UPATH_VERSION__: version,
   },
