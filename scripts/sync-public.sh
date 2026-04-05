@@ -83,7 +83,7 @@ git clone --branch "$PUBLIC_BRANCH" --depth 1 "$PUBLIC_URL" "$TEMP_DIR/public" 2
 info "Syncing whitelisted files..."
 
 # Remove everything in public (except .git) to handle deletions
-find "$TEMP_DIR/public" -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
+find "$TEMP_DIR/public" -mindepth 1 -maxdepth 1 -not -name '.git' -exec rm -rf {} +
 
 # Copy whitelisted files
 for item in "${WHITELIST[@]}"; do
