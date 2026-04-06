@@ -74,7 +74,6 @@
     "lint": "npx tsc --noEmit",
     "prepublishOnly": "npm run build",
     "test:integration": "npm run build && node test/integration/cjs-test.cjs && node test/integration/esm-test.mjs",
-    "sync:public": "bash scripts/sync-public.sh",
     "prepare": "husky"
   },
   "lint-staged": {
