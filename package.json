@@ -1,7 +1,7 @@
 {
   "name": "upath",
   "description": "A drop-in replacement / proxy to Node.js path, replacing \\\\ with / for all results & adding file extension functions.",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "homepage": "https://github.com/anodynos/upath/",
   "author": {
     "name": "Angelos Pikoulas",
