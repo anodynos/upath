@@ -85,7 +85,13 @@ class DocReporter {
   onRunComplete(_testContexts, results) {
     const sections = []
 
-    for (const testFile of results.testResults) {
+    // Sort test files by name for deterministic doc output regardless of
+    // Jest's parallel execution order.
+    const sortedTestResults = [...results.testResults].sort((a, b) =>
+      path.basename(a.testFilePath).localeCompare(path.basename(b.testFilePath)),
+    )
+
+    for (const testFile of sortedTestResults) {
       const fileName = path.basename(testFile.testFilePath)
       if (SKIP_FILES.includes(fileName)) continue
 

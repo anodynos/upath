@@ -2,9 +2,7 @@
 
 > Auto-generated from test results by `doc-reporter.ts`. Do not edit manually.
 >
-> **Note:** Node.js compatibility tests (200+ vectors in [`node-compat.test.ts`](../src/__tests__/node-compat.test.ts))
-> are excluded from this document for brevity. Those tests verify that every proxied `path` function produces identical
-> results to Node.js built-in `path`.
+> **Note:** Node.js compatibility tests (200+ vectors in [`node-compat.test.ts`](../src/__tests__/node-compat.test.ts)) are excluded from this document for brevity. Those tests verify that every proxied `path` function produces identical results to Node.js built-in `path`.
 
 ## `upath.addExt(filename, ext)`
 
@@ -128,50 +126,6 @@
 | `"fileWith/defaultExt.longExt", 'js', ['min', '.dev'], 8`  | `"fileWith/defaultExt.longExt"`     |
 | `"fileWith/defaultExt.longRext", 'js', ['min', '.dev'], 8` | `"fileWith/defaultExt.longRext.js"` |
 
-## `upath.normalize(path)`
-
-| Input                             | Output                     |
-| --------------------------------- | -------------------------- |
-| `"c:/windows/nodejs/path"`        | `"c:/windows/nodejs/path"` |
-| `"c:/windows/../nodejs/path"`     | `"c:/nodejs/path"`         |
-| `"c:\\windows\\nodejs\\path"`     | `"c:/windows/nodejs/path"` |
-| `"c:\\windows\\..\\nodejs\\path"` | `"c:/nodejs/path"`         |
-| `"/windows\\unix/mixed"`          | `"/windows/unix/mixed"`    |
-| `"\\windows//unix/mixed"`         | `"/windows/unix/mixed"`    |
-| `"\\windows\\..\\unix/mixed/"`    | `"/unix/mixed/"`           |
-
-## `upath.join(paths...)`
-
-| Input                                | Output                |
-| ------------------------------------ | --------------------- |
-| `["some/nodejs/deep","../path"]`     | `"some/nodejs/path"`  |
-| `["some/nodejs\\windows","../path"]` | `"some/nodejs/path"`  |
-| `["some\\windows\\only","..\\path"]` | `"some/windows/path"` |
-
-## `upath.toUnix(path)`
-
-| Input                               | Output                       |
-| ----------------------------------- | ---------------------------- |
-| `".//windows\\//unix/\\/mixed////"` | `"./windows/unix/mixed/"`    |
-| `"..///windows\\..\\\\unix/mixed"`  | `"../windows/../unix/mixed"` |
-| `""`                                | `""`                         |
-| `"/"`                               | `"/"`                        |
-| `"\\\\server\\share"`               | `"//server/share"`           |
-| `"already/forward/slashes"`         | `"already/forward/slashes"`  |
-| `"\\"`                              | `"/"`                        |
-| `"////multiple///slashes"`          | `"//multiple/slashes"`       |
-| `"mixed\\back//and///slashes"`      | `"mixed/back/and/slashes"`   |
-| `"a\\b\\c"`                         | `"a/b/c"`                    |
-| `"C:\\Users\\test"`                 | `"C:/Users/test"`            |
-
-## `upath.isAbsolute(path) — backslash normalization`
-
-| Input                 | Output                         |
-| --------------------- | ------------------------------ |
-| `"\\foo"`             | `true (backslash normalized)`  |
-| `"\\\\server\\share"` | `true (backslash normalized)`  |
-| `"foo\\bar"`          | `false (backslash normalized)` |
-
 ## `upath.normalizeSafe(path)`
 
 ### equal to path.normalize
@@ -246,3 +200,47 @@
 | `["//./c:/temp/file","../path"]`              | `"//./c:/temp/path"`      |
 | `["",""]`                                     | `"."`                     |
 | `["./foo","","bar"]`                          | `"./foo/bar"`             |
+
+## `upath.normalize(path)`
+
+| Input                             | Output                     |
+| --------------------------------- | -------------------------- |
+| `"c:/windows/nodejs/path"`        | `"c:/windows/nodejs/path"` |
+| `"c:/windows/../nodejs/path"`     | `"c:/nodejs/path"`         |
+| `"c:\\windows\\nodejs\\path"`     | `"c:/windows/nodejs/path"` |
+| `"c:\\windows\\..\\nodejs\\path"` | `"c:/nodejs/path"`         |
+| `"/windows\\unix/mixed"`          | `"/windows/unix/mixed"`    |
+| `"\\windows//unix/mixed"`         | `"/windows/unix/mixed"`    |
+| `"\\windows\\..\\unix/mixed/"`    | `"/unix/mixed/"`           |
+
+## `upath.join(paths...)`
+
+| Input                                | Output                |
+| ------------------------------------ | --------------------- |
+| `["some/nodejs/deep","../path"]`     | `"some/nodejs/path"`  |
+| `["some/nodejs\\windows","../path"]` | `"some/nodejs/path"`  |
+| `["some\\windows\\only","..\\path"]` | `"some/windows/path"` |
+
+## `upath.toUnix(path)`
+
+| Input                               | Output                       |
+| ----------------------------------- | ---------------------------- |
+| `".//windows\\//unix/\\/mixed////"` | `"./windows/unix/mixed/"`    |
+| `"..///windows\\..\\\\unix/mixed"`  | `"../windows/../unix/mixed"` |
+| `""`                                | `""`                         |
+| `"/"`                               | `"/"`                        |
+| `"\\\\server\\share"`               | `"//server/share"`           |
+| `"already/forward/slashes"`         | `"already/forward/slashes"`  |
+| `"\\"`                              | `"/"`                        |
+| `"////multiple///slashes"`          | `"//multiple/slashes"`       |
+| `"mixed\\back//and///slashes"`      | `"mixed/back/and/slashes"`   |
+| `"a\\b\\c"`                         | `"a/b/c"`                    |
+| `"C:\\Users\\test"`                 | `"C:/Users/test"`            |
+
+## `upath.isAbsolute(path) — backslash normalization`
+
+| Input                 | Output                         |
+| --------------------- | ------------------------------ |
+| `"\\foo"`             | `true (backslash normalized)`  |
+| `"\\\\server\\share"` | `true (backslash normalized)`  |
+| `"foo\\bar"`          | `false (backslash normalized)` |

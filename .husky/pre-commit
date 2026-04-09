@@ -1,1 +1,9 @@
-npx lint-staged
+# If lint-staged not in PATH (no local node_modules), use main worktree's
+if ! command -v lint-staged >/dev/null 2>&1; then
+  MAIN_WT=$(git worktree list --porcelain | head -1 | sed 's/worktree //')
+  if [ -d "$MAIN_WT/node_modules/.bin" ]; then
+    export PATH="$MAIN_WT/node_modules/.bin:$PATH"
+  fi
+fi
+
+lint-staged

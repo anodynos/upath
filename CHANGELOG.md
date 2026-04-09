@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [3.0.6] - 2026-04-09
+
+### Added
+
+- **Polar.sh funding** -- added to `.github/FUNDING.yml` and `package.json` alongside existing GitHub Sponsors and Tidelift.
+- **"Who Uses upath" section** in README -- trust signals with notable dependents (Chokidar, Nuxt, 1,300+ npm packages).
+- **Architecture section** in README -- explains the dynamic proxy pattern and how upath stays in sync with Node.js.
+
+### Changed
+
+- **README revamped** -- pain-first API docs showing `path` vs `upath` behavior side-by-side, inspired by the v2-era docs. Every extra function now explains _why_ it exists (what `path` does wrong).
+- **Deterministic `docs/API.md` generation** -- test files are now sorted by name before the doc reporter processes them, eliminating spurious diffs caused by Jest's non-deterministic parallel execution order.
+
+### Fixed
+
+- **Pre-commit hook now works in git worktrees without `node_modules`** -- the hook falls back to the main worktree's `node_modules/.bin` when lint-staged isn't found locally.
+
+## [3.0.1] - [3.0.5]
+
+Patch releases for CI/CD setup (Copybara bidirectional sync, Trusted Publishing OIDC), build fixes, and internal tooling. No user-facing API changes.
+
 ## [3.0.0] - 2026-04-05
 
 ### Breaking Changes
@@ -31,4 +52,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Build toolchain changed to tsup (dual CJS + ESM output).
 - Test framework changed to Jest with ts-jest.
 
+[3.0.6]: https://github.com/anodynos/upath/compare/v3.0.5...v3.0.6
 [3.0.0]: https://github.com/anodynos/upath/releases/tag/v3.0.0
