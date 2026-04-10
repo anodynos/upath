@@ -75,7 +75,8 @@
     "build": "npx tsup",
     "test": "npx jest",
     "test:coverage": "npx jest --coverage",
-    "lint": "npx tsc --noEmit",
+    "lint": "npx eslint src",
+    "lint:types": "npx tsc --noEmit",
     "prepublishOnly": "npm run build",
     "test:integration": "npm run build && node test/integration/cjs-test.cjs && node test/integration/esm-test.mjs",
     "prepare": "husky"
@@ -84,8 +85,11 @@
     "*.{ts,tsx,js,jsx,mjs,cjs,json,md,mdx,css,scss,yaml,yml,html}": "prettier --write"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/jest": "^29.5.0",
     "@types/node": "^20.0.0",
+    "eslint": "^10.1.0",
+    "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
     "lint-staged": "^16.4.0",
@@ -93,6 +97,7 @@
     "ts-jest": "^29.2.0",
     "ts-node": "^10.9.2",
     "tsup": "^8.0.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.58.0"
   }
 }

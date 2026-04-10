@@ -365,7 +365,7 @@ describePosix('Node.js compat: parse', () => {
     ['/foo/bar.baz', '/'],
   ]
 
-  test.each(unixPaths)('upath.parse(%j) has root=%j and round-trips via format', (p, expectedRoot) => {
+  test.each(unixPaths)('upath.parse(%j) has root=%j and round-trips via format', (p, _expectedRoot) => {
     const parsed = upath.parse(p)
     // upath normalizes `\` → `/` and collapses `//`, so the root may differ
     // from path.posix when the input contains backslashes
