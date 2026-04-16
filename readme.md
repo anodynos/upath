@@ -12,7 +12,7 @@
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/upath)](https://bundlephobia.com/package/upath)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/anodynos?label=Sponsors)](https://github.com/sponsors/anodynos)
 
-Trusted for over a decade. **20 million downloads per week.** Zero runtime dependencies. One import and every path in your project is consistent -- no more `\` vs `/` headaches across Windows, Linux, and macOS.
+Trusted for over a decade. **20 million downloads per week.** Zero runtime dependencies. 100% tested against NodeJS's own path tests. One import and every path in your project is consistent -- no more `\` vs `/` headaches across Windows, Linux, and macOS. 
 
 ```typescript
 import upath from 'upath' // use exactly like path — but it always works
@@ -281,6 +281,12 @@ upath has been free and MIT-licensed for over a decade. If it saves you time or 
 - [Tidelift](https://tidelift.com/subscription/pkg/npm-upath) -- enterprise supply-chain support
 
 Running `npm fund` in your project will also show you if upath is in your tree.
+
+## Security contact information
+
+To report a security vulnerability, please use the
+[Tidelift security contact](https://tidelift.com/security).
+Tidelift will coordinate the fix and disclosure.
 
 ## License
 
