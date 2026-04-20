@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.7
+
+### Patch Changes
+
+- 7f1590a: Fix `@types/node` >= 25 compatibility. `PlatformPath` was removed from `@types/node` v25; upath now derives its `PlatformPath` type from `typeof path` instead of re-exporting the removed interface. Works with `@types/node` v20 through v25+.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
