@@ -79,15 +79,20 @@
     "lint:types": "npx tsc --noEmit",
     "prepublishOnly": "npm run build",
     "test:integration": "npm run build && node test/integration/cjs-test.cjs && node test/integration/esm-test.mjs",
-    "prepare": "husky"
+    "prepare": "husky",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "npm run build && changeset publish"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs,cjs,json,md,mdx,css,scss,yaml,yml,html}": "prettier --write"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.30.0",
     "@eslint/js": "^10.0.1",
     "@types/jest": "^29.5.0",
-    "@types/node": "^20.0.0",
+    "@types/node": ">=20.0.0",
     "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",

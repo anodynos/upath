@@ -12,7 +12,9 @@
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/upath)](https://bundlephobia.com/package/upath)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/anodynos?label=Sponsors)](https://github.com/sponsors/anodynos)
 
-Trusted for over a decade. **20 million downloads per week.** Zero runtime dependencies. 100% tested against NodeJS's own path tests. One import and every path in your project is consistent -- no more `\` vs `/` headaches across Windows, Linux, and macOS. 
+A drop-in replacement for Node.js `path` that normalizes all backslashes to forward slashes, adds safe path manipulation and file extension utilities, and stays in sync with every Node.js release automatically.
+
+Trusted for over a decade. **20 million downloads per week.** Zero runtime dependencies. 100% tested against NodeJS's own path tests. One import and every path in your project is consistent -- no more `\` vs `/` headaches across Windows, Linux, and macOS.
 
 ```typescript
 import upath from 'upath' // use exactly like path — but it always works
@@ -243,7 +245,7 @@ If you run `npm ls upath` in a non-trivial Node.js project, there's a good chanc
 
 ## What's New in v3
 
-- **TypeScript rewrite** -- full type safety, source-of-truth types shipped with the package.
+- **TypeScript rewrite** -- full type safety, source-of-truth types shipped with the package. Compatible with `@types/node` v20 through v25+.
 - **Dual CJS/ESM** -- works with `import` and `require()` out of the box via package.json `exports`.
 - **Node >= 20** -- drops legacy Node support.
 - **Auto-generated API docs** -- see [`docs/API.md`](docs/API.md) for complete input/output tables generated from the test suite.

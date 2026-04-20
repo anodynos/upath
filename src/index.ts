@@ -204,7 +204,10 @@ upath.VERSION = __UPATH_VERSION__
 // Re-export path types for consumers
 // ---------------------------------------------------------------------------
 
-export type { ParsedPath, FormatInputPathObject, PlatformPath } from 'node:path'
+export type { ParsedPath, FormatInputPathObject } from 'node:path'
+
+// PlatformPath was removed in @types/node >= 25. Derive from the import for cross-version compat.
+export type PlatformPath = typeof path
 
 // ---------------------------------------------------------------------------
 // Typed named exports — gives consumers IDE autocompletion + type safety
@@ -230,8 +233,8 @@ export const sep = upath.sep as '/'
 export const delimiter = upath.delimiter as string
 
 // Platform objects (pass-through)
-export const posix = upath.posix as path.PlatformPath
-export const win32 = upath.win32 as path.PlatformPath
+export const posix = upath.posix as PlatformPath
+export const win32 = upath.win32 as PlatformPath
 
 // Version
 export const VERSION = upath.VERSION as string
@@ -243,7 +246,7 @@ export { toUnix, normalizeSafe, normalizeTrim, joinSafe, addExt, trimExt, remove
 // Default export — the full upath object, typed as the union of path + extras
 // ---------------------------------------------------------------------------
 
-export interface UPath extends path.PlatformPath {
+export interface UPath extends PlatformPath {
   VERSION: string
   sep: '/'
   toUnix(p: string): string
