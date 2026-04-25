@@ -79,7 +79,7 @@
     "lint:types": "npx tsc --noEmit",
     "prepublishOnly": "npm run build",
     "test:integration": "npm run build && node test/integration/cjs-test.cjs && node test/integration/esm-test.mjs",
-    "prepare": "husky",
+    "prepare": "git config core.hooksPath .husky && chmod +x .husky/pre-commit 2>/dev/null || true",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish"
