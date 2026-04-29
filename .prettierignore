@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+coverage/
+package*.json
+
+# Markdown handled by remark (AZ-970)
+*.md
+*.mdc
+*.mdx
