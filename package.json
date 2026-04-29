@@ -84,7 +84,8 @@
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish",
     "format:md": "remark . --output --silently-ignore --ext md --ext mdc",
-    "postinstall": "find node_modules -path '*/mdast-util-to-markdown/lib/unsafe.js' -exec cp node_modules/@neozen/mdast-util-to-markdown/lib/unsafe.js {} \\; && cp node_modules/@neozen/mdast-util-gfm-autolink-literal/lib/index.js node_modules/mdast-util-gfm-autolink-literal/lib/index.js && cp node_modules/@neozen/mdast-util-gfm-strikethrough/lib/index.js node_modules/mdast-util-gfm-strikethrough/lib/index.js && cp node_modules/@neozen/mdast-util-gfm-footnote/lib/index.js node_modules/mdast-util-gfm-footnote/lib/index.js"
+    "postinstall": "find node_modules -path '*/mdast-util-to-markdown/lib/unsafe.js' -exec cp node_modules/@neozen/mdast-util-to-markdown/lib/unsafe.js {} \\; && cp node_modules/@neozen/mdast-util-gfm-autolink-literal/lib/index.js node_modules/mdast-util-gfm-autolink-literal/lib/index.js && cp node_modules/@neozen/mdast-util-gfm-strikethrough/lib/index.js node_modules/mdast-util-gfm-strikethrough/lib/index.js && cp node_modules/@neozen/mdast-util-gfm-footnote/lib/index.js node_modules/mdast-util-gfm-footnote/lib/index.js",
+    "format": "prettier --write \"**/*.{ts,js,json}\" && npm run format:md"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs,cjs,json,css,scss,yaml,yml,html}": "prettier --write",
