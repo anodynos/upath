@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 [ "${HUSKY-}" = "0" ] && exit 0
-# Merge commits run pre-merge-commit, NOT pre-commit (git >= 2.24) — without this the
-# corpus-empty guard (AZ-1755/AZ-1756) would miss merge ingress.
-bash "$(dirname -- "$0")/corpus-empty-guard.sh" || exit 1
+# Merge commits run pre-merge-commit, NOT pre-commit (git >= 2.24). Guard lives in AgenZen — AZ-1755/AZ-1756.
+AZ_HOOK="../../.husky/pre-commit"
+[ -f "$AZ_HOOK" ] || { echo "⚠ not mounted under AgenZen — corpus guard skipped" >&2; exit 0; }
+exec bash "$AZ_HOOK"
