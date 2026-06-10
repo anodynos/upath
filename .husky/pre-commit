@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 [ "${HUSKY-}" = "0" ] && exit 0
+# Corpus-empty guard (AZ-1755/AZ-1756) — blocks commits that gut tracked files.
+bash "$(dirname -- "$0")/corpus-empty-guard.sh" || exit 1
 # If lint-staged not in PATH (no local node_modules), use main worktree's
 if ! command -v lint-staged >/dev/null 2>&1; then
   MAIN_WT=$(git worktree list --porcelain | head -1 | sed 's/worktree //')

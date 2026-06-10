@@ -83,12 +83,12 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish",
-    "format:md": "remark . --output --silently-ignore --ext md --ext mdc",
+    "format:md": "node scripts/format-md-mounted-shim.cjs --write",
+    "format:check:md": "node scripts/format-md-mounted-shim.cjs --check",
     "format": "prettier --write \"**/*.{ts,js,json}\" && npm run format:md"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx,mjs,cjs,json,css,scss,yaml,yml,html}": "prettier --write",
-    "*.{md,mdc}": "remark --output --silently-ignore"
+    "*.{ts,tsx,js,jsx,mjs,cjs,json,css,scss,yaml,yml,html}": "prettier --write"
   },
   "devDependencies": {
     "@changesets/cli": "^2.30.0",
