@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 [ "${HUSKY-}" = "0" ] && exit 0
 # Merge commits run pre-merge-commit, NOT pre-commit (git >= 2.24). Guard lives in AgenZen — AZ-1755/AZ-1756.
-AZ_HOOK="$(dirname -- "$0")/../../../.husky/pre-commit"
+AZ_HOOK="$(git rev-parse --path-format=absolute --git-common-dir)/../../../.husky/pre-commit"
 [ -f "$AZ_HOOK" ] || { echo "⚠ not mounted under AgenZen — corpus guard skipped" >&2; exit 0; }
 exec bash "$AZ_HOOK"
