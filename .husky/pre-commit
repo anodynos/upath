@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 [ "${HUSKY-}" = "0" ] && exit 0
 # Corpus-empty guard lives in AgenZen — ONE implementation, trampolined (AZ-1755/AZ-1756).
-AZ_HOOK="../../.husky/pre-commit"
+AZ_HOOK="$(dirname -- "$0")/../../../.husky/pre-commit"
 if [ -f "$AZ_HOOK" ]; then bash "$AZ_HOOK" || exit 1; else echo "⚠ not mounted under AgenZen — corpus guard skipped" >&2; fi
 # If lint-staged not in PATH (no local node_modules), use main worktree's
 if ! command -v lint-staged >/dev/null 2>&1; then
