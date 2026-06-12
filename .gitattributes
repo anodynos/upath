@@ -139,3 +139,8 @@ LICENSE text eol=lf
 # Databases
 *.sqlite binary
 *.db binary
+
+## PM merge strategies — eliminate mechanical conflicts (AZ-1483/AZ-1716)
+# Append-only PM-infra files: union merge takes all lines from both sides.
+**/project-management/.mutation-log.jsonl merge=union
+**/project-management/.sync-manifest.yaml merge=union
