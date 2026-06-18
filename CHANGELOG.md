@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- **README revamped** -- pain-first API docs showing `path` vs `upath` behavior side-by-side, inspired by the v2-era docs. Every extra function now explains _why_ it exists (what `path` does wrong).
+- **README revamped** -- pain-first API docs showing `path` vs `upath` behavior side-by-side, inspired by the v2-era docs. Every extra function now explains *why* it exists (what `path` does wrong).
 - **Deterministic `docs/API.md` generation** -- test files are now sorted by name before the doc reporter processes them, eliminating spurious diffs caused by Jest's non-deterministic parallel execution order.
 
 ### Fixed
@@ -59,4 +59,5 @@ Patch releases for CI/CD setup (Copybara bidirectional sync, Trusted Publishing 
 - Test framework changed to Jest with ts-jest.
 
 [3.0.6]: https://github.com/anodynos/upath/compare/v3.0.5...v3.0.6
+
 [3.0.0]: https://github.com/anodynos/upath/releases/tag/v3.0.0

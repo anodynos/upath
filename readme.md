@@ -199,7 +199,7 @@ upath.trimExt('../my/file.longExt') // '../my/file.longExt' (too long, not an ex
 
 **The pain:** `path.basename('file.json', '.js')` turns `'file.json'` into `'file.json'`? Actually no -- it turns `'file.js'` into `'file'` but it also corrupts `'file.json'` into... wait, it depends on the platform. Just use `removeExt`.
 
-Removes the specific `ext` from `filename`, if present -- and _only_ that exact extension:
+Removes the specific `ext` from `filename`, if present -- and *only* that exact extension:
 
 ```typescript
 upath.removeExt('file.js', '.js') // 'file'
