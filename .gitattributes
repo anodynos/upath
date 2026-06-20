@@ -144,3 +144,8 @@ LICENSE text eol=lf
 # Append-only PM-infra files: union merge takes all lines from both sides.
 **/project-management/.mutation-log.jsonl merge=union
 **/project-management/.sync-manifest.yaml merge=union
+
+## PM merge strategies — eliminate mechanical conflicts (AZ-1483/AZ-1716)
+# Append-only PM-infra files: union merge takes all lines from both sides.
+**/project-management/.pm-audit.jsonl merge=union
+**/project-management/.health-history.jsonl merge=union
