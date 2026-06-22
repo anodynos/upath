@@ -71,6 +71,10 @@ describe('upath safe functions', () => {
       // Root edge cases
       ['/', '/'],
       ['//', '/'],
+      // The `//./` DOS-device/UNC root is structural, like `/`, so its
+      // trailing slash must be kept (otherwise normalizeTrim is not idempotent).
+      ['//.//', '//./'],
+      ['//./', '//./'],
     ]
 
     test.each(cases)('normalizeTrim(%j) → %j', (input, expected) => {
