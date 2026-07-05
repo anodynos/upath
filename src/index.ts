@@ -81,11 +81,11 @@ function normalizeSafe(p: string): string {
 
 /**
  * Like `normalizeSafe` but also trims a trailing slash (unless the path is
- * root `/`).
+ * root `/` or the `//./` DOS-device/UNC root).
  */
 function normalizeTrim(p: string): string {
   p = normalizeSafe(p)
-  if (p.endsWith('/') && p.length > 1) {
+  if (p.endsWith('/') && p.length > 1 && p !== '//./') {
     return p.slice(0, -1)
   }
   return p
