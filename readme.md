@@ -239,6 +239,7 @@ upath is a foundational dependency in the Node.js ecosystem, trusted by **1,300+
 - [**Chokidar**](https://github.com/paulmillr/chokidar) -- the file watcher behind Webpack, Vite, Rollup, and most dev servers
 - [**Nuxt**](https://github.com/nuxt/nuxt) -- the Vue.js framework (v2)
 - [**ansi-colors**](https://github.com/doowb/ansi-colors) -- terminal color styling
+- [**renovate**](https://github.com/renovatebot/renovate) -- automated dependency update tool
 - Countless Webpack plugins, build tools, and CLI frameworks
 
 If you run `npm ls upath` in a non-trivial Node.js project, there's a good chance it's already there.
