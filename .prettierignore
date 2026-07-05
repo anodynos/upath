@@ -4,7 +4,7 @@ build/
 coverage/
 package*.json
 
-# Markdown handled by remark (AZ-970)
+# Markdown is not auto-formatted
 *.md
 *.mdc
 *.mdx

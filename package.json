@@ -83,16 +83,13 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish",
-    "format:md": "node \"$(git rev-parse --path-format=absolute --git-common-dir)/../../../scripts/mounted/format-md-mounted-shim.cjs\" --write",
-    "format:check:md": "node \"$(git rev-parse --path-format=absolute --git-common-dir)/../../../scripts/mounted/format-md-mounted-shim.cjs\" --check",
-    "format": "prettier --write \"**/*.{ts,js,json}\" && npm run format:md"
+    "format": "prettier --write \"**/*.{ts,js,json}\""
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs,cjs,json,css,scss,yaml,yml,html}": "prettier --write"
   },
   "devDependencies": {
     "@changesets/cli": "^2.30.0",
-    "@neozen/remark-config": "^1.0.0-neozen.1",
     "@eslint/js": "^10.0.1",
     "@types/jest": "^29.5.0",
     "@types/node": ">=20.0.0",
@@ -102,19 +99,10 @@
     "jest": "^29.7.0",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.1",
-    "remark-cli": "^12.0.1",
-    "remark-frontmatter": "^5.0.0",
-    "remark-gfm": "^4.0.1",
     "ts-jest": "^29.2.0",
     "ts-node": "^10.9.2",
     "tsup": "^8.0.0",
     "typescript": "^5.5.0",
     "typescript-eslint": "^8.58.0"
-  },
-  "overrides": {
-    "mdast-util-gfm-autolink-literal": "npm:@neozen/mdast-util-gfm-autolink-literal@^2.0.1-neozen.1",
-    "mdast-util-gfm-footnote": "npm:@neozen/mdast-util-gfm-footnote@^2.1.0-neozen.1",
-    "mdast-util-gfm-strikethrough": "npm:@neozen/mdast-util-gfm-strikethrough@^2.0.0-neozen.1",
-    "mdast-util-to-markdown": "npm:@neozen/mdast-util-to-markdown@^2.1.2-neozen.1"
   }
 }
