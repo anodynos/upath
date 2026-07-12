@@ -34,7 +34,7 @@ jobs:
         run: |
           VERSION=$(node -p "require('./package.json').version")
           TAG="v${VERSION}"
-          if ! git rev-parse "$TAG" >/dev/null 2>&1; then
+          if ! git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
             git tag "$TAG"
             git push origin "$TAG"
           fi
