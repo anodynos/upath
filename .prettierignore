@@ -8,3 +8,7 @@ package*.json
 *.md
 *.mdc
 *.mdx
+
+# Machine-generated PM artifacts — never reformat (AZ-2224 / HARMONY with AZ root)
+.sync-manifest.yaml
+.mutation-log.jsonl
