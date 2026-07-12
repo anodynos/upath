@@ -83,7 +83,9 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish",
-    "format": "prettier --write \"**/*.{ts,js,json}\""
+    "format": "prettier --write \"**/*.{ts,js,json}\"",
+    "format:md": "node \"$(git rev-parse --path-format=absolute --git-common-dir)/../../../scripts/mounted/format-md-mounted-shim.cjs\" --write",
+    "format:check:md": "node \"$(git rev-parse --path-format=absolute --git-common-dir)/../../../scripts/mounted/format-md-mounted-shim.cjs\" --check"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs,cjs,json,css,scss,yaml,yml,html}": "prettier --write"
